@@ -1,1 +1,2 @@
-# pinydesk
+# pinydesk database manager
+

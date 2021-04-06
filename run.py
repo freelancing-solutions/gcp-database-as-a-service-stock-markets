@@ -1,5 +1,5 @@
 import os
-from pinydesk import create_app
+from pinydesk.main import create_app
 
 app = create_app()
 print("App Running")
