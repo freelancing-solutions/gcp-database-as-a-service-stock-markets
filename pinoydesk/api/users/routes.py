@@ -136,9 +136,9 @@ def check_password() -> tuple:
         given a password in json check if it matches the hash in file
     :return:
     """
-    user_data = request.get_json()
-    uid = user_data.get('uid')
-    password = user_data('password')
+    user_data: dict = request.get_json()
+    uid: str = user_data.get('uid')
+    password: str = user_data.get('password')
     user_view_instance: UserView = UserView()
     return user_view_instance.check_password(uid=uid, password=password)
 
@@ -149,8 +149,8 @@ def de_activate_user() -> tuple:
         given uid in json de-activate user
     :return: json as tuple
     """
-    user_data = request.get_json()
-    uid = user_data.get('uid')
+    user_data: dict = request.get_json()
+    uid: str = user_data.get('uid')
     user_view_instance: UserView = UserView()
     return user_view_instance.deactivate_user(uid=uid)
 

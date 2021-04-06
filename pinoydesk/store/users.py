@@ -1,7 +1,7 @@
+import typing
 from google.cloud import ndb
 from flask import current_app
 from werkzeug.security import generate_password_hash
-
 from pinoydesk.utils.utils import timestamp
 
 
@@ -83,12 +83,12 @@ class UserModel(ndb.Model):
             raise ValueError('invalid membership')
 
         if membership in self.membership_list:
-            membership_list: list = self.membership_list.split(sep=",")
+            membership_list: typing.List[str] = self.membership_list.split(sep=",")
             membership_list.remove(membership)
             self.membership_list = ",".join(membership_list)
         return False
 
-    def get_membership(self) -> list:
+    def get_membership(self) -> typing.List[str]:
         return self.membership_list.split(",")
 
     def set_access_rights(self, access_right: str) -> bool:
@@ -103,7 +103,7 @@ class UserModel(ndb.Model):
             raise ValueError('invalid access right')
 
         if access_right in self.access_rights_list:
-            access_list: list = self.access_rights_list.split(",")
+            access_list: typing.List[str] = self.access_rights_list.split(",")
             access_list.remove(access_right)
             self.access_rights_list = ",".join(access_list)
             return True
