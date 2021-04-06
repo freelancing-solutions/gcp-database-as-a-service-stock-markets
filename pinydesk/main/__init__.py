@@ -8,9 +8,11 @@ def create_app(config_class=Config):
     from pinydesk.api.users.routes import users_bp
     from pinydesk.api.stocks.routes import stocks_bp
     from pinydesk.api.settings.routes import settings_bp
+    from pinydesk.handlers.routes import handlers_bp
     
     app.register_blueprint(users_bp)
     app.register_blueprint(stocks_bp)
     app.register_blueprint(settings_bp)
+    app.register_blueprint(handlers_bp)
 
     return app

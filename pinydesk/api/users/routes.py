@@ -8,7 +8,7 @@ users_bp = Blueprint('users', __name__)
 def create_user() -> tuple:
     """
         given user details create new user
-    :return:
+    :return: json response as tuple
     """
     # created new user
     user_data: dict = request.get_json()
@@ -27,7 +27,7 @@ def user(path: str) -> tuple:
     """
         update or get a specific user by uid
     :param path:
-    :return:
+    :return: json response as tuple
     """
     if request.method == "GET":
         # get a specific user
@@ -50,7 +50,7 @@ def users(path: str) -> tuple:
     """
         get all , active or in-active users
     :param path:
-    :return:
+    :return: json response as tuple
     """
     if path == "all":
         users_view_instance: UserView = UserView()
@@ -67,30 +67,78 @@ def users(path: str) -> tuple:
 
 @users_bp.route('/api/v1/get-user-email/<path:path>', methods=['GET'])
 def get_user_email(path: str) -> tuple:
+    """
+
+    :param path:
+    :return: json response as tuple
+    """
     users_view_instance: UserView = UserView()
     return users_view_instance.get_user(email=path)
 
 
 @users_bp.route('/api/v1/get-user-cell/<path:path>', methods=['GET'])
 def get_user_cell(path: str) -> tuple:
+    """
+        given cell number return user details
+    :param path:
+    :return: json response as tuple
+    """
     users_view_instance: UserView = UserView()
     return users_view_instance.get_user(cell=path)
 
 
+@users_bp.route('/api/v1/get-user-uid/<path:path>', methods=['GET'])
+def get_user_uid(path: str) -> tuple:
+    """
+        given a user uid return user details
+    :param path:
+    :return: json response as tuple
+    """
+    users_view_instance: UserView = UserView()
+    return users_view_instance.get_user(uid=path)
+
+
 @users_bp.route('/api/v1/delete-user-cell/<path:path>', methods=['DELETE'])
 def delete_user_cell(path: str) -> tuple:
+    """
+        given a user cell number delete user
+    :param path:
+    :return: json response as tuple
+    """
     users_view_instance: UserView = UserView()
     return users_view_instance.delete_user(cell=path)
 
 
 @users_bp.route('/api/v1/delete-user-email/<path:path>', methods=['DELETE'])
 def delete_user_email(path: str) -> tuple:
+    """
+        given a user email address delete user
+    :param path:
+    :return: json response as tuple
+    """
     users_view_instance: UserView = UserView()
     return users_view_instance.delete_user(email=path)
 
 
 @users_bp.route('/api/v1/delete-user-uid/<path:path>', methods=['DELETE'])
 def delete_user_uid(path: str) -> tuple:
+    """
+        given a user uid delete user details
+    :param path:
+    :return: json response as tuple
+    """
     users_view_instance: UserView = UserView()
     return users_view_instance.delete_user(uid=path)
 
+
+@users_bp.route('/api/v1/check-password', methods=["POST"])
+def check_password() -> tuple:
+    """
+        given a password in json check if it matches the hash in file
+    :return:
+    """
+    user_data = request.get_json()
+    uid = user_data.get('uid')
+    password = user_data('password')
+    user_view_instance: UserView = UserView()
+    return user_view_instance.check_password(uid=uid, password=password)

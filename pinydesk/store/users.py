@@ -1,5 +1,5 @@
 from google.cloud import ndb
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, jsonify
 
 
@@ -7,7 +7,7 @@ class UserView:
     def __init__(self):
         self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
 
-    def add_user(self, names, surname, cell, email, password, uid=None) -> tuple:
+    def add_user(self, names: str, surname: str, cell: str, email: str, password: str, uid: str = None) -> tuple:
         """
             create new user
         :param names:
@@ -37,7 +37,7 @@ class UserView:
                 '''
                 return jsonify({'status': False, 'message': message}), 500
             try:
-                user_instance = UserModel()
+                user_instance: UserModel = UserModel()
                 if uid:
                     user_instance.set_uid(uid=uid)
                 user_instance.set_names(names=names)
@@ -52,7 +52,7 @@ class UserView:
             except TypeError as e:
                 return jsonify({"status": False, "message": e}), 500
 
-    def update_user(self, uid, names, surname, cell, email) -> tuple:
+    def update_user(self, uid: str, names: str, surname: str, cell: str, email: str) -> tuple:
         """
             update user details
         :param uid:
@@ -82,7 +82,7 @@ class UserView:
             else:
                 return jsonify({'status': False, 'message': 'user not found cannot update user details'}), 500
 
-    def delete_user(self, uid=None, email=None, cell=None):
+    def delete_user(self, uid: str = None, email: str = None, cell: str = None) -> tuple:
         """
             given either, uid, email or cell delete user
         :param uid:
@@ -111,7 +111,7 @@ class UserView:
                     return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
             return jsonify({'status': False, 'message': 'user not found'}), 500
 
-    def get_active_users(self):
+    def get_active_users(self) -> tuple:
         """
             return a list of all users
         :return:
@@ -121,7 +121,7 @@ class UserView:
             return jsonify(
                 {'status': True, 'payload': users_list, 'message': 'successfully retrieved active users'}), 200
 
-    def get_in_active_users(self):
+    def get_in_active_users(self) -> tuple:
         """
             return a list of non active users
         :return:
@@ -131,7 +131,7 @@ class UserView:
             return jsonify(
                 {'status': True, 'payload': users_list, 'message': 'successfully retrieved active users'}), 200
 
-    def get_all_users(self):
+    def get_all_users(self) -> tuple:
         """
             get a list of all users
         :return:
@@ -141,7 +141,7 @@ class UserView:
             message: str = 'successfully retrieved active users'
             return jsonify({'status': True, 'payload': users_list, 'message': message}), 200
 
-    def get_user(self, uid=None, cell=None, email=None):
+    def get_user(self, uid: str = None, cell: str = None, email: str = None) -> tuple:
         """
             return a user either by uid, cell or email
         :param uid:
@@ -168,20 +168,38 @@ class UserView:
                     message: str = 'successfully retrieved user by email'
                     return jsonify({'status': True, 'payload': users_list[0], 'message': message}), 200
 
-            return jsonify({'status': False, 'message': 'to retrieve a user either submit an email, cell or user id'}), 500
+            return jsonify(
+                {'status': False, 'message': 'to retrieve a user either submit an email, cell or user id'}), 500
+
+    def check_password(self, uid: str, password: str) -> tuple:
+        with self.client.context():
+            if uid is None:
+                return jsonify({'status': False, 'message': 'please submit user id'}), 500
+            if password is None:
+                return jsonify({'status': False, 'message': 'please submit password'}), 500
+
+            users_list = UserModel.query(UserModel.uid == uid).fetch()
+            if len(users_list) > 0:
+                user_instance: UserModel = users_list[0]
+                if check_password_hash(password=password, pwhash=user_instance.password) is True:
+                    return jsonify({'status': True, 'message': 'passwords match'}), 200
+                else:
+                    return jsonify({'status': False, 'message': 'passwords do not match'}), 200
+            else:
+                return jsonify({'status': False, 'message': 'user not found'}), 200
 
 
 class UserModel(ndb.Model):
-    uid = ndb.StringProperty()
-    names = ndb.StringProperty()
-    surname = ndb.StringProperty()
-    cell = ndb.StringProperty()
-    email = ndb.StringProperty()
-    password = ndb.StringProperty()
-    membership_list = ndb.StringProperty()
-    access_rights = ndb.StringProperty()
-    is_active = ndb.StringProperty()
-    time_registered = ndb.IntegerProperty()
+    uid: str = ndb.StringProperty()
+    names: str = ndb.StringProperty()
+    surname: str = ndb.StringProperty()
+    cell: str = ndb.StringProperty()
+    email: str = ndb.StringProperty()
+    password: str = ndb.StringProperty()
+    membership_list: str = ndb.StringProperty()
+    access_rights: str = ndb.StringProperty()
+    is_active: bool = ndb.BooleanProperty()
+    time_registered: int = ndb.IntegerProperty()
 
     def set_uid(self, uid: str) -> bool:
         if uid is None:
@@ -238,14 +256,14 @@ class UserModel(ndb.Model):
         return True
 
     def set_membership(self, membership: str) -> bool:
-        if not membership in current_app.config.DEFAULT_MEMBERSHIP_LIST:
+        if membership not in current_app.config.DEFAULT_MEMBERSHIP_LIST:
             raise ValueError('invalid membership')
 
         self.membership_list += "," + membership
         return True
 
-    def remove_membership(self, membership) -> bool:
-        if not membership in current_app.config.DEFAULT_MEMBERSHIP_LIST:
+    def remove_membership(self, membership: str) -> bool:
+        if membership not in current_app.config.DEFAULT_MEMBERSHIP_LIST:
             raise ValueError('invalid membership')
 
         if membership in self.membership_list:
@@ -257,15 +275,15 @@ class UserModel(ndb.Model):
     def get_membership(self) -> list:
         return self.membership_list.split(",")
 
-    def set_access_rights(self, access_right) -> bool:
-        if not access_right in current_app.config.DEFAULT_ACCESS_RIGHTS:
+    def set_access_rights(self, access_right: str) -> bool:
+        if access_right not in current_app.config.DEFAULT_ACCESS_RIGHTS:
             raise ValueError('invalid access right')
 
         self.access_rights += "," + access_right
         return True
 
-    def remove_access_right(self, access_right) -> bool:
-        if not access_right in current_app.config.DEFAULT_ACCESS_RIGHTS:
+    def remove_access_right(self, access_right: str) -> bool:
+        if access_right not in current_app.config.DEFAULT_ACCESS_RIGHTS:
             raise ValueError('invalid access right')
 
         if access_right in self.access_rights:
