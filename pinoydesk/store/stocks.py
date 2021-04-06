@@ -1,9 +1,10 @@
 from google.cloud import ndb
 import datetime
 from pinoydesk.config import Config
+from pinoydesk.utils.utils import create_id
 
 
-class Stock(ndb.Model):
+class StockModel(ndb.Model):
     """
         remember to set timezone info when saving date
         id,
@@ -38,19 +39,10 @@ class Stock(ndb.Model):
     symbol: str = ndb.StringProperty()
     date_created: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
 
-    def set_exchange_name(self, exchange) -> bool:
-        if exchange == "":
-            raise ValueError('exchange name cannot be null')
 
-        if not isinstance(exchange, str):
-            raise TypeError('Exchange can only be a String')
-
-        self.exchange_name = exchange
-        return True
-
-
-class Buys(ndb.Model):
+class BuyModel(ndb.Model):
     stock_id: str = ndb.StringProperty()
+    transaction_id: str = ndb.StringProperty()
     date: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
     buy_volume: int = ndb.IntegerProperty(default=0)
     buy_value: int = ndb.IntegerProperty(default=0)
@@ -58,9 +50,17 @@ class Buys(ndb.Model):
     buy_market_val_percent: int = ndb.IntegerProperty(default=0)
     buy_trade_count: int = ndb.IntegerProperty(default=0)
 
+    def set_transaction_id(self):
+        """
+            an id to match buy volume sell volume and net volume
+        :return:
+        """
+        self.transaction_id = create_id()
 
-class Sell(ndb.Model):
+
+class SellVolumeModel(ndb.Model):
     stock_id: str = ndb.StringProperty()
+    transaction_id: str = ndb.StringProperty()
     date: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
     sell_volume: int = ndb.IntegerProperty(default=0)
     sell_value: int = ndb.IntegerProperty(default=0)
@@ -71,9 +71,9 @@ class Sell(ndb.Model):
 
 class NetVolumeModel(ndb.Model):
     stock_id: str = ndb.StringProperty()
+    transaction_id: str = ndb.StringProperty()
     date: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
     net_volume: int = ndb.IntegerProperty(default=0)
     net_value: int = ndb.IntegerProperty(default=0)
     total_volume: int = ndb.IntegerProperty(default=0)
     total_value: int = ndb.IntegerProperty(default=0)
-    
