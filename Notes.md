@@ -10,7 +10,7 @@ which will be utilized by GCP Functions
 - Will manage database instances for
     - stocks
     - users
-    - settings
+    - settings    
    
 - Text from PDF Extractor
     - will run as GCP Function
