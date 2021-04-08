@@ -1,7 +1,7 @@
 from google.cloud import ndb
 import datetime
 from flask import current_app, jsonify
-from pinoydesk.store.stocks import Stock, Broker, StockModel, BuyVolumeModel
+from pinoydesk.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel
 
 
 class StockView:
@@ -87,7 +87,7 @@ class StockView:
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
             if "date" in buy_data and buy_data['date'] != "":
-                date: datetime.datetime = buy_data['date']
+                date: datetime.date = buy_data['date']
             else:
                 return jsonify({'status': False, 'message': "date is required"}), 500
 
@@ -127,4 +127,55 @@ class StockView:
 
             return jsonify({'status': True, 'message': 'Stock Model Successfully created',
                             'payload': buy_volume_instance.to_dict()}), 200
+
+    def create_sell_volume(self, sell_data: dict) -> tuple:
+        with self.client.context():
+            if "stock_id" in sell_data and sell_data['stock_id'] != "":
+                stock_id: str = sell_data['stock_id']
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
+
+            if "date" in sell_data and sell_data["date"] != "":
+                date: datetime.date = sell_data['date']
+            else:
+                return jsonify({'status': False, 'message': "date is required"}), 500
+
+            if "sell_volume" in sell_data and sell_data["sell_volume"] != "":
+                sell_volume: int = int(sell_data["sell_volume"])
+            else:
+                return jsonify({"status": False , "message": "sell volume is required"}), 500
+
+            if "sell_value" in sell_data and sell_data["sell_value"] != "":
+                sell_value: int = int(sell_data["sell_value"])
+            else:
+                return jsonify({"status": False, "message": "sell value is required"}), 500
+
+            if "sell_ave_price" in sell_data and sell_data["sell_ave_price"] != "":
+                sell_ave_price: int = int(sell_data["sell_ave_price"])
+            else:
+                return jsonify({"status": False, "message": "sell ave price is required"}), 500
+
+            if "sell_market_val_percent" in sell_data and sell_data["sell_market_val_percent"] != "":
+                sell_market_val_percent: int = int(sell_data["sell_market_val_percent"])
+            else:
+                return jsonify({"status": False, "message": "sell market value percent price is required"}), 500
+
+            if "sell_trade_count" in sell_data and sell_data["sell_trade_count"] != "":
+                sell_trade_count: int = int(sell_data["sell_trade_count"])
+            else:
+                return jsonify({"status": False, "message": "sell trade account percent price is required"}), 500
+
+            try:
+                sell_volume_instance: SellVolumeModel = SellVolumeModel(stock_id=stock_id, date=date, sell_volume=sell_volume,
+                                                                        sell_value=sell_value, sell_ave_price=sell_ave_price,
+                                                                        sell_market_val_percent=sell_market_val_percent,
+                                                                        sell_trade_count=sell_trade_count)
+                key = sell_volume_instance.put()
+            except ValueError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': e}), 500
+
+            return jsonify({'status': True, 'message': 'Sell Volume Successfully created',
+                            'payload': sell_volume_instance.to_dict()}), 200
 
