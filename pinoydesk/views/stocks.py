@@ -1,7 +1,7 @@
 from google.cloud import ndb
 import datetime
 from flask import current_app, jsonify
-from pinoydesk.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel
+from pinoydesk.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
 
 
 class StockView:
@@ -178,4 +178,59 @@ class StockView:
 
             return jsonify({'status': True, 'message': 'Sell Volume Successfully created',
                             'payload': sell_volume_instance.to_dict()}), 200
+
+    def create_net_volume(self, net_volume_data: dict) -> tuple:
+        with self.client.context():
+            if "stock_id" in net_volume_data and net_volume_data["stock_id"] != "":
+                stock_id: str = net_volume_data["stock_id"]
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
+            if "date" in net_volume_data and net_volume_data['date'] != "":
+                date: datetime.date = net_volume_data['date']
+            else:
+                return jsonify({'status': False, 'message': "date is required"}), 500
+
+            if "transaction_id" in net_volume_data and net_volume_data["transaction_id"] != "":
+                transaction_id: str = net_volume_data["transaction_id"]
+            else:
+                return jsonify({'status': False, 'message': "transaction id is required"}), 500
+
+            if "net_volume" in net_volume_data and net_volume_data["net_volume"] != "":
+                net_volume: int = int(net_volume_data["net_volume"])
+            else:
+                return jsonify({'status': False, 'message': "net volume is required"}), 500
+
+            if "net_value" in net_volume_data and net_volume_data["net_value"] != "":
+                net_value: int = int(net_volume_data["net_value"])
+            else:
+                return jsonify({'status': False, 'message': "net value is required"}), 500
+
+            if "total_value" in net_volume_data and net_volume_data["total_value"] != "":
+                total_value: int = int(net_volume_data["total_value"])
+            else:
+                return jsonify({'status': False, 'message': "total value is required"}), 500
+
+            if "total_volume" in net_volume_data and net_volume_data["total_volume"] != "":
+                total_volume: int = int(net_volume_data['total_volume'])
+            else:
+                return jsonify({'status': False, 'message': "total volume is required"}), 500
+
+            try:
+                net_volume_instance: NetVolumeModel = NetVolumeModel(stock_id=stock_id, transaction_id=transaction_id, date=date,
+                                                                     net_volume=net_volume, net_value=net_value, total_value=total_value,
+                                                                     total_volume=total_volume)
+                key = net_volume_instance.put()
+
+            except ValueError as e:
+                return jsonify({'status': False, 'message': str(e)}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': str(e)}), 500
+
+            return jsonify({'status': True, 'message': 'Net Volume Successfully created',
+                            'payload': net_volume_instance.to_dict()}), 200
+
+
+
+
+
 
