@@ -1,3 +1,4 @@
+import typing
 from google.cloud import ndb
 import datetime
 from flask import current_app, jsonify
@@ -67,20 +68,25 @@ class StockView:
             return jsonify({'status': True, 'message': 'successfully saved broker data',
                             'payload': broker_instance.to_dict()}), 200
 
-    def create_stock_model(self, exchange_id: str, sid: str, stock: Stock, broker: Broker) -> tuple:
+    def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
         with self.client.context():
             try:
+                stock_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
+                stock = [0]
+                broker_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
+                broker = broker_list[0]
                 stock_model_instance = StockModel(exchange_id=exchange_id, sid=sid, stock=stock, broker=broker)
                 key = stock_model_instance.put()
             except ValueError as e:
                 return jsonify({'status': False, 'message': e}), 500
             except TypeError as e:
                 return jsonify({'status': False, 'message': e}), 500
-
+            except KeyError as e:
+                return jsonify({'status': False, 'message': e}), 500
             return jsonify({'status': True, 'message': 'Stock Model Successfully created',
                             'payload': stock_model_instance.to_dict()}), 200
 
-    def add_buy_model(self, buy_data: dict) -> tuple:
+    def create_buy_model(self, buy_data: dict) -> tuple:
         with self.client.context():
             if "stock_id" in buy_data and buy_data['stock_id'] != "":
                 stock_id: str = buy_data['stock_id']

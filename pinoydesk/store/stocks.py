@@ -129,10 +129,6 @@ class BuyVolumeModel(ndb.Model):
     buy_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_trade_count: int = ndb.IntegerProperty(default=0, validator=set_int_property)
 
-    def save(self, client):
-        with client.context():
-            self.put()
-
 
 class SellVolumeModel(ndb.Model):
     """
