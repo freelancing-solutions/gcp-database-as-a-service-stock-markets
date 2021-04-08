@@ -91,7 +91,10 @@ class StockModel(ndb.Model):
     broker = ndb.StructuredProperty(Broker, validator=set_broker)
 
 
-class BuyModel(ndb.Model):
+class BuyVolumeModel(ndb.Model):
+    """
+        daily buy volumes
+    """
 
     def set_stock_id(self, value: str) -> str:
         value = value.strip()
@@ -132,6 +135,9 @@ class BuyModel(ndb.Model):
 
 
 class SellVolumeModel(ndb.Model):
+    """
+        daily sell volumes
+    """
     def set_id(self, value: str) -> str:
         value = value.strip()
         if value is None or value == "":
@@ -166,6 +172,9 @@ class SellVolumeModel(ndb.Model):
 
 
 class NetVolumeModel(ndb.Model):
+    """
+        daily net volume
+    """
     def set_id(self, value: str) -> str:
         value = value.strip()
         if value is None or value == "":

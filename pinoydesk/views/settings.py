@@ -96,7 +96,9 @@ class ExchangeDataView:
             if len(exchange_list) > 0:
                 exchange_instance: ExchangeDataModel = exchange_list[0]
                 payload: typing.List[str] = exchange_instance.exchange_tickers_list
-                return jsonify({'status': True, 'message': 'successfully fetched exchange errors'}), 200
+                return jsonify({'status': True,
+                                'message': 'successfully fetched exchange errors',
+                                'payload': payload}), 200
 
             return jsonify({'status': False, 'message': 'error unable to locate exchange'}), 500
 
