@@ -5,70 +5,40 @@ from pinoydesk.utils.utils import create_id
 
 
 class Stock(ndb.Model):
-    stock_id: str = ndb.StringProperty(required=True, indexed=True)
-    stock_code: str = ndb.StringProperty(required=True, indexed=True)
-    stock_name: str = ndb.StringProperty(required=True)
-    symbol: str = ndb.StringProperty(required=True, indexed=True)
+    def set_string(self, value: str) -> str:
+        value: str = value.strip()
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string".format(self.name))
+        return value
 
-    def set_stock_id(self, stock_id: str) -> bool:
-        stock_id: str = stock_id.strip()
-        if stock_id is None or stock_id == "":
-            raise ValueError('Stock Id cannot be Null')
-        if not isinstance(stock_id, str):
-            raise TypeError("Stock Id can only be a string")
-
-        self.stock_id = stock_id
-        return True
-
-    def set_stock_code(self, stock_code: str) -> bool:
-        stock_code = stock_code.strip()
-        if stock_code is None or stock_code == "":
-            raise ValueError("Stock Code cannot be Null")
-        if not isinstance(stock_code, str):
-            raise TypeError("stock_code may only be a string")
-        self.stock_code = stock_code
-        return True
-
-    def set_stock_name(self, stock_name: str) -> bool:
-        stock_name = stock_name.strip()
-        if stock_name is None or stock_name == "":
-            raise ValueError("Stock Name cannot be Null")
-        if not isinstance(stock_name, str):
-            raise TypeError("Stock Name may only be a string")
-        self.stock_name = stock_name
-        return True
-
-    def set_symbol(self, symbol: str) -> bool:
-        symbol: str = symbol.strip()
-        if symbol is None or symbol == "":
-            raise ValueError("Symbol cannot be Null")
-        if not isinstance(symbol, str):
-            raise TypeError("Symbol can only be a string")
-        self.symbol = symbol
-        return True
+    stock_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
+    stock_code: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
+    stock_name: str = ndb.StringProperty(required=True, validator=set_string)
+    symbol: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
 
 
 class Broker(ndb.Model):
-    broker_id: str = ndb.StringProperty(required=True)
-    broker_code: str = ndb.StringProperty(required=True)
 
-    def set_broker_id(self, broker_id: str) -> bool:
+    def set_id(self, broker_id: str) -> str:
         broker_id = broker_id.strip()
         if broker_id is None or broker_id == "":
-            raise ValueError("Broker ID  cannot be Null")
+            raise ValueError("{}  cannot be Null".format(self.name))
         if not isinstance(broker_id, str):
-            raise TypeError("Broker ID can only be a string")
-        self.broker_id = broker_id
-        return True
+            raise TypeError("{} can only be a string".format(self.name))
+        return broker_id
 
-    def set_broker_code(self, broker_code: str) -> bool:
+    def set_broker_code(self, broker_code: str) -> str:
         broker_code = broker_code.strip()
         if broker_code is None or broker_code == "":
-            raise ValueError("Broker Code cannot be Null")
+            raise ValueError("{} cannot be Null".format(self.name))
         if not isinstance(broker_code, str):
-            raise TypeError("Broker Code can only be a string")
-        self.broker_code = broker_code
-        return True
+            raise TypeError("{} can only be a string".format(self.name))
+        return broker_code
+
+    broker_id: str = ndb.StringProperty(required=True, validator=set_id)
+    broker_code: str = ndb.StringProperty(required=True, validator=set_broker_code)
 
 
 class StockModel(ndb.Model):
@@ -96,76 +66,125 @@ class StockModel(ndb.Model):
         total_volume,
         total_value
     """
-    exchange_id: str = ndb.StringProperty(required=True, indexed=True)
-    sid: str = ndb.StringProperty()
-    stock = ndb.StructuredProperty(Stock)
-    broker = ndb.StructuredProperty(Broker)
 
-    def set_exchange_id(self, exchange_id: str) -> bool:
-        exchange_id: str = exchange_id.strip()
-        if exchange_id is None or exchange_id == "":
-            raise ValueError('exchange id cannot be null')
-        if not isinstance(exchange_id, str):
-            raise TypeError('exchange id may only be a string')
-        self.exchange_id = exchange_id
-        return True
+    def set_id(self, value: str) -> str:
+        value: str = value.strip()
+        if value is None or value == "":
+            raise ValueError('{} cannot be Null'.format(self.name))
+        if not isinstance(value, str):
+            raise TypeError('{} may only be a string'.format(self.name))
+        return value
 
-    def set_id(self, sid: str) -> bool:
-        if sid is None or sid == "":
-            raise ValueError("id cannot be null")
-
-        if not isinstance(sid, str):
-            raise TypeError("id can only be a string")
-        self.sid = sid
-        return True
-
-    def set_stock(self, stock: Stock) -> bool:
+    def set_stock(self, stock: Stock) -> Stock:
         if not isinstance(stock, Stock):
-            raise TypeError('Invalid Stock argument, needs to be an instance of Stock')
-        self.stock = stock
-        return True
+            raise TypeError('{}, needs to be an instance of Stock'.format(self.name))
+        return stock
 
-    def set_broker(self, broker: Broker) -> bool:
+    def set_broker(self, broker: Broker) -> Broker:
         if not isinstance(broker, Broker):
-            raise TypeError("Invalid Broker argument, needs to be an instance of Broker")
-        self.broker = broker
-        return True
+            raise TypeError("{}, Needs to be an instance of Broker".format(self.name))
+        return broker
+
+    exchange_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_id)
+    sid: str = ndb.StringProperty(validator=set_id)
+    stock = ndb.StructuredProperty(Stock, validator=set_stock)
+    broker = ndb.StructuredProperty(Broker, validator=set_broker)
 
 
 class BuyModel(ndb.Model):
-    stock_id: str = ndb.StringProperty()
-    transaction_id: str = ndb.StringProperty()
-    date: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
-    buy_volume: int = ndb.IntegerProperty(default=0)
-    buy_value: int = ndb.IntegerProperty(default=0)
-    buy_ave_price: int = ndb.IntegerProperty(default=0)
-    buy_market_val_percent: int = ndb.IntegerProperty(default=0)
-    buy_trade_count: int = ndb.IntegerProperty(default=0)
 
-    def set_transaction_id(self):
-        """
-            an id to match buy volume sell volume and net volume
-        :return:
-        """
-        self.transaction_id = create_id()
+    def set_stock_id(self, value: str) -> str:
+        value = value.strip()
+        if value is None or value == "":
+            raise ValueError('{} cannot be Null'.format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string".format(self.name))
+        return value
+
+    def set_date(self, value: object) -> object:
+        if isinstance(value, datetime.datetime):
+            return value
+        raise TypeError('{} can only be an object of datetime'.format(self.name))
+
+    def set_int_property(self, value: int) -> int:
+        if value is None or value == "":
+            raise ValueError("{} can not be Null".format(self.name))
+
+        if not isinstance(value, int):
+            raise TypeError("{} can only be an Integer".format(self.name))
+        if value < 0:
+            raise ValueError("{} can only be a positive integer".format(self.name))
+        return value
+
+    transaction_id: str = ndb.StringProperty(indexed=True, required=True, default=create_id())
+    stock_id: str = ndb.StringProperty(validator=set_stock_id)
+    date: object = ndb.DateTimeProperty(auto_now_add=True,
+                                        tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=set_date)
+    buy_volume: int = ndb.IntegerProperty(default=0, validator=set_int_property)
+    buy_value: int = ndb.IntegerProperty(default=0, validator=set_int_property)
+    buy_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int_property)
+    buy_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_int_property)
+    buy_trade_count: int = ndb.IntegerProperty(default=0, validator=set_int_property)
+
+    def save(self, client):
+        with client.context():
+            self.put()
 
 
 class SellVolumeModel(ndb.Model):
-    stock_id: str = ndb.StringProperty()
-    transaction_id: str = ndb.StringProperty()
+    def set_id(self, value: str) -> str:
+        value = value.strip()
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string".format(self.name))
+        return value
+
+    def set_int(self, value: int) -> int:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, int):
+            raise TypeError("{} can only be a string".format(self.name))
+        return value
+
+    def set_transaction_id(self, transaction_id: str) -> str:
+        transaction_id = transaction_id.strip()
+        if transaction_id is None or transaction_id == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(transaction_id, str):
+            raise TypeError("{} can only be a str".format(self.name))
+        return transaction_id
+    transaction_id: str = ndb.StringProperty(indexed=True, validator=set_transaction_id)
+
+    stock_id: str = ndb.StringProperty(validator=set_id)
     date: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
-    sell_volume: int = ndb.IntegerProperty(default=0)
-    sell_value: int = ndb.IntegerProperty(default=0)
-    sell_ave_price: int = ndb.IntegerProperty(default=0)
-    sell_market_val_percent: int = ndb.IntegerProperty(default=0)
-    sell_trade_count: int = ndb.IntegerProperty(default=0)
+    sell_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
+    sell_value: int = ndb.IntegerProperty(default=0, validator=set_int)
+    sell_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int)
+    sell_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_int)
+    sell_trade_count: int = ndb.IntegerProperty(default=0, validator=set_int)
 
 
 class NetVolumeModel(ndb.Model):
-    stock_id: str = ndb.StringProperty()
-    transaction_id: str = ndb.StringProperty()
+    def set_id(self, value: str) -> str:
+        value = value.strip()
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string".format(self.name))
+        return value
+
+    def set_int(self, value: int) -> int:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, int):
+            raise TypeError("{} can only be a string".format(self.name))
+        return value
+
+    stock_id: str = ndb.StringProperty(validator=set_id)
+    transaction_id: str = ndb.StringProperty(validator=set_id)
     date: object = ndb.DateTimeProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
-    net_volume: int = ndb.IntegerProperty(default=0)
-    net_value: int = ndb.IntegerProperty(default=0)
-    total_volume: int = ndb.IntegerProperty(default=0)
-    total_value: int = ndb.IntegerProperty(default=0)
+    net_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
+    net_value: int = ndb.IntegerProperty(default=0, validator=set_int)
+    total_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
+    total_value: int = ndb.IntegerProperty(default=0, validator=set_int)
