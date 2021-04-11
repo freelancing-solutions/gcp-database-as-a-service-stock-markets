@@ -1,5 +1,5 @@
 import os
-from pinoydesk.main import create_app
+from data_service.main import create_app
 
 data_service = create_app()
 

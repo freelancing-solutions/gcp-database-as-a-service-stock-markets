@@ -12,8 +12,7 @@
 # below:
 .git
 .gitignore
-*.docx
-
+*.pyc
 # Python pycache:
 __pycache__/
 # Ignored by the build system
