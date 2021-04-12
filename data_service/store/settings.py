@@ -199,4 +199,3 @@ class StockAPIEndPointModel(ndb.Model):
         self.api_key = api_key
         return True
 
-
