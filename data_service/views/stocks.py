@@ -259,6 +259,50 @@ class StockView:
             return jsonify({'status': True, 'message': message,
                             'payload': net_volume_instance.to_dict()}), 200
 
+    def update_stock_data(self, stock_data: dict) -> tuple:
+        with self.client.context():
+
+            if 'stock_id' in stock_data and stock_data['stock_id'] != "":
+                stock_id: str = stock_data.get('stock_id') or None
+            else:
+                stock_id = create_id(size=12)
+            if 'stock_code' in stock_data and stock_data['stock_code'] != "":
+                stock_code: str = stock_data.get('stock_code') or None
+            else:
+                return jsonify({'status': False, 'message': 'Stock Code is required'}), 500
+
+            if 'stock_name' in stock_data and stock_data['stock_name'] != "":
+                stock_name: str = stock_data.get('stock_name') or None
+            else:
+                return jsonify({'status': False, 'message': 'Stock Name is required'}), 500
+            if 'symbol' in stock_data and stock_data['symbol'] != "":
+                symbol: str = stock_data.get('symbol') or None
+            else:
+                return jsonify({'status': False, 'message': 'Stock Symbol is required'}), 500
+
+            try:
+                stock_instance_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
+                if len(stock_instance_list) > 0:
+                    stock_instance: Stock = stock_instance_list[0]
+                    stock_instance.stock_id = stock_id
+                    stock_instance.stock_code = stock_code
+                    stock_instance.stock_name = stock_name
+                    stock_instance.symbol = symbol
+                    key = stock_instance.put()
+                    if key is not None:
+                        return jsonify({'status': True, 'payload': stock_instance.to_dict(), 'message': 'successfully updated stock'}), 200
+                    else:
+                        return jsonify({'status': False, 'message': 'Something snapped'}), 500
+
+            except ValueError as e:
+                return jsonify({'status': False, 'message': str(e)}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': str(e)}), 500
+            except KeyError as e:
+                return jsonify({'status': False, 'message': str(e)}), 500
+
+    
+
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
             with either stock_id or stock_code or symbol return stock_data
