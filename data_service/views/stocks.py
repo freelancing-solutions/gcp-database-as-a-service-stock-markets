@@ -61,7 +61,8 @@ class StockView:
                 return jsonify({'status': False, 'message': 'Broker Code is required'}), 500
             if "broker_name" in broker_data and broker_data['broker_name'] != "":
                 broker_name: str = broker_data.get("broker_name")
-
+            else:
+                return jsonify({'status': False, 'message': 'Broker Name is required'}), 500
             try:
                 broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code, broker_name=broker_name)
                 key = broker_instance.put()
@@ -301,7 +302,42 @@ class StockView:
             except KeyError as e:
                 return jsonify({'status': False, 'message': str(e)}), 500
 
-    
+    def update_broker_data(self, broker_data: dict) -> tuple:
+        with self.client.context():
+
+            if "broker_id" in broker_data and broker_data['broker_id'] != "":
+                broker_id: str = broker_data.get('broker_id') or None
+            else:
+                broker_id: str = create_id(size=12)
+            if "broker_code" in broker_data and broker_data['broker_code'] != "":
+                broker_code: str = broker_data.get('broker_code') or None
+            else:
+                return jsonify({'status': False, 'message': 'Broker Code is required'}), 500
+            if "broker_name" in broker_data and broker_data['broker_name'] != "":
+                broker_name: str = broker_data.get("broker_name")
+            else:
+                return jsonify({'status': False, 'message': 'Broker Name is required'}), 500
+
+            try:
+                broker_instance_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
+                if isinstance(broker_instance_list, list) and len(broker_instance_list) > 0:
+                    broker_instance: Broker = broker_instance_list[0]
+                    broker_instance.broker_id = broker_id
+                    broker_instance.broker_code = broker_code
+                    broker_instance.broker_name = broker_name
+                    key = broker_instance.put()
+                    if key is not None:
+                        return jsonify({'status': True, 'payload': broker_instance.to_dict(),
+                                        'message': 'broker instance updated successfully'}), 200
+                    else:
+                        return jsonify({'status': False, 'message': 'while updating broker something snapped'}), 500
+
+            except ValueError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except KeyError as e:
+                return jsonify({'status': False, 'message': e}), 500
 
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
