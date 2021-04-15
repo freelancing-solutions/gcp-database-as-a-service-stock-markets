@@ -339,6 +339,9 @@ class StockView:
             except KeyError as e:
                 return jsonify({'status': False, 'message': e}), 500
 
+    def update_stock_model(self, stock_model: dict) -> tuple:
+        pass
+
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
             with either stock_id or stock_code or symbol return stock_data
