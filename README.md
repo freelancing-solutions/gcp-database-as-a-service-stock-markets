@@ -38,7 +38,7 @@
     
     This will be done in the following manner.
     --
-    1. Through catching JSON Responses from database queries with Service Workers registered on Cloud Flare.     
+    1. ***Through catching JSON Responses*** from database queries with Service Workers registered on Cloud Flare.     
         - The data-service is able to purge the cached data through an API call.
         - The Cache will expired through a predetermined time(TTL) if a purge was not triggered.
     2. Through Catching Requests for data on the browser through a service worker registered on each client browser.
