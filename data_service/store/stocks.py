@@ -59,7 +59,7 @@ class Broker(ndb.Model):
     def set_id(self, broker_id: str) -> str:
         broker_id = broker_id.strip()
         if broker_id is None or broker_id == "":
-            raise ValueError("{}  cannot be Null".format(self.name))
+            broker_id = create_id(size=12)
         if not isinstance(broker_id, str):
             raise TypeError("{} can only be a string".format(self.name))
         return broker_id
@@ -72,8 +72,17 @@ class Broker(ndb.Model):
             raise TypeError("{} can only be a string".format(self.name))
         return broker_code
 
+    def set_broker_name(self, broker_name: str) -> str:
+        broker_name = broker_name.strip()
+        if broker_name is None or broker_name == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(broker_name, str):
+            raise TypeError("{} can only be a string".format(self.name))
+        return broker_name
+
     broker_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_id)
     broker_code: str = ndb.StringProperty(required=True, indexed=True, validator=set_broker_code)
+    broker_name: str = ndb.StringProperty(required=True, validator=set_broker_name)
 
     def __eq__(self, other) -> bool:
         if self.broker_id != other.broker_id:

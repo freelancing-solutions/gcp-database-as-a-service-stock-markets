@@ -12,18 +12,18 @@ api_list_type = typing.List[StockAPIEndPointModel]
 
 class UserSettingsView:
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project='pinoydesk')
 
 
 class AdminSettingsView:
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project='pinoydesk')
 
 
 class ExchangeDataView:
 
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project='pinoydesk')
 
     def add_exchange(self, country: str = None, name: str = None) -> tuple:
         with self.client.context():
@@ -129,7 +129,7 @@ class ExchangeDataView:
 
 class ScrappingPagesView:
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project='pinoydesk')
 
     def return_scrappers_settings(self) -> tuple:
         with self.client.context():
@@ -205,7 +205,7 @@ class ScrappingPagesView:
 
 class StockAPIEndPointView:
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project='pinoydesk')
 
 
 

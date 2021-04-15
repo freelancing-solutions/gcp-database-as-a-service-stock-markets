@@ -9,7 +9,7 @@ class Config:
     DEFAULT_MEMBERSHIP_LIST = ["member"]
     DEFAULT_ACCESS_RIGHTS = ["visitor", "user", "super_user", "admin"]
     ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL") or config("ADMIN_EMAIL")
-    UTC_OFFSET = datetime.timedelta(hours=2)
+    UTC_OFFSET = datetime.timedelta(hours=4)
     DATA_SOURCE_TYPES = ['api', 'scrape']
     PUBSUB_VERIFICATION_TOKEN=os.environ.get("os.environ.get") or config("PUBSUB_VERIFICATION_TOKEN")
 

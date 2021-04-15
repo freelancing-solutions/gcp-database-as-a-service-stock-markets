@@ -3,16 +3,16 @@ from google.cloud import ndb
 import datetime
 from flask import current_app, jsonify
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
-from data_service.utils.utils import date_string_to_date
-
+from data_service.utils.utils import date_string_to_date, create_id
+from data_service.config import Config
 stock_list_type = typing.List[Stock]
 
 
 class StockView:
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project="pinoydesk")
         with current_app.app_context():
-            self.timezone = datetime.timezone(current_app.config.UTC_OFFSET)
+            self.timezone = datetime.timezone(Config.UTC_OFFSET)
 
     def create_stock_data(self, stock_data: dict) -> tuple:
         with self.client.context():
@@ -20,7 +20,7 @@ class StockView:
             if 'stock_id' in stock_data and stock_data['stock_id'] != "":
                 stock_id: str = stock_data.get('stock_id') or None
             else:
-                return jsonify({'status': False, 'message': 'Stock Id is required'}), 500
+                stock_id = create_id(size=12)
             if 'stock_code' in stock_data and stock_data['stock_code'] != "":
                 stock_code: str = stock_data.get('stock_code') or None
             else:
@@ -54,15 +54,16 @@ class StockView:
             if "broker_id" in broker_data and broker_data['broker_id'] != "":
                 broker_id: str = broker_data.get('broker_id') or None
             else:
-                return jsonify({'status': False, 'message': 'Broker ID is required'}), 500
-
+                broker_id: str = create_id(size=12)
             if "broker_code" in broker_data and broker_data['broker_code'] != "":
                 broker_code: str = broker_data.get('broker_code') or None
             else:
-                return jsonify({'status': False, 'message': 'Broker ID is required'}), 500
+                return jsonify({'status': False, 'message': 'Broker Code is required'}), 500
+            if "broker_name" in broker_data and broker_data['broker_name'] != "":
+                broker_name: str = broker_data.get("broker_name")
 
             try:
-                broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code)
+                broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code, broker_name=broker_name)
                 key = broker_instance.put()
             except ValueError as e:
                 return jsonify({'status': False, 'message': e}), 500
