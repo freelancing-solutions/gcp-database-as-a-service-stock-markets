@@ -5,6 +5,7 @@ from flask import current_app, jsonify
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
 from data_service.utils.utils import date_string_to_date, create_id
 from data_service.config import Config
+
 stock_list_type = typing.List[Stock]
 
 
@@ -218,7 +219,7 @@ class StockView:
                 return jsonify({'status': False, 'message': "date is required"}), 500
 
             if "transaction_id" in net_volume_data and net_volume_data["transaction_id"] != "":
-                transaction_id: str = net_volume_data.get("transaction_id")  or None
+                transaction_id: str = net_volume_data.get("transaction_id") or None
             else:
                 return jsonify({'status': False, 'message': "transaction id is required"}), 500
 
@@ -291,7 +292,8 @@ class StockView:
                     stock_instance.symbol = symbol
                     key = stock_instance.put()
                     if key is not None:
-                        return jsonify({'status': True, 'payload': stock_instance.to_dict(), 'message': 'successfully updated stock'}), 200
+                        return jsonify({'status': True, 'payload': stock_instance.to_dict(),
+                                        'message': 'successfully updated stock'}), 200
                     else:
                         return jsonify({'status': False, 'message': 'Something snapped'}), 500
 
@@ -340,7 +342,52 @@ class StockView:
                 return jsonify({'status': False, 'message': e}), 500
 
     def update_stock_model(self, stock_model: dict) -> tuple:
-        pass
+        with self.client.context():
+            if 'transaction_id' in stock_model and stock_model['transaction_id'] != "":
+                transaction_id: str = stock_model['transaction_id']
+            else:
+                return jsonify({'status': False, 'message': 'transaction_id is required'}), 500
+
+            if 'exchange_id' in stock_model and stock_model['exchange_id'] != "":
+                exchange_id: str = stock_model['exchange_id']
+            else:
+                return jsonify({'status': False, 'message': 'exchange_id is required'}), 500
+
+            if 'stock' in stock_model and stock_model['stock'] != "":
+                stock: Stock = stock_model['stock']
+            else:
+                return jsonify({'status': False, 'message': 'stock is required'}), 500
+
+            if 'broker' in stock_model and stock_model['broker'] != "":
+                broker: Broker = stock_model['broker']
+            else:
+                return jsonify({'status': False, 'message': 'Broker is required'}), 500
+            try:
+                stock_model_list: typing.List[StockModel] = StockModel.query(
+                    StockModel.transaction_id == transaction_id).fetch()
+
+                if isinstance(stock_model_list, list) and len(stock_model_list) > 0:
+                    stock_model = stock_model_list[0]
+                    stock_model.transaction_id = transaction_id
+                    stock_model.exchange_id = exchange_id
+                    stock_model.stock = stock
+                    stock_model.broker = broker
+                    key = stock_model.put()
+                    if key is not None:
+                        return jsonify({'status': True, 'payload': stock_model.to_dict(),
+                                        'message': 'stock model is update'}), 200
+                    else:
+                        return jsonify(
+                            {'status': False, 'message': 'Something snapped while updating stock model'}), 500
+                else:
+                    return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
+
+            except ValueError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except KeyError as e:
+                return jsonify({'status': False, 'message': e}), 500
 
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
@@ -378,7 +425,7 @@ class StockView:
     def get_all_stocks(self) -> tuple:
         with self.client.context():
             stock_list: typing.List[dict] = [stock.to_dict() for stock in Stock.query().fetch()]
-            return jsonify({"status": True, "payload": stock_list, "message": "stocks returns" }), 200
+            return jsonify({"status": True, "payload": stock_list, "message": "stocks returns"}), 200
 
     def get_broker_data(self, broker_id: str = None, broker_code: str = None) -> tuple:
         """
@@ -428,7 +475,7 @@ class StockView:
                         "status": False, "message": "stock found",
                         "payload": stock_model_list[0].to_dict()
                     }), 200
-                
+
                 return jsonify({"status": False, "message": "that transaction does not exist"}), 500
 
             return jsonify({"status": False, "message": "transaction id is required"}), 500
@@ -542,7 +589,7 @@ class StockView:
                     NetVolumeModel.date == date, NetVolumeModel.stock_id == stock_id).fetch()
             else:
                 message: str = "net volume data not found"
-                return jsonify({"status": False,  "message": message}), 500
+                return jsonify({"status": False, "message": message}), 500
 
             payload: typing.List[dict] = [net_volume.to_dict() for net_volume in net_volume_list]
             message: str = "successfully fetched net volume"
@@ -572,4 +619,3 @@ class StockView:
 
             message: str = "net volume data not found"
             return jsonify({"status": True, "payload": payload, "message": message}), 500
-
