@@ -462,6 +462,81 @@ class StockView:
             except KeyError as e:
                 return jsonify({'status': False, 'message': e}), 500
 
+    def update_sell_volume(self, sell_data: dict) -> tuple:
+        with self.client.context():
+            if "stock_id" in sell_data and sell_data['stock_id'] != "":
+                stock_id: str = sell_data.get('stock_id') or None
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
+
+            if "date" in sell_data and sell_data["date"] != "":
+                try:
+                    date: object = date_string_to_date(sell_data.get('date'))
+                except ValueError as e:
+                    date: object = datetime.date(datetime.datetime.now())
+            else:
+                return jsonify({'status': False, 'message': "date is required"}), 500
+
+            if "sell_volume" in sell_data and sell_data["sell_volume"] != "":
+                sell_volume: int = int(sell_data.get("sell_volume"))
+            else:
+                return jsonify({"status": False, "message": "sell volume is required"}), 500
+
+            if "sell_value" in sell_data and sell_data["sell_value"] != "":
+                sell_value: int = int(sell_data.get("sell_value"))
+            else:
+                return jsonify({"status": False, "message": "sell value is required"}), 500
+
+            if "sell_ave_price" in sell_data and sell_data["sell_ave_price"] != "":
+                sell_ave_price: int = int(sell_data.get("sell_ave_price"))
+            else:
+                return jsonify({"status": False, "message": "sell ave price is required"}), 500
+
+            if "sell_market_val_percent" in sell_data and sell_data["sell_market_val_percent"] != "":
+                sell_market_val_percent: int = int(sell_data.get("sell_market_val_percent"))
+            else:
+                return jsonify({"status": False, "message": "sell market value percent price is required"}), 500
+
+            if "sell_trade_count" in sell_data and sell_data["sell_trade_count"] != "":
+                sell_trade_count: int = int(sell_data.get("sell_trade_count"))
+            else:
+                return jsonify({"status": False, "message": "sell trade account percent price is required"}), 500
+
+            if 'transaction_id' in sell_data and sell_data['transaction_id'] != "":
+                transaction_id: str = sell_data.get('transaction_id')
+            else:
+                return jsonify({'status': False, 'message': 'transaction_id is required'}), 500
+
+            try:
+                sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
+                    SellVolumeModel.transaction_id == transaction_id).fetch()
+
+                if isinstance(sell_volume_list, list) and len(sell_volume_list) > 0:
+                    sell_volume: SellVolumeModel = sell_volume_list[0]
+                    sell_volume.stock_id = stock_id
+                    sell_volume.date = date
+                    sell_volume.sell_volume = sell_volume
+                    sell_volume.sell_value = sell_value
+                    sell_volume.sell_ave_price = sell_ave_price
+                    sell_volume.sell_market_val_percent = sell_market_val_percent
+                    sell_volume.sell_trade_count = sell_trade_count
+                    sell_volume.transaction_id = transaction_id
+                    key = sell_volume.put()
+
+                    if key is not None:
+                        return jsonify({'status': True, 'payload': sell_volume.to_dict(),
+                                        'message': 'sell volume successfully updated'}), 200
+
+                    else:
+                        return jsonify({'status': False, 'message': 'something snapped updating sell volume'}), 500
+
+            except ValueError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except KeyError as e:
+                return jsonify({'status': False, 'message': e}), 500
+
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
             with either stock_id or stock_code or symbol return stock_data
