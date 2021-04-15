@@ -389,9 +389,78 @@ class StockView:
             except KeyError as e:
                 return jsonify({'status': False, 'message': e}), 500
 
-    def update_buy_model(self, buy_model: dict) -> tuple:
-        pass
+    def update_buy_volume(self, buy_data: dict) -> tuple:
 
+        with self.client.context():
+            if "stock_id" in buy_data and buy_data['stock_id'] != "":
+                stock_id: str = buy_data.get('stock_id') or None
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
+            if "date" in buy_data and buy_data['date'] != "":
+                # TODO- insure that FORMAT is DD_MM-YYYY
+                try:
+                    date: object = date_string_to_date(buy_data.get('date'))
+                except ValueError as e:
+                    date: object = datetime.date(datetime.datetime.now())
+            else:
+                return jsonify({'status': False, 'message': "date is required"}), 500
+
+            if "buy_volume" in buy_data and buy_data['buy_volume'] != "":
+                buy_volume: int = int(buy_data.get('buy_volume'))
+            else:
+                return jsonify({'status': False, 'message': "buy volume is required"}), 500
+
+            if "buy_value" in buy_data and buy_data["buy_value"] != "":
+                buy_value: int = int(buy_data.get("buy_value"))
+            else:
+                return jsonify({'status': False, 'message': "buy value is required"}), 500
+
+            if "buy_ave_price" in buy_data and buy_data["buy_ave_price"] != "":
+                buy_ave_price: int = int(buy_data.get("buy_ave_price"))
+            else:
+                return jsonify({'status': False, 'message': "buy average price is required"}), 500
+
+            if "buy_market_val_percent" in buy_data and buy_data["buy_market_val_percent"] != "":
+                buy_market_val_percent: int = int(buy_data.get("buy_market_val_percent"))
+            else:
+                return jsonify({'status': False, 'message': "buy market value percent is required"}), 500
+
+            if "buy_trade_count" in buy_data and buy_data["buy_trade_count"] != "":
+                buy_trade_count: int = int(buy_data.get("buy_trade_count"))
+            else:
+                return jsonify({'status': False, 'message': "buy trade account"}), 500
+
+            if "transaction_id" in buy_data and buy_data["transaction_id"] != "":
+                transaction_id: str = buy_data.get("transaction_id")
+            else:
+                return jsonify({'status': False, 'message': "Transaction ID"}), 500
+
+            try:
+                buy_transactions_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(BuyVolumeModel.transaction_id == transaction_id).fetch()
+                if isinstance(buy_transactions_list, list) > 0:
+                    buy_instance: BuyVolumeModel = buy_transactions_list[0]
+                    buy_instance.stock_id = stock_id
+                    buy_instance.date = date
+                    buy_instance.buy_volume = buy_volume
+                    buy_instance.buy_value = buy_value
+                    buy_instance.buy_ave_price = buy_ave_price
+                    buy_instance.buy_market_val_percent = buy_market_val_percent
+                    buy_instance.buy_trade_count = buy_trade_count
+                    key = buy_instance.put()
+                    if key is not None:
+                        return jsonify({'status': True, 'payload':buy_instance.to_dict(),
+                                        'message': 'successfully updated buy_volume'}), 200
+                    else:
+                        return jsonify({'status': False, 'message': 'something snapped while updating buy volumes'}), 500
+                else:
+                    return jsonify({'status': False, 'message': 'buy volume not found'}), 500
+
+            except ValueError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except TypeError as e:
+                return jsonify({'status': False, 'message': e}), 500
+            except KeyError as e:
+                return jsonify({'status': False, 'message': e}), 500
 
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
