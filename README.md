@@ -1,9 +1,9 @@
-#### Pinoy-Desk database as a service
+#### GCP Based Database as a service
 
-     Pinoy-Desk Database as a Service is intended
-     for you use by Pinoy Desk's Several applications
-     hosted as microservices. in Google Cloud Platform.
- 
+The purpose of the project is to make it easy to use datastore database on 
+GCP Platform with several of its cloud platform offerings such as GCP by offering a single end point from which to 
+access data.
+
  **How it Works?**
  --
      by creating API endpoints for databases hosted in Google Cloud Platform this service is able to 
