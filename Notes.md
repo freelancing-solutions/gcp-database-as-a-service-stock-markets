@@ -3,7 +3,7 @@ End of day stock data for the phillipines
 https://www.pseapi.com/
 
 
-PinyDesk database manager will run as an 
+database manager will run as an 
 app engine instance and expose API's
 which will be utilized by GCP Functions
 
