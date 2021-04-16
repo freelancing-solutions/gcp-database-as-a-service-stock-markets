@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-
+from data_service.main import cache_stock_buys_sells, default_timeout
 from data_service.utils.utils import date_string_to_date
 from data_service.views.stocks import StockView
 
@@ -55,6 +55,7 @@ def stocks(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/all/<path:path>', methods=['POST'])
+@cache_stock_buys_sells.cached(timeout=3600)
 def stocks_all(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     if path == "stocks":
@@ -68,6 +69,7 @@ def stocks_all(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/daily/<path:path>', methods=['POST'])
+@cache_stock_buys_sells.cached(timeout=default_timeout)
 def daily_stocks(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     if path == "buy-volumes":
@@ -84,6 +86,7 @@ def daily_stocks(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/item/<path:path>', methods=['POST'])
+@cache_stock_buys_sells.cached(timeout=default_timeout)
 def stock_item(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     if path == "stock":
@@ -126,6 +129,7 @@ def stock_item(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/day-volumes/<path:path>', methods=['POST'])
+@cache_stock_buys_sells.cached(timeout=default_timeout)
 def day_volumes(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     if path == "buy-volumes":

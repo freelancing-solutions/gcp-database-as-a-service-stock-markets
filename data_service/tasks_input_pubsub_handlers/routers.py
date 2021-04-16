@@ -19,7 +19,7 @@ def save_api_stock_data() -> tuple:
     """
     stock_data: dict = request.get_json()
     stock_view_instance: StockView = StockView()
-    return stock_view_instance.add_api_stock_data(stock_data=stock_data)
+    return stock_view_instance.create_stock_data(stock_data=stock_data)
 
 
 @task_bp.route('/task/stocks/scraped/save', methods=['POST'])
@@ -32,7 +32,7 @@ def save_scraped_stock_data() -> tuple:
     """
     stock_data: dict = request.get_json()
     stock_view_instance: StockView = StockView()
-    return stock_view_instance.add_scrapped_stock_data(stock_data=stock_data)
+    return stock_view_instance.create_stock_data(stock_data=stock_data)
 
 
 @task_bp.route('/task/stocks/pdf/save', methods=['POST'])
@@ -43,4 +43,4 @@ def save_scraped_pdf_data() -> tuple:
     """
     stock_data: dict = request.get_json()
     stock_view_instance: StockView = StockView()
-    return stock_view_instance.add_scrapped_pdf_data(stock_data=stock_data)
+    return stock_view_instance.create_stock_data(stock_data=stock_data)

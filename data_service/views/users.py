@@ -62,9 +62,9 @@ class UserView:
                                 "payload": user_instance.to_dict()
                                 }), 200
             except ValueError as e:
-                return jsonify({"status": False, "message": e}), 500
+                return jsonify({"status": False, "message": str(e)}), 500
             except TypeError as e:
-                return jsonify({"status": False, "message": e}), 500
+                return jsonify({"status": False, "message": str(e)}), 500
 
     def update_user(self, uid: str, names: str, surname: str, cell: str, email: str) -> tuple:
         """
@@ -90,9 +90,9 @@ class UserView:
                     user_instance.put()
                     return jsonify({'status': True, 'message': 'successfully updated user details'}), 200
                 except ValueError as e:
-                    return jsonify({"status": False, "message": e}), 500
+                    return jsonify({"status": False, "message": str(e)}), 500
                 except TypeError as e:
-                    return jsonify({"status": False, "message": e}), 500
+                    return jsonify({"status": False, "message": str(e)}), 500
             else:
                 return jsonify({'status': False, 'message': 'user not found cannot update user details'}), 500
 

@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-
 from data_service.views.settings import ExchangeDataView, ScrappingPagesView
 
 settings_bp = Blueprint('settings_bp', __name__)

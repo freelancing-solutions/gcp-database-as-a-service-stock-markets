@@ -20,9 +20,9 @@ class ScrapperView:
                     scrapper_instance.data = scrapper_data.get('data')
                     scrapper_instance.put()
                 except ValueError as e:
-                    return jsonify({'status': False, 'message': e}), 500
+                    return jsonify({'status': False, 'message': str(e)}), 500
                 except TypeError as e:
-                    return jsonify({'status': False, 'message': e}), 500
+                    return jsonify({'status': False, 'message': str(e)}), 500
 
         else:
             return jsonify({'status': False, 'message': "invalid data format"}), 500
@@ -39,9 +39,9 @@ class ScrapperView:
                     else:
                         return jsonify({"status": False, "message": "scrapper data already deleted"}), 500
                 except ValueError as e:
-                    return jsonify({"status": False, "message": e}), 500
+                    return jsonify({"status": False, "message": str(e)}), 500
                 except TypeError as e:
-                    return jsonify({"status": False, "message": e}), 500
+                    return jsonify({"status": False, "message": str(e)}), 500
         else:
             return jsonify({"status": False, "message": "Invalid data_id format"}), 500
 

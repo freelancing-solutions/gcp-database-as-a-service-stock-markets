@@ -50,6 +50,9 @@ class Stock(ndb.Model):
     def __str__(self) -> str:
         return "<Stock stock_code: {}, symbol: {}".format(self.stock_code, self.symbol)
 
+    def __repr__(self):
+        return "{}".format(self.stock_id)
+
 
 class Broker(ndb.Model):
     """
