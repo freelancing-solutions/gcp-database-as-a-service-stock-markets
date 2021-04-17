@@ -20,13 +20,17 @@ class PlanValidators:
 
     @staticmethod
     def plan_exist(plan_id: str) -> bool:
-        plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(MembershipPlans.plan_id == plan_id).fetch()
+        plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(
+            MembershipPlans.plan_id == plan_id).fetch()
         if isinstance(plan_instance_list, list) and len(plan_instance_list) > 0:
             return True
         return False
 
 
 class Memberships(ndb.Model):
+    """
+        TODO - add validators
+    """
     uid = ndb.StringProperty()
     plan_id = ndb.StringProperty()
     status = ndb.StringProperty()  # Paid/ Unpaid
@@ -37,6 +41,7 @@ class Memberships(ndb.Model):
 class MembershipPlans(ndb.Model):
     """
         contains a definition of all membership plans
+        TODO - add validators
 
     """
     plan_id = ndb.StringProperty()
@@ -52,5 +57,8 @@ class MembershipPlans(ndb.Model):
 
 
 class AccessRights(ndb.Model):
+    """
+        TODO - add validators
+    """
     plan_id = ndb.StringProperty()
     access_rights_list = ndb.StringProperty(repeated=True)  # a list containing the rights of users

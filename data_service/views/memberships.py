@@ -152,35 +152,71 @@ class MembershipsView(Validators):
         with self.client.context():
             membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
             response_data: typing.List[dict] = [member.to_dict() for member in membership_list]
-            if isinstance(response_data,list) and len(response_data):
-                return jsonify({'status': True, 'payload': response_data[0], 'message': 'successfully fetched members'}), 200
+            if isinstance(response_data, list) and len(response_data):
+                return jsonify(
+                    {'status': True, 'payload': response_data[0], 'message': 'successfully fetched members'}), 200
             else:
                 return jsonify({'status': False, 'message': 'user does not have any membership plan'}), 500
-
 
     def payment_amount(self, uid: str) -> tuple:
         """
             for a specific user return payment amount
         """
-        pass
+        with self.client.context():
+            membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
+            if isinstance(membership_list, list) and len(membership_list) > 0:
+                membership_instance: Memberships = membership_list[0]
+                plan_id = membership_instance.plan_id
+                membership_plan_instance: MembershipPlans = MembershipPlansView().get_plan(plan_id=plan_id)
+                if membership_plan_instance is None:
+                    return jsonify({'status': False, 'message': 'could not find plan associate with the plan_id'}), 500
+                amount_data: dict = {
+                    'term_payment_amount': membership_plan_instance.term_payment_amount,
+                    'registration_amount': membership_plan_instance.registration_amount}
+                message: str = 'successfully returned payment details'
+                return jsonify({'status': True, 'payload': amount_data, 'message': message}), 200
 
-    def set_payment_status(self, uid: str, status: bool) -> tuple:
+    def set_payment_status(self, uid: str, status: str) -> tuple:  # status is paid or unpaid
         """
             for a specific user set payment status
         """
-        pass
+        with self.client.context():
+            try:
+                membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
+                if isinstance(membership_list, list) and len(membership_list) > 0:
+                    membership_instance: Memberships = membership_list[0]
+                    membership_instance.status = status
+                    key = membership_instance.put()
+                    if key is None:
+                        message: str = 'for some reason we are unable to set payment status'
+                        return jsonify({'status': False, 'message': message}), 500
 
+            except ValueError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except TypeError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except BadRequestError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except BadQueryError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
 
+            return jsonify({'status': False, 'message': 'payment status has been successfully set',
+                            'payload': membership_instance.to_dict()}), 200
 
 
 class MembershipPlansView:
     def __init__(self):
-        pass
+        self.client = ndb.Client(namespace="main", project=current_app.config.get('PROJECT'))
 
     def add_plan(self, membership_name: str, description: str, schedule_day: int, schedule_term: str) -> tuple:
         pass
 
-    def update_plan(self, plan_id, membership_name: str, description: str, schedule_day: int, schedule_term: str) -> tuple:
+    def update_plan(self, plan_id, membership_name: str, description: str, schedule_day: int,
+                    schedule_term: str) -> tuple:
         pass
 
     def set_plan_status(self, plan_id: str, status: bool) -> tuple:
@@ -188,16 +224,23 @@ class MembershipPlansView:
 
     def return_monthly_plans(self) -> tuple:
         pass
-    
+
     def return_quarterly_plan(self) -> tuple:
         pass
 
     def return_annual_plans(self) -> tuple:
         pass
 
+    def get_plan(self, plan_id) -> typing.Union[None, MembershipPlans]:
+        with self.client.context():
+            membership_plans_list: typing.List[MembershipPlans] = MembershipPlans.query(MembershipPlans.plan_id == plan_id).fetch()
+            if isinstance(membership_plans_list, list) and len(membership_plans_list) > 0:
+                membership_instance: MembershipPlans = membership_plans_list[0]
+                return membership_instance
+            else:
+                return None
+
 
 class AccessRightsView:
     def __init__(self):
         pass
-
-
