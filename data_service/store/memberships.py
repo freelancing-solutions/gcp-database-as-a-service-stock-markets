@@ -20,12 +20,28 @@ class PlanValidators:
 
     @staticmethod
     def plan_exist(plan_id: str) -> bool:
+        if not isinstance(plan_id, str):
+            return False
+        plan_id = plan_id.strip()
+        if plan_id == "":
+            return False
         plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(
             MembershipPlans.plan_id == plan_id).fetch()
         if isinstance(plan_instance_list, list) and len(plan_instance_list) > 0:
             return True
         return False
 
+    @staticmethod
+    def plan_name_exist(plan_name: str) -> bool:
+        if not isinstance(plan_name, str):
+            return False
+        plan_name = plan_name.strip().lower()
+        if plan_name == "":
+            return False
+        plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(MembershipPlans.plan_name == plan_name)
+        if isinstance(plan_instance_list, list) and len(plan_instance_list) > 0:
+            return True
+        return False
 
 class Memberships(ndb.Model):
     """
@@ -45,7 +61,7 @@ class MembershipPlans(ndb.Model):
 
     """
     plan_id = ndb.StringProperty()
-    membership_name = ndb.StringProperty()
+    plan_name = ndb.StringProperty()
     description = ndb.StringProperty()
     total_members = ndb.IntegerProperty()
     schedule_day = ndb.IntegerProperty()  # 1 or 2 or 3 of every month or week, or three months

@@ -9,6 +9,8 @@ class UserValidators:
     # Which ever module calls this validators it will provide its own context
     @staticmethod
     def is_user_valid(uid: str) -> bool:
+        if not isinstance(uid, str):
+            return False
         users_instance_list: typing.List[UserModel] = UserModel.query(UserModel.uid == uid).fetch()
         if isinstance(users_instance_list, list) and len(users_instance_list) > 0:
             return True
