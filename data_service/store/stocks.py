@@ -1,4 +1,5 @@
 from google.cloud import ndb
+from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 import datetime
 from data_service.config import Config
 from data_service.utils.utils import create_id

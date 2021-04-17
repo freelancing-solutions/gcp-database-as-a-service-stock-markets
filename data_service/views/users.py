@@ -2,7 +2,6 @@ import typing
 from google.cloud import ndb
 from flask import current_app, jsonify
 from werkzeug.security import check_password_hash
-
 from data_service.config.types import dict_list_type
 from data_service.store.users import UserModel
 from data_service.utils.utils import create_id
@@ -12,7 +11,7 @@ users_type = typing.List[UserModel]
 
 class UserView:
     def __init__(self):
-        self.client = ndb.Client(namespace="main", project=current_app.config.PROJECT)
+        self.client = ndb.Client(namespace="main", project=current_app.config.get('PROJECT'))
 
     def add_user(self, names: str, surname: str, cell: str, email: str, password: str, uid: str = None) -> tuple:
         """

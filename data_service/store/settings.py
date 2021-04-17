@@ -1,4 +1,5 @@
 from google.cloud import ndb
+from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from data_service.config.types import tickers_type, errors_type, timestamps_type
 from data_service.utils.utils import create_id
 

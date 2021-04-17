@@ -1,8 +1,18 @@
+import typing
 from google.cloud import ndb
-from flask import current_app
+from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from werkzeug.security import generate_password_hash
-from data_service.config.types import membership_type, access_rights_type
 from data_service.utils.utils import timestamp
+
+
+class UserValidators:
+    # Which ever module calls this validators it will provide its own context
+    @staticmethod
+    def is_user_valid(uid: str) -> bool:
+        users_instance_list: typing.List[UserModel] = UserModel.query(UserModel.uid == uid).fetch()
+        if isinstance(users_instance_list, list) and len(users_instance_list) > 0:
+            return True
+        return False
 
 
 class UserModel(ndb.Model):
@@ -12,8 +22,6 @@ class UserModel(ndb.Model):
     cell: str = ndb.StringProperty(indexed=True)
     email: str = ndb.StringProperty(indexed=True)
     password: str = ndb.StringProperty()
-    membership_list: membership_type = ndb.StringProperty(repeated=True)
-    access_rights_list: access_rights_type = ndb.StringProperty(repeated=True)
     is_active: bool = ndb.BooleanProperty(default=True)
     time_registered: int = ndb.IntegerProperty(default=timestamp())
 
@@ -70,42 +78,6 @@ class UserModel(ndb.Model):
 
         self.password = generate_password_hash(password, method="pbkdf2:sha256", salt_length=8)
         return True
-
-    def set_membership(self, membership: str) -> bool:
-        if membership not in current_app.config.DEFAULT_MEMBERSHIP_LIST:
-            raise ValueError('invalid membership')
-
-        self.membership_list += membership
-        return True
-
-    def remove_membership(self, membership: str) -> bool:
-        if membership not in current_app.config.DEFAULT_MEMBERSHIP_LIST:
-            raise ValueError('invalid membership')
-        if membership in self.membership_list:
-            self.membership_list.remove(membership)
-        return False
-
-    def get_memberships(self) -> membership_type:
-        return self.membership_list
-
-    def set_access_rights(self, access_right: str) -> bool:
-        if access_right not in current_app.config.DEFAULT_ACCESS_RIGHTS:
-            raise ValueError('invalid access right')
-
-        self.access_rights_list += access_right
-        return True
-
-    def remove_access_right(self, access_right: str) -> bool:
-        if access_right not in current_app.config.DEFAULT_ACCESS_RIGHTS:
-            raise ValueError('invalid access right')
-
-        if access_right in self.access_rights_list:
-            self.access_rights_list.remove(access_rights_type)
-            return True
-        return False
-
-    def get_access_rights(self) -> access_rights_type:
-        return self.access_rights_list
 
     def set_is_active(self, is_active: bool) -> bool:
         if not isinstance(is_active, bool):
