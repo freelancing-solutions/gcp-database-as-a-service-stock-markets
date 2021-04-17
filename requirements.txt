@@ -1,6 +1,7 @@
 bcrypt==3.2.0
 Flask==1.0.2
-Flask-Bcrypt==0.7.1
+Flask-Bcrypt==0.7.
+Flask-Caching==1.9.0
 google-api-core==1.23.0
 google-auth==1.22.1
 google-cloud==0.34.0
