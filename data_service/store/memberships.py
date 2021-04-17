@@ -60,16 +60,58 @@ class MembershipPlans(ndb.Model):
         TODO - add validators
 
     """
-    plan_id = ndb.StringProperty()
-    plan_name = ndb.StringProperty()
-    description = ndb.StringProperty()
-    total_members = ndb.IntegerProperty()
-    schedule_day = ndb.IntegerProperty()  # 1 or 2 or 3 of every month or week, or three months
-    schedule_term = ndb.StringProperty()  # Monthly, Quarterly, Annually
-    term_payment_amount = ndb.IntegerProperty()
-    registration_amount = ndb.IntegerProperty()
+    def set_plan_id(self, value: str) -> str:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string ".format(self.name))
+        if len(value) > 64:
+            raise ValueError("Invalid format for ID")
+        return value.strip()
+
+    def set_string(self, value: str) -> str:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string ".format(self.name))
+        return value.strip()
+
+    def set_schedule_term(self, value: str) -> str:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(self.name))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string ".format(self.name))
+        value = value.strip().lower()
+        if value in ["monthly", "quarterly", "annually"]:
+            return value
+        raise ValueError("Invalid scheduled term")
+
+    def set_schedule_day(self, value: int) -> int:
+        if not isinstance(value, int):
+            raise TypeError('{} can only be an integer'.format(self.name))
+        if not value in [1,2,3,4,5]:
+            raise ValueError('{} can only be between 1 -> 5 of every month'.format(self.name))
+        return value
+
+    def set_number(self, value):
+        if not isinstance(value, int):
+            raise TypeError('{} can only be an integer'.format(self.name))
+
+        if value < 0:
+            raise TypeError("{} no negative numbers".format(self.name))
+
+        return value
+
+    plan_id = ndb.StringProperty(validator=set_plan_id)
+    plan_name = ndb.StringProperty(validator=set_string)
+    description = ndb.StringProperty(validator=set_string)
+    total_members = ndb.IntegerProperty(validator=set_number)
+    schedule_day = ndb.IntegerProperty(validator=set_schedule_day)  # 1 or 2 or 3 of every month or week, or three months
+    schedule_term = ndb.StringProperty(validator=set_schedule_term)  # Monthly, Quarterly, Annually
+    term_payment_amount = ndb.IntegerProperty(validator=set_number)
+    registration_amount = ndb.IntegerProperty(validator=set_number)
     is_active = ndb.BooleanProperty(default=False)
-    date_created = ndb.DateProperty()
+    date_created = ndb.DateProperty(auto_now_add=True)
 
 
 class AccessRights(ndb.Model):

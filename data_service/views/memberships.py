@@ -12,7 +12,7 @@ from data_service.utils.utils import create_id
 
 class Validators(UserValid, PlanValid, MemberValid):
     def __init__(self):
-        self.max_put_retries = 10
+        self.max_put_retries: int = 10
 
     def can_add_member(self, uid: str, plan_id: str, start_date: datetime) -> bool:
         user_valid: bool = self.is_user_valid(uid=uid)
@@ -225,7 +225,7 @@ class MembershipPlansView(Validators):
                  term_payment: int, registration_amount: int, is_active: bool) -> tuple:
         """
             checks to see if the plan actually exists and the new plan name wont cause a conflict with an existing name
-            
+
         """
 
         with self.client.context():
@@ -298,17 +298,48 @@ class MembershipPlansView(Validators):
             return jsonify({'status': True, 'message': 'successfully created new membership plan',
                             'payload': membership_plans_instance.to_dict()}), 200
 
-    def set_plan_status(self, plan_id: str, status: bool) -> tuple:
-        pass
+    def set_is_active(self, plan_id: str, is_active: bool) -> tuple:
+        with self.client.context():
+            try:
+                membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query(
+                    MembershipPlans.plan_id == plan_id).fetch()
+                if isinstance(membership_plan_list, list) and len(membership_plan_list) > 0:
+                    membership_plans_instance: MembershipPlans = membership_plan_list[0]
+                    membership_plans_instance.is_active = is_active
+                    key = membership_plans_instance.put(use_cache=True, retries=self.max_put_retries)
+                    if key is None:
+                        message: str = 'for some reason we are unable to create a new plan'
+                        return jsonify({'status': False, 'message': message}), 500
 
-    def return_monthly_plans(self) -> tuple:
-        pass
+            except ValueError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except TypeError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except BadRequestError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except BadQueryError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
 
-    def return_quarterly_plan(self) -> tuple:
-        pass
+            return jsonify({'status': True, 'message': 'successfully update membership plan status',
+                            'payload': membership_plans_instance.to_dict()}), 200
 
-    def return_annual_plans(self) -> tuple:
-        pass
+    def return_plans_by_schedule_term(self, schedule_term: str) -> tuple:
+        with self.client.context():
+            try:
+                membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query(
+                    MembershipPlans.schedule_term == schedule_term).fetch()
+                payload: typing.List[dict] = [membership.to_dict() for membership in membership_plan_list]
+                return jsonify({'status': False, 'payload': payload, 'message': 'successfully retrieved monthly plans'}), 200
+            except BadRequestError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except BadQueryError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
 
     def get_plan(self, plan_id: str) -> typing.Union[None, MembershipPlans]:
         """
@@ -325,6 +356,11 @@ class MembershipPlansView(Validators):
                     return None
             return None
 
+    def return_plan(self, plan_id: str) -> tuple:
+        plan_instance = self.get_plan(plan_id=plan_id)
+        if plan_instance is not None:
+            return jsonify({'status': True, 'payload': plan_instance.to_dict(), 'message': 'successfully fetched plan'}), 200
+        return jsonify({'status': False, 'message': 'Unable to get plan'}), 500
 
 class AccessRightsView:
     def __init__(self):
