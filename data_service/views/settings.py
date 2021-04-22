@@ -2,8 +2,10 @@ import typing
 from flask import current_app, jsonify
 from google.cloud import ndb
 from data_service.config.types import dict_list_type, tickers_type
+from data_service.main import cache_stock_buys_sells
 from data_service.store.settings import (UserSettingsModel, AdminSettingsModel, ExchangeDataModel,
                                          ScrappingPagesModel, StockAPIEndPointModel)
+from data_service.utils.utils import return_ttl, end_of_month
 
 exc_list_type = typing.List[ExchangeDataModel]
 scrape_list_type = typing.List[ScrappingPagesModel]
@@ -62,6 +64,7 @@ class ExchangeDataView:
             else:
                 return jsonify({'status': False, 'message': 'unable to find the exchange please inform admin'}), 500
 
+    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def get_exchange_tickers(self, exchange_id: str) -> tuple:
         with self.client.context():
             exchange_id: str = exchange_id.strip()
@@ -75,6 +78,7 @@ class ExchangeDataView:
             else:
                 return jsonify({'status': False, 'message': 'Unable to locate exchange'}), 500
 
+    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def get_exchange(self, exchange_id: str) -> tuple:
         with self.client.context():
             exchange_id: str = exchange_id.strip()
@@ -86,6 +90,7 @@ class ExchangeDataView:
                                 'payload': exchange_instance.to_dict()}), 200
             return jsonify({'status': False, 'message': 'error unable to locate exchange'}), 500
 
+    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def return_all_exchanges(self) -> tuple:
         with self.client.context():
             exchange_list: exc_list_type = ExchangeDataModel.query().fetch()
@@ -93,6 +98,7 @@ class ExchangeDataView:
             message: str = 'successfully retrieved Exchanges List'
             return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
+    @cache_stock_buys_sells.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     def return_exchange_errors(self, exchange_id: str) -> tuple:
         with self.client.context():
             exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
@@ -131,6 +137,7 @@ class ScrappingPagesView:
     def __init__(self):
         self.client = ndb.Client(namespace="main", project='pinoydesk')
 
+    @cache_stock_buys_sells.cached(timeout=return_ttl(name='long'), unless=end_of_month)
     def return_scrappers_settings(self) -> tuple:
         with self.client.context():
             scrapping_instance_list: scrape_list_type = ScrappingPagesModel.query().fetch()

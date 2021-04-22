@@ -1,4 +1,6 @@
 import typing
+
+from google.api_core.exceptions import RetryError
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from werkzeug.security import generate_password_hash
@@ -8,10 +10,15 @@ from data_service.utils.utils import timestamp
 class UserValidators:
     # Which ever module calls this validators it will provide its own context
     @staticmethod
-    def is_user_valid(uid: str) -> bool:
+    def is_user_valid(uid: str) -> typing.Union[None, bool]:
         if not isinstance(uid, str):
             return False
-        users_instance_list: typing.List[UserModel] = UserModel.query(UserModel.uid == uid).fetch()
+        try:
+            users_instance_list: typing.List[UserModel] = UserModel.query(UserModel.uid == uid).fetch()
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
         if isinstance(users_instance_list, list) and len(users_instance_list) > 0:
             return True
         return False

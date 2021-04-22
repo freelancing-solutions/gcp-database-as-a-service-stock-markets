@@ -19,6 +19,8 @@ def create_app(config_class=Config):
     from data_service.api.users.routes import users_bp
     from data_service.api.stocks.routes import stocks_bp
     from data_service.api.settings.routes import settings_bp
+    from data_service.api.memberships.routes import memberships_bp
+    from data_service.api.affiliates.routes import affiliates_bp
     from data_service.handlers.routes import default_handlers_bp
     from data_service.api.pubsub.routes import pubsub_bp
     from data_service.api.scrapper.routes import scrapper_bp
@@ -27,6 +29,8 @@ def create_app(config_class=Config):
 
     app.register_blueprint(users_bp)
     app.register_blueprint(stocks_bp)
+    app.register_blueprint(memberships_bp)
+    app.register_blueprint(affiliates_bp)
     app.register_blueprint(settings_bp)
     app.register_blueprint(task_bp)
     app.register_blueprint(scrapper_bp)

@@ -51,8 +51,8 @@ class Stock(ndb.Model):
     def __str__(self) -> str:
         return "<Stock stock_code: {}, symbol: {}".format(self.stock_code, self.symbol)
 
-    def __repr__(self):
-        return "{}".format(self.stock_id)
+    def __repr__(self) -> str:
+        return "<Stock: {}{}{}{}".format(self.stock_id, self.stock_code, self.symbol, self.stock_name)
 
 
 class Broker(ndb.Model):
@@ -89,6 +89,9 @@ class Broker(ndb.Model):
     broker_name: str = ndb.StringProperty(required=True, validator=set_broker_name)
 
     def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+
         if self.broker_id != other.broker_id:
             return False
         if self.broker_code != other.broker_code:
@@ -96,7 +99,10 @@ class Broker(ndb.Model):
         return True
 
     def __str__(self) -> str:
-        return "<Broker broker_code: {}".format(self.broker_code)
+        return "<Broker broker_code: {} {}".format(self.broker_code, self.broker_name)
+
+    def __repr__(self) -> str:
+        return "<Broker: {} {} {}".format(self.broker_id, self.broker_code, self.broker_name)
 
 
 class StockModel(ndb.Model):
@@ -148,6 +154,19 @@ class StockModel(ndb.Model):
     stock = ndb.StructuredProperty(Stock, validator=set_stock)
     broker = ndb.StructuredProperty(Broker, validator=set_broker)
 
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.transaction_id != other.transaction_id:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<Stock_Model: Stock : {} , Broker {}".format(str(self.stock), str(self.broker))
+
+    def __repr__(self) -> str:
+        return "<Stock_Model: {}{}{}".format(self.transaction_id, self.stock.stock_id, self.broker.broker_id)
+
 
 class BuyVolumeModel(ndb.Model):
     """
@@ -162,8 +181,8 @@ class BuyVolumeModel(ndb.Model):
             raise TypeError("{} can only be a string".format(self.name))
         return value
 
-    def set_date(self, value: object) -> object:
-        if isinstance(value, object):
+    def set_date(self, value: datetime.date) -> datetime.date:
+        if isinstance(value, datetime.date):
             return value
         raise TypeError('{} can only be an object of datetime'.format(self.name))
 
@@ -179,12 +198,30 @@ class BuyVolumeModel(ndb.Model):
 
     transaction_id: str = ndb.StringProperty(indexed=True, required=True, default=create_id())
     stock_id: str = ndb.StringProperty(validator=set_stock_id)
-    date: object = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=set_date)
+    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
+                                                   validator=set_date)
     buy_volume: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_value: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_trade_count: int = ndb.IntegerProperty(default=0, validator=set_int_property)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.transaction_id != other.transaction_id:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<Buy_Volume: date_created: {} buy volume: {} , buy value: {}, buy ave price: {}, " \
+               "buy market value percent: {}, buy trade account: {}".format(self.date_created, self.buy_volume,
+                                                                            self.buy_value, self.buy_ave_price,
+                                                                            self.buy_market_val_percent,
+                                                                            self.buy_trade_count)
+
+    def __repr__(self) -> str:
+        return "<Buy_Volume: {}{}{}".format(self.transaction_id, self.stock_id, self.date_created)
 
 
 class SellVolumeModel(ndb.Model):
@@ -217,12 +254,29 @@ class SellVolumeModel(ndb.Model):
 
     stock_id: str = ndb.StringProperty(validator=set_id)
     # Auto now add can be over written
-    date: object = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
+    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
     sell_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_trade_count: int = ndb.IntegerProperty(default=0, validator=set_int)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.transaction_id != other.transaction_id:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<Sell_Volume: Date_Created : {} , sell_volume: {}, sell_value: {}, sell_ave_price: {}, " \
+               "sell_market_val_percent: {}, sell_trade_account: {}".format(self.date_created, self.sell_volume,
+                                                                            self.sell_value, self.sell_ave_price,
+                                                                            self.sell_market_val_percent,
+                                                                            self.sell_trade_count)
+
+    def __repr__(self) -> str:
+        return "Sell_Volume: {} {} {}".format(self.transaction_id, self.stock_id, self.date_created)
 
 
 class NetVolumeModel(ndb.Model):
@@ -246,8 +300,22 @@ class NetVolumeModel(ndb.Model):
 
     stock_id: str = ndb.StringProperty(validator=set_id)
     transaction_id: str = ndb.StringProperty(validator=set_id)
-    date: object = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
+    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
     net_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     net_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     total_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     total_value: int = ndb.IntegerProperty(default=0, validator=set_int)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.transaction_id != other.transaction_id:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<Net_Volume: date_created: {}, net_volume: {}, net_value: {}, total_volume: {}, total_value: {}".format(
+            self.date_created, self.net_volume, self.net_value, self.total_volume, self.total_value)
+
+    def __repr__(self) -> str:
+        return "<Net_Volume: {}{}{}".format(self.date_created, self.transaction_id, self.stock_id)

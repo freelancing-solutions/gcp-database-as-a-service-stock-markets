@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
+
+from data_service.store.exceptions import DataServiceError, InputError
+
 default_handlers_bp = Blueprint('handlers', __name__)
 
 
@@ -41,6 +44,15 @@ def handle_un_authorized_requests(e: Unauthorized) -> tuple:
 @default_handlers_bp.app_errorhandler(HTTPException)
 def handle_http_exception(e: HTTPException) -> tuple:
     return jsonify({'status': False, 'message': 'HTTP Error'}), 503
+
+# Custom Errors
+@default_handlers_bp.app_errorhandler(DataServiceError)
+def handle_data_service_error(e: DataServiceError):
+    return jsonify({'status': False, 'message': e.description}), e.code
+
+@default_handlers_bp.app_errorhandler(InputError)
+def handle_input_error(e: InputError) -> tuple:
+    return jsonify({'status': False, 'message': e.description}), e.code
 
 
 """

@@ -1,5 +1,5 @@
 import os, random, string, time, datetime
-
+from datetime import datetime, date
 import typing
 
 char_set = string.ascii_lowercase + string.digits
@@ -18,19 +18,22 @@ def timestamp() -> int: return int(float(time.time()) * 1000)
 def timestamp_difference(stamp1, stamp2) -> int: return int(stamp1 - stamp2)
 
 
-def date_string_to_date(date: str) -> object:
-    if isinstance(date, str):
-        if "/" in date:
-            date_list: typing.List[str] = date.split("/")
-        elif "-" in date:
-            date_list: typing.List[str] = date.split("-")
+def date_string_to_date(date_str: str) -> date:
+    """
+        date form dd/mm/yyyy
+    """
+    if isinstance(date_str, str):
+        if "/" in date_str:
+            date_list: typing.List[str] = date_str.split("/")
+        elif "-" in date_str:
+            date_list: typing.List[str] = date_str.split("-")
         else:
             raise ValueError('Date format invalid')
         try:
             year: int = int(date_list[2])
             month: int = int(date_list[1])
             day: int = int(date_list[0])
-        except KeyError as e:
+        except KeyError:
             raise ValueError("Date Format invalid")
 
         if 0 < month > 12:
@@ -39,16 +42,34 @@ def date_string_to_date(date: str) -> object:
         if 0 < day > 31:
             raise ValueError("Date Format invalid")
 
-        if 2000 < year > datetime.datetime.now().year:
+        if year < 1990:
             raise ValueError("Date Format invalid")
 
-        return datetime.date(year=year, month=month, day=day)
+        return date(year=year, month=month, day=day)
 
-    elif isinstance(date, object):
-        return date
-
+    elif isinstance(date_str, date):
+        return date_str
     else:
         raise ValueError('Date format invalid')
 
 
+# cache functions
 
+def end_of_month() -> bool:
+    now = datetime.now().date()
+    if now.day in [29, 30, 31, 1, 2, 3]:
+        return True
+    return False
+
+def return_ttl(name) -> int:
+    cache_ttl_short: int = 60 * 60 * 3  # 3 hours
+    cache_ttl_medium: int = 60 * 60 * 6  # 6 hours
+    cache_ttl_long: int = 60 * 60 * 12  # 24 hours
+
+    if name == "long":
+        return cache_ttl_long
+    elif name == "short":
+        return cache_ttl_short
+    elif name == "medium":
+        return cache_ttl_medium
+    return cache_ttl_short
