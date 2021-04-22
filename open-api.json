@@ -1,0 +1,21 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "data-service-api",
+    "description": "exposes endpoints to manage databases for a stock trading platfrom",
+    "contact": {
+      "name": "API Support",
+      "url": "https://api.pinoydesk.com/support",
+      "email": "mobiusndou@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "data-service.pinoydesk.com"
+    }
+  ],
+  "paths": {
+
+  }
+}

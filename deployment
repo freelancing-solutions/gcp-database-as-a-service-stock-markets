@@ -1,0 +1,10 @@
+
+
+open api deployment configs
+
+Validation
+    gcloud endpoints services deploy open-api.json --validate-only
+
+Deploy
+    gcloud endpoints services deploy open-api.json
+

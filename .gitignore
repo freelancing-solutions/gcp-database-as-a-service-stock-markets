@@ -3,3 +3,4 @@ appengine-generated/
 *.yaml
 .env
 *.pyc
+open-api.json

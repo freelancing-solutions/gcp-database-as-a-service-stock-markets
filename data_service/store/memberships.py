@@ -207,7 +207,7 @@ class AccessRights(ndb.Model):
         # of all the routes he or she can access
     """
     plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    access_rights_list = ndb.StringProperty(repeated=True)  # a list containing the rights of users
+    access_rights_list: typing.List[str] = ndb.StringProperty(repeated=True)  # a list containing the rights of users
 
 
 class MembershipDailyStats(ndb.Model):
