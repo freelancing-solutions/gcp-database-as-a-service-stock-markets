@@ -1,5 +1,4 @@
 import typing
-from google.cloud import ndb
 from flask import current_app, jsonify
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
 from google.api_core.exceptions import Aborted, RetryError

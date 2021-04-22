@@ -1,3 +1,4 @@
+from flask import current_app
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 import datetime
@@ -200,6 +201,7 @@ class BuyVolumeModel(ndb.Model):
     stock_id: str = ndb.StringProperty(validator=set_stock_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
                                                    validator=set_date)
+    currency: str = ndb.StringProperty(default=current_app.config.get('CURRENCY'))
     buy_volume: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_value: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int_property)
@@ -255,6 +257,7 @@ class SellVolumeModel(ndb.Model):
     stock_id: str = ndb.StringProperty(validator=set_id)
     # Auto now add can be over written
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
+    currency: str = ndb.StringProperty(default=current_app.config.get('CURRENCY'))
     sell_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int)
@@ -301,6 +304,7 @@ class NetVolumeModel(ndb.Model):
     stock_id: str = ndb.StringProperty(validator=set_id)
     transaction_id: str = ndb.StringProperty(validator=set_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
+    currency: str = ndb.StringProperty(default=current_app.config.get('CURRENCY'))
     net_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     net_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     total_volume: int = ndb.IntegerProperty(default=0, validator=set_int)

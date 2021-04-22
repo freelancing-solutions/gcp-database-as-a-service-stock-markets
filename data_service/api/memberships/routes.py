@@ -84,3 +84,5 @@ def change_membership_plan(plan_id: str) -> tuple:
 
         member_ship_instance_view: MembershipsView = MembershipsView()
         return member_ship_instance_view.change_membership(uid=uid, origin_plan_id=plan_id, dest_plan_id=dest_plan_id)
+
+# TODO - Finish up

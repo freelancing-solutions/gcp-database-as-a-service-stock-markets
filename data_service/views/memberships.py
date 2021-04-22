@@ -7,6 +7,7 @@ from datetime import datetime, date
 from data_service.store.exceptions import DataServiceError
 from data_service.store.memberships import MembershipPlans, AccessRights, Memberships
 from data_service.store.memberships import PlanValidators as PlanValid
+from data_service.store.mixins import AmountMixin
 from data_service.store.users import UserValidators as UserValid
 from data_service.store.memberships import MembershipValidators as MemberValid
 from data_service.utils.utils import create_id, end_of_month, return_ttl
@@ -294,8 +295,8 @@ class MembershipsView(Validators):
                         message: str = 'could not find plan associate with the plan_id'
                         return jsonify({'status': False, 'message': message}), 500
                     amount_data: dict = {
-                        'term_payment_amount': membership_plan_instance.term_payment_amount,
-                        'registration_amount': membership_plan_instance.registration_amount}
+                        'term_payment_amount': str(membership_plan_instance.term_payment_amount),
+                        'registration_amount': str(membership_plan_instance.registration_amount)}
                     message: str = 'successfully returned payment details'
                     return jsonify({'status': True, 'payload': amount_data, 'message': message}), 200
 
@@ -358,7 +359,7 @@ class MembershipPlansView(Validators):
         self.client = ndb.Client(namespace="main", project=current_app.config.get('PROJECT'))
 
     def add_plan(self, plan_name: str, description: str, schedule_day: int, schedule_term: str,
-                 term_payment: int, registration_amount: int, is_active: bool) -> tuple:
+                 term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
         """
             checks to see if the plan actually exists and the new plan name wont cause a conflict with an existing name
 
@@ -367,13 +368,17 @@ class MembershipPlansView(Validators):
             try:
                 if self.can_add_plan(plan_name=plan_name) is True:
                     total_members: int = 0
+                    # Creating Amount Mixins to represent real currency
+                    curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
+                    curr_registration_amount: AmountMixin = AmountMixin(amount=registration_amount, currency=currency)
+
                     plan_instance: MembershipPlans = MembershipPlans(plan_id=create_id(), plan_name=plan_name,
                                                                      description=description,
                                                                      total_members=total_members,
                                                                      schedule_day=schedule_day,
                                                                      schedule_term=schedule_term,
-                                                                     term_payment=term_payment,
-                                                                     registration_amount=registration_amount,
+                                                                     term_payment=curr_term_payment,
+                                                                     registration_amount=curr_registration_amount,
                                                                      is_active=is_active,
                                                                      date_created=datetime.now().date())
                     key = plan_instance.put(use_cache=True, retries=self.max_put_retries)
@@ -407,7 +412,7 @@ class MembershipPlansView(Validators):
                             'payload': plan_instance.to_dict()}), 200
 
     def update_plan(self, plan_id: str, plan_name: str, description: str, schedule_day: int, schedule_term: str,
-                    term_payment: int, registration_amount: int, is_active: bool) -> tuple:
+                    term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
 
         with self.client.context():
             try:
@@ -415,13 +420,17 @@ class MembershipPlansView(Validators):
                     membership_plans_list: typing.List[MembershipPlans] = MembershipPlans.query(
                         MembershipPlans.plan_id == plan_id).fetch()
                     if isinstance(membership_plans_list, list) and len(membership_plans_list) > 0:
+                        curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
+                        curr_registration_amount: AmountMixin = AmountMixin(amount=registration_amount,
+                                                                            currency=currency)
+
                         membership_plans_instance: MembershipPlans = membership_plans_list[0]
                         membership_plans_instance.plan_name = plan_name
                         membership_plans_instance.description = description
                         membership_plans_instance.schedule_day = schedule_day
                         membership_plans_instance.schedule_term = schedule_term
-                        membership_plans_instance.term_payment_amount = term_payment
-                        membership_plans_instance.registration_amount = registration_amount
+                        membership_plans_instance.term_payment_amount = curr_term_payment
+                        membership_plans_instance.registration_amount = curr_registration_amount
                         membership_plans_instance.is_active = is_active
                         key = membership_plans_instance.put(use_cache=True, retries=self.max_put_retries)
                         if key is None:

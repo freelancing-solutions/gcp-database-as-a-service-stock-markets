@@ -14,6 +14,7 @@ class Config:
     PUBSUB_VERIFICATION_TOKEN = os.environ.get("PUBSUB_VERIFICATION_TOKEN") or config("PUBSUB_VERIFICATION_TOKEN")
     DATASTORE_TIMEOUT: int = 3600  # seconds
     DATASTORE_RETRIES: int = 10  # total retries when saving to datastore
+    CURRENCY: str = "$"
 
 
 

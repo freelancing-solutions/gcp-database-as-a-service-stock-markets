@@ -4,6 +4,8 @@ from google.api_core.exceptions import RetryError, Aborted
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
+from data_service.store.mixins import AmountMixin
+
 
 class MembershipValidators:
 
@@ -129,6 +131,11 @@ class ClassSetters:
             raise TypeError("{}, should be boolean".format(self.name))
         return value
 
+    def set_amount(self, value: AmountMixin) -> AmountMixin:
+        if not isinstance(value, AmountMixin):
+            raise TypeError("{}, Amount Invalid".format(self.name))
+        return value
+
 
 class Memberships(ndb.Model):
     """
@@ -138,7 +145,7 @@ class Memberships(ndb.Model):
     plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     status: str = ndb.StringProperty(validator=ClassSetters.set_status)  # Paid/ Unpaid
     date_created: date = ndb.DateTimeProperty(auto_now_add=True,
-                                        validator=ClassSetters.set_datetime)  # the date and time this plan was created
+                                              validator=ClassSetters.set_datetime)
     plan_start_date: date = ndb.DateProperty(validator=ClassSetters.set_datetime)  # the date this plan will become active
 
     def __eq__(self, other) -> bool:
@@ -170,8 +177,8 @@ class MembershipPlans(ndb.Model):
     total_members: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
     schedule_day: int = ndb.IntegerProperty(validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or week, or three months
     schedule_term: str = ndb.StringProperty(validator=ClassSetters.set_schedule_term)  # Monthly, Quarterly, Annually
-    term_payment_amount: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
-    registration_amount: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
+    term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    registration_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     is_active: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
     date_created: int = ndb.DateProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
 

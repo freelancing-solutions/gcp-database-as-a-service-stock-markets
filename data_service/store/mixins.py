@@ -15,7 +15,7 @@ class AmountMixin(ndb.Model):
         return True
 
     def __str__(self) -> str:
-        return "<Amount {} {}".format(self.currency, self.amount)
+        return "{} {}".format(self.currency, self.amount)
 
     def __repr__(self) -> str:
         return self.__str__()

@@ -233,6 +233,21 @@ class AffiliateEarningsTransactions(ndb.Model):
     total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
     transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
 
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.affiliate_id != other.affiliate_id:
+            return False
+        if self.total_earned != other.total_earned:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<AffiliateEarningsTransactions total_earned: {} ".format(str(self.total_earned))
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class AffiliateTransactionItems(ndb.Model):
     """
@@ -241,7 +256,29 @@ class AffiliateTransactionItems(ndb.Model):
     transaction_id: str = ndb.StringProperty()
     amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
     transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassValidators.set_date)
-    
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.amount != other.amount:
+            return False
+        if self.transaction_id != other.transaction_id:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<AffiliateTransactionItem Amount: {}, date: {}".format(str(self.amount), str(self.transaction_date))
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class AffiliateSettings(ndb.Model):
+    """
+        if earnings are recurring then an affiliate will continue to earn income
+        on their down-line , if not then income will be earned once off when a recruited user becomes a member.
+    """
     earnings_percent: int = ndb.IntegerProperty(validator=ClassValidators.set_percent)
+    reccurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+
+
