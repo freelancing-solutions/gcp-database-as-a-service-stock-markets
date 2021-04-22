@@ -46,5 +46,35 @@ class Ticket(ndb.Model):
         return self.__str__()
 
 
+class TicketThread(ndb.Model):
+    """
+        sort by ticket_id, then time_created , then mark by sent_by to create thread
+    """
+    ticket_id: str = ndb.StringProperty()
+    thread_id: str = ndb.StringProperty()
+    sent_by: str = ndb.StringProperty()  # Support Staff or Client
+    subject: str = ndb.StringProperty()
+    message: str = ndb.StringProperty()
+    time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
 
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        if self.ticket_id != other.ticket_id:
+            return False
+        if self.thread_id != other.thread_id:
+            return False
+        if self.sent_by != other.sent_by:
+            return False
+        if self.time_created != other.time_created:
+            return False
 
+        return True
+
+    def __str__(self) -> str:
+        return "<TicketThread Sent_by: {}, Subject: {}, Message {} Time_Created: {}".format(self.sent_by, self.subject,
+                                                                                            self.message,
+                                                                                            str(self.time_created))
+
+    def __repr__(self) -> str:
+        return self.__str__()
