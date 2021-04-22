@@ -2,6 +2,12 @@ from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
 class ScrapperTempStore(ndb.Model):
+    """
+        used to store scrapped data from sellenium
+        this is data still waiting to be parsed
+        the parser should to be able to fill in info from external api endpoints
+        available
+    """
 
     def set_id(self, data_id: str) -> str:
         data_id = data_id.strip()
