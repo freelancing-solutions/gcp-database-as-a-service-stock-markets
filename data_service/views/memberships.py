@@ -10,7 +10,7 @@ from data_service.store.memberships import PlanValidators as PlanValid
 from data_service.store.users import UserValidators as UserValid
 from data_service.store.memberships import MembershipValidators as MemberValid
 from data_service.utils.utils import create_id, end_of_month, return_ttl
-from data_service.main import cache_stock_buys_sells
+from data_service.main import cache_memberships
 
 
 class Validators(UserValid, PlanValid, MemberValid):
@@ -195,7 +195,7 @@ class MembershipsView(Validators):
         with self.client.context():
             return "Ok", 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='long'), unless=end_of_month)
+    @cache_memberships.cached(timeout=return_ttl(name='long'), unless=end_of_month)
     def return_plan_members_by_payment_status(self, plan_id: str, status: str) -> tuple:
         """
             for members of this plan_id return members by payment_status
@@ -224,7 +224,7 @@ class MembershipsView(Validators):
                 message: str = str(e.message or e)
                 return jsonify({'status': False, 'message': message}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def return_plan_members(self, plan_id) -> tuple:
         """
             return all members of a plan
@@ -252,7 +252,7 @@ class MembershipsView(Validators):
                 message: str = str(e.message or e)
                 return jsonify({'status': False, 'message': message}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def is_member_off(self, uid: str) -> tuple:
         """
             returns user membership details
@@ -278,7 +278,7 @@ class MembershipsView(Validators):
                 message: str = str(e)
                 return jsonify({'status': False, 'message': message}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def payment_amount(self, uid: str) -> tuple:
         """
             for a specific user return payment amount
@@ -491,7 +491,7 @@ class MembershipPlansView(Validators):
             return jsonify({'status': True, 'message': 'successfully update membership plan status',
                             'payload': membership_plans_instance.to_dict()}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     def return_plans_by_schedule_term(self, schedule_term: str) -> tuple:
         with self.client.context():
             try:
@@ -516,7 +516,7 @@ class MembershipPlansView(Validators):
                 message: str = str(e)
                 return jsonify({'status': False, 'message': message}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='short'))
+    @cache_memberships.cached(timeout=return_ttl(name='short'))
     def get_plan(self, plan_id: str) -> typing.Union[None, MembershipPlans]:
         """
             this utility will be used by other views to obtain information about membershipPlans
@@ -540,7 +540,7 @@ class MembershipPlansView(Validators):
 
             return None
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='long'))
+    @cache_memberships.cached(timeout=return_ttl(name='long'))
     def return_plan(self, plan_id: str) -> tuple:
         plan_instance = self.get_plan(plan_id=plan_id)
         if plan_instance is not None:
@@ -552,7 +552,7 @@ class AccessRightsView:
     def __init__(self):
         self.client = ndb.Client(namespace="main", project=current_app.config.get('PROJECT'))
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='short'))
+    @cache_memberships.cached(timeout=return_ttl(name='short'))
     def get_access_rights(self, plan_id: str) -> typing.Union[None, AccessRights]:
         with self.client.context():
             if isinstance(plan_id, str):

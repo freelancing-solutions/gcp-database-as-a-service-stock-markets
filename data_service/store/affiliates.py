@@ -81,7 +81,7 @@ class EarningsValidators:
         if not isinstance(affiliate_id, str) or affiliate_id == "":
             raise ValueError("Affiliate_id cannot be Null, and can only be a string")
         try:
-            earnings_list: typing.List[EarningsClass] = EarningsClass.query(EarningsClass.affiliate_id == affiliate_id).fetch()
+            earnings_list: typing.List[EarningsData] = EarningsData.query(EarningsData.affiliate_id == affiliate_id).fetch()
             if isinstance(earnings_list, list) and len(earnings_list) > 0:
                 return True
             return False
@@ -185,14 +185,39 @@ class Recruits(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
-class EarningsClass(ndb.Model):
+class EarningsData(ndb.Model):
     """
         class used to track periodical earnings per affiliate
+        #
     """
+    def set_date(self, value) -> date:
+        if not isinstance(value, date):
+            raise ValueError("{} is invalid".format(self.name))
+        return value
+
     affiliate_id: str = ndb.StringProperty(validator=ClassValidators.set_id)
     start_date: date = ndb.DateProperty(auto_now_add=True)
-    end_date: date = ndb.DateProperty(validator=ClassValidators.set_date)
+    last_updated: date = ndb.DateProperty(validator=set_date)
     total_earned: int = ndb.IntegerProperty(default=0, validator=ClassValidators.set_number)
+    is_paid: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+    on_hold: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.affiliate_id != other.affiliate_id:
+            return False
+        if self.start_date != other.start_date:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<EarningsClass start_date: {}, end_date: {}, total_earned: {}, is_paid: {}, on_hold: {}".format(
+            self.start_date, self.last_updated, self.total_earned, self.is_paid, self.on_hold)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class AffiliateSettings(ndb.Model):
     earnings_percent: int = ndb.IntegerProperty(validator=ClassValidators.set_percent)

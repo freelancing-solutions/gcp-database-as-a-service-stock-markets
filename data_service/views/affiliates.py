@@ -3,12 +3,11 @@ from google.cloud import ndb
 from flask import current_app, jsonify
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
 from google.api_core.exceptions import Aborted, RetryError
-
-from data_service.main import cache_stock_buys_sells
+from data_service.main import cache_affiliates
 from data_service.store.affiliates import AffiliatesValidators as ValidAffiliate
 from data_service.store.affiliates import RecruitsValidators as ValidRecruit
 from data_service.store.affiliates import EarningsValidators as ValidEarnings
-from data_service.store.affiliates import Affiliates, AffiliateSettings, Recruits, EarningsClass
+from data_service.store.affiliates import Affiliates, AffiliateSettings, Recruits, EarningsData
 from data_service.store.exceptions import DataServiceError
 from data_service.utils.utils import create_id, return_ttl, end_of_month
 from data_service.views.context_utils import use_context
@@ -171,7 +170,7 @@ class AffiliatesView(Validator):
         except Aborted as e:
             return jsonify({'status': False, 'message': str(e)}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_affiliate(self, affiliate_data: dict) -> tuple:
         """
@@ -206,7 +205,7 @@ class AffiliatesView(Validator):
         else:
             return jsonify({'status': False, 'message': 'unable to locate affiliate'}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_all_affiliates(self) -> tuple:
         """
@@ -217,7 +216,7 @@ class AffiliatesView(Validator):
         return jsonify({'status': True, 'message': 'Successfully returned all affiliates',
                         'payload': payload}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_active_affiliates(self) -> tuple:
         """
@@ -229,7 +228,7 @@ class AffiliatesView(Validator):
         return jsonify({'status': True, 'message': 'successfully returned all affiliates',
                         'payload': payload}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_in_active_affiliates(self) -> tuple:
         """
@@ -241,7 +240,7 @@ class AffiliatesView(Validator):
         return jsonify({'status': True, 'message': 'successfully returned all affiliates',
                         'payload': payload}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_deleted_affiliates(self) -> tuple:
         """
@@ -249,7 +248,18 @@ class AffiliatesView(Validator):
         """
         affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.is_deleted == True).fetch()
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
-        return jsonify({'status': True, 'message': 'Successfully returned all affiliates',
+        return jsonify({'status': True, 'message': 'Successfully returned deleted affiliates',
+                        'payload': payload}), 200
+
+    @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @use_context
+    def get_not_deleted_affiliates(self) -> tuple:
+        """
+            return affiliates who are not active
+        """
+        affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.is_deleted == False).fetch()
+        payload = [affiliate.to_dict() for affiliate in affiliates_list]
+        return jsonify({'status': True, 'message': 'Successfully returned affiliates which are not deleted',
                         'payload': payload}), 200
 
 
@@ -323,6 +333,7 @@ class RecruitsView(Validator):
             message: str = "Recruit does not exist"
             return jsonify({'status': False, 'message': message}), 500
 
+    @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
     def get_recruit(self, recruit_data: dict) -> tuple:
         affiliate_id: str = recruit_data.get('affiliate_id')
@@ -337,6 +348,7 @@ class RecruitsView(Validator):
             message: str = "Recruit does not exist"
             return jsonify({'status': False, 'message': message}), 500
 
+    @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
     def get_recruits_by_active_status(self, is_active: bool) -> tuple:
         if not isinstance(is_active, bool):
@@ -347,6 +359,7 @@ class RecruitsView(Validator):
         message: str = "{} recruits successfully fetched recruits by active status".format(str(len(recruits_list)))
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
+    @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
     def get_recruits_by_deleted_status(self, is_deleted: bool) -> tuple:
         if not isinstance(is_deleted, bool):
@@ -357,6 +370,7 @@ class RecruitsView(Validator):
         message: str = "{} recruits successfully fetched recruits by deleted status".format(str(len(recruits_list)))
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
+    @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
     def get_recruits_by_affiliate(self, affiliate_data: dict) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
@@ -368,6 +382,7 @@ class RecruitsView(Validator):
         message: str = "{} recruits successfully fetched recruits by active status".format(str(len(recruits_list)))
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
+    @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
     def get_recruits_by_active_and_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
@@ -384,7 +399,6 @@ class RecruitsView(Validator):
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
 
-
 class EarningsView(Validator):
     """
         Used by system to register new earnings for affiliates
@@ -392,4 +406,35 @@ class EarningsView(Validator):
 
     def __init__(self):
         super(EarningsView, self).__init__()
-        self.client = ndb.Client(namespace="main", project=current_app.config.get('PROJECT'))
+        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
+        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
+
+    def register_earnings(self, earnings_data: dict) -> tuple:
+        """
+            register new earnings record
+        """
+        pass
+
+    def mark_paid(self, earnings_data: dict, is_paid: bool) -> tuple:
+        """
+            mark earnings record as paid or not paid
+        """
+        pass
+
+    def mark_on_hold(self, earnings_data: dict, on_hold: bool) -> bool :
+        """
+            mark earnings as on hold or not on hold
+            earnings which are on-hold may not be paid until problem is resolved
+        """
+        pass
+
+    def transfer_earnings_to_wallet(self, earnings_data: dict) -> tuple:
+        """
+            transfer earnings to wallet
+            wallet earnings can be sent to paypal or through EFT
+        """
+        pass
+
+
+
+
