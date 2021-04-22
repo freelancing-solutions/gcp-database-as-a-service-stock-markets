@@ -232,6 +232,7 @@ class AffiliateEarningsTransactions(ndb.Model):
     affiliate_id: str = ndb.StringProperty()
     total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
     transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
+    last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -243,7 +244,7 @@ class AffiliateEarningsTransactions(ndb.Model):
         return True
 
     def __str__(self) -> str:
-        return "<AffiliateEarningsTransactions total_earned: {} ".format(str(self.total_earned))
+        return "total_earned: {} ".format(str(self.total_earned))
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -279,6 +280,10 @@ class AffiliateSettings(ndb.Model):
         on their down-line , if not then income will be earned once off when a recruited user becomes a member.
     """
     earnings_percent: int = ndb.IntegerProperty(validator=ClassValidators.set_percent)
-    reccurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+    recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+    total_affiliates_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
+    total_affiliates: int = ndb.IntegerProperty(default=0, validator=ClassValidators.set_number)
+
+
 
 

@@ -208,3 +208,20 @@ class AccessRights(ndb.Model):
     """
     plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     access_rights_list = ndb.StringProperty(repeated=True)  # a list containing the rights of users
+
+
+class MembershipDailyStats(ndb.Model):
+    """
+        provides information and settings pertaining to paying members
+
+        run update stats task against this class daily
+    """
+    daily_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    total_users: int = ndb.IntegerProperty(default=0)
+    total_members: int = ndb.IntegerProperty(default=0)
+    expected_monthly_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    expected_quarterly_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    expected_annual_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    expected_earnings_this_month: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    total_earned_so_far: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+
