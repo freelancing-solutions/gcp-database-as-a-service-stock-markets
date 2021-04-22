@@ -2,6 +2,7 @@ import typing
 from google.cloud import ndb
 from datetime import date, datetime
 from google.api_core.exceptions import RetryError, Aborted
+from data_service.store.mixins import AmountMixin
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
 
@@ -129,6 +130,11 @@ class ClassValidators:
 
         return value
 
+    def set_amount(self, amount: AmountMixin) -> AmountMixin:
+        if not isinstance(amount, AmountMixin):
+            raise TypeError('{} is invalid'.format(self.name))
+        return amount
+
 class Affiliates(ndb.Model):
     """
         class used to track affiliates registered
@@ -198,7 +204,7 @@ class EarningsData(ndb.Model):
     affiliate_id: str = ndb.StringProperty(validator=ClassValidators.set_id)
     start_date: date = ndb.DateProperty(auto_now_add=True)
     last_updated: date = ndb.DateProperty(validator=set_date)
-    total_earned: int = ndb.IntegerProperty(default=0, validator=ClassValidators.set_number)
+    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
     is_paid: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
     on_hold: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
 
@@ -218,6 +224,24 @@ class EarningsData(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+
+class AffiliateEarningsTransactions(ndb.Model):
+    """
+        keeps track of amounts paid from earningsData
+    """
+    affiliate_id: str = ndb.StringProperty()
+    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
+    transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
+
+
+class AffiliateTransactionItems(ndb.Model):
+    """
+        keeps track of singular transaction items
+    """
+    transaction_id: str = ndb.StringProperty()
+    amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
+    transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassValidators.set_date)
+    
 
 class AffiliateSettings(ndb.Model):
     earnings_percent: int = ndb.IntegerProperty(validator=ClassValidators.set_percent)
