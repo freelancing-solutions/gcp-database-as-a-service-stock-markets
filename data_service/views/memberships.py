@@ -1,3 +1,4 @@
+import functools
 import typing
 from google.api_core.exceptions import RetryError, Aborted
 from google.cloud import ndb
@@ -55,9 +56,22 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
     def can_add_coupon(self, code: str, expiration_time: int) -> any:
         coupon_exist: typing.Union[None, bool] = yield self.coupon_exist(code=code)
         expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
+        discount_valid: typing.Union[None, bool] = yield self.discount_valid(discount=discount)
 
-        if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool):
-            return coupon_exist and expiration_valid
+        if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
+            return (not coupon_exist) and expiration_valid and discount_valid
+        message: str = "Unable to verify input data"
+        raise DataServiceError(message)
+
+    @ndb.tasklet
+    def can_update_coupon(self, code: str, expiration_time: int, discount: int) -> any:
+        coupon_exist: typing.Union[None, bool] = yield self.coupon_exist(code=code)
+        expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
+        discount_valid: typing.Union[None, bool] = yield self.discount_valid(discount=discount)
+
+        if isinstance(coupon_exist, bool) and isinstance(expiration_valid,bool) and isinstance(discount_valid, bool):
+            return coupon_exist and expiration_valid and discount_valid
+
         message: str = "Unable to verify input data"
         raise DataServiceError(message)
 
@@ -583,6 +597,7 @@ class MembershipPlansView(Validators):
             return jsonify({'status': True, 'payload': plan_instance.to_dict(), 'message': message}), 200
         return jsonify({'status': False, 'message': 'Unable to get plan'}), 500
 
+
 class AccessRightsView:
     def __init__(self):
         pass
@@ -608,24 +623,36 @@ class CouponsView(Validators):
     def __init__(self):
         super(CouponsView, self).__init__()
 
+    @staticmethod
+    def get_coupon_data(func):
+        functools.wraps(func)
+
+        def wrapper(*args, **kwargs):
+            coupon_data: dict = kwargs.get('coupon_data')
+            if "code" in coupon_data and coupon_data['code'] != "":
+                code: str = coupon_data.get('code')
+            else:
+                return jsonify({'status': False, 'message': 'coupon code is required'}), 500
+
+            if "discount" in coupon_data and coupon_data['discount'] != "":
+                discount: int = int(coupon_data.get('discount'))
+            else:
+                return jsonify({'status': False, 'message': 'discount is required'}), 500
+
+            if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
+                expiration_time: int = int(coupon_data['expiration_time'])
+            else:
+                return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
+
+            return func(code=code, discount=discount, expiration_time=expiration_time, *args)
+
+        return wrapper
+
+    @get_coupon_data
     @use_context
-    def add_coupon(self, coupon_data: dict) -> tuple:
-        if "code" in coupon_data and coupon_data['code'] != "":
-            code: str = coupon_data.get('code')
-        else:
-            return jsonify({'status': False, 'message': 'coupon code is required'}), 500
-
-        if "discount" in coupon_data and coupon_data['discount'] != "":
-            discount: int = int(coupon_data.get('discount'))
-        else:
-            return jsonify({'status': False, 'message': 'discount is required'}), 500
-
-        if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
-            expiration_time: int = int(coupon_data['expiration_time'])
-        else:
-            return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
+    def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
         try:
-            if self.can_add_coupon(code=code, expiration_time=expiration_time):
+            if self.can_add_coupon(code=code, expiration_time=expiration_time).result():
                 coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
                 key = coupons_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
@@ -648,10 +675,35 @@ class CouponsView(Validators):
         return jsonify({'status': True, 'message': 'successfully created coupon code',
                         'payload': coupons_instance.to_dict()}), 200
 
-    def update_coupon(self, coupon_data: dict) -> tuple:
-        pass
+    @get_coupon_data
+    @use_context
+    def update_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
+        if self.can_update_coupon(code=code, expiration_time=expiration_time).result():
+            try:
+                coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
+                coupon_instance.discount = discount
+                coupon_instance.expiration_time = expiration_time
+                key = coupon_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+                if key is None:
+                    message: str = "Error updating coupon"
+                    return jsonify({'status': False, 'message': message}), 500
 
-    def set_expiration_date(self, coupon_data: dict, expire_timestamp: int) -> tuple:
+                return jsonify({'status': True, 'message': 'successfully updated coupon'}), 200
+
+            except ConnectionRefusedError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except RetryError as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+            except Aborted as e:
+                message: str = str(e)
+                return jsonify({'status': False, 'message': message}), 500
+        else:
+            message: str = "Unable to update coupon code"
+            return jsonify({'status': False, 'message': message}), 500
+
+    def set_expiration_date(self, coupon_data: dict, expiration_time: int) -> tuple:
         pass
 
     def cancel_coupon(self, coupon_data: dict) -> tuple:

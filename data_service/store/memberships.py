@@ -38,7 +38,7 @@ class PlanValidators:
             return False
         try:
             plan_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).get_async(keys_only=True).get_result()
+                MembershipPlans.plan_id == plan_id).get_async().get_result()
         except ConnectionRefusedError:
             return None
         except RetryError:
@@ -63,7 +63,7 @@ class PlanValidators:
             return False
         try:
             plan_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_name == plan_name).get_async(keys_only=True).get_result()
+                MembershipPlans.plan_name == plan_name).get_async().get_result()
             if isinstance(plan_instance, MembershipPlans):
                 return True
 
@@ -100,6 +100,15 @@ class CouponsValidator:
         if not isinstance(expiration_time, int):
             return False
         if expiration_time < get_days(days=1):
+            return False
+        return True
+
+    @staticmethod
+    @ndb.tasklet
+    def discount_valid(discount_valid: int) -> bool:
+        if not isinstance(discount_valid, int):
+            return False
+        if 0 < discount_valid > 100:
             return False
         return True
 
