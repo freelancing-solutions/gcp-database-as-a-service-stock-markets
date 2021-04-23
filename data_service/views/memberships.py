@@ -648,7 +648,6 @@ class CouponsView(Validators):
     def __init__(self):
         super(CouponsView, self).__init__()
 
-
     @get_coupon_data
     @use_context
     def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
