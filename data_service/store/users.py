@@ -9,12 +9,15 @@ from data_service.utils.utils import timestamp
 
 class UserValidators:
     # Which ever module calls this validators it will provide its own context
+
     @staticmethod
+    @ndb.tasklet
     def is_user_valid(uid: str) -> typing.Union[None, bool]:
         if not isinstance(uid, str):
             return False
         try:
-            users_instance_list: typing.List[UserModel] = UserModel.query(UserModel.uid == uid).fetch()
+            users_instance_list: typing.List[UserModel] = UserModel.query().filter(
+                UserModel.uid == uid).get_async(keys_only=True)
         except ConnectionRefusedError:
             return None
         except RetryError:

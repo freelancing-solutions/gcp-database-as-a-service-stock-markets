@@ -56,8 +56,8 @@ def date_string_to_date(date_str: str) -> date:
 # cache functions
 
 def end_of_month() -> bool:
-    now = datetime.now().date()
-    if now.day in [29, 30, 31, 1, 2, 3]:
+    now: date = datetime.now().date()
+    if now.day in [30, 31, 1]:
         return True
     return False
 

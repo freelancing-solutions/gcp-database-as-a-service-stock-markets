@@ -1,5 +1,6 @@
 import typing
 from google.api_core.exceptions import RetryError, Aborted
+from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadQueryError, BadRequestError
 from flask import jsonify, current_app
 from datetime import datetime, date
@@ -17,29 +18,33 @@ from data_service.views.use_context import use_context
 class Validators(UserValid, PlanValid, MemberValid):
 
     def __init__(self):
-        self.max_put_retries: int = 10
+        super(Validators, self).__init__()
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
-    def can_add_member(self, uid: str, plan_id: str, start_date: date) -> bool:
-        user_valid: bool = self.is_user_valid(uid=uid)
-        plan_exist: bool = self.plan_exist(plan_id=plan_id)
-        date_valid: bool = self.start_date_valid(start_date=start_date)
+    @ndb.tasklet
+    def can_add_member(self, uid: str, plan_id: str, start_date: date) -> any:
+        user_valid: typing.Union[None, bool] = yield self.is_user_valid(uid=uid)
+        plan_exist: typing.Union[None, bool] = yield self.plan_exist(plan_id=plan_id)
+        date_valid: typing.Union[None, bool] = yield self.start_date_valid(start_date=start_date)
+
         if isinstance(user_valid, bool) and isinstance(plan_exist, bool) and isinstance(date_valid, bool):
             return user_valid and plan_exist and date_valid
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_add_plan(self, plan_name: str) -> bool:
-        name_exist: bool = self.plan_name_exist(plan_name)
+    @ndb.tasklet
+    def can_add_plan(self, plan_name: str) -> any:
+        name_exist: typing.Union[None, bool] = yield self.plan_name_exist(plan_name)
         if isinstance(name_exist, bool):
             return name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_update_plan(self, plan_id: str, plan_name: str) -> bool:
-        plan_exist: bool = self.plan_exist(plan_id=plan_id)
-        plan_name_exist: bool = self.plan_name_exist(plan_name=plan_name)
+    @ndb.tasklet
+    def can_update_plan(self, plan_id: str, plan_name: str) -> any:
+        plan_exist: typing.Union[None, bool] = yield self.plan_exist(plan_id=plan_id)
+        plan_name_exist: typing.Union[None, bool] = yield self.plan_name_exist(plan_name=plan_name)
         if isinstance(plan_exist, bool) and isinstance(plan_name_exist, bool):
             return plan_exist and plan_name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
@@ -49,13 +54,12 @@ class MembershipsView(Validators):
 
     def __init__(self):
         super(MembershipsView, self).__init__()
-        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
-        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
     def _create_or_update_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
-        if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date) is True:
+        if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date).result() is True:
             try:
+                # can use get to simplify this and make transactions faster
                 member_ships_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
                 if isinstance(member_ships_list, list) and len(member_ships_list) > 0:
                     membership_instance: Memberships = member_ships_list[0]
@@ -68,6 +72,7 @@ class MembershipsView(Validators):
                 membership_instance.uid = uid
                 membership_instance.plan_start_date = plan_start_date
                 key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+
                 if key is None:
                     message: str = "Unable to save membership instance to database, please try again"
                     raise DataServiceError(message)
@@ -96,6 +101,7 @@ class MembershipsView(Validators):
 
             return jsonify({'status': True, 'message': 'successfully updated membership',
                             'payload': membership_instance.to_dict()}), 200
+
         message: str = """Unable to create or update memberships this may be 
         due to errors in database connections or duplicate data"""
         return jsonify({'status': False, 'message': message}), 500
@@ -108,63 +114,54 @@ class MembershipsView(Validators):
 
     @use_context
     def set_membership_status(self, uid: str, status: str) -> tuple:
+        try:
+            membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+            membership_instance.status = status
+            key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "Unable to save membership instance to database, please try again"
+                raise DataServiceError(message)
 
-        membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
-        if isinstance(membership_list, list) and len(membership_list) > 0:
-            membership_instance: Memberships = membership_list[0]
-            try:
-                membership_instance.status = status
-                key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = "Unable to save membership instance to database, please try again"
-                    raise DataServiceError(message)
+        except ValueError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except BadRequestError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except BadQueryError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except ConnectionRefusedError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except RetryError as e:
+            message: str = str(e.message or e)
+            return jsonify({'status': False, 'message': message}), 500
+        except Aborted as e:
+            message: str = str(e.message or e)
+            return jsonify({'status': False, 'message': message}), 500
 
-            except ValueError as e:
-                message: str = str(e)
-                return jsonify({'status': False, 'message': message}), 500
-            except BadRequestError as e:
-                message: str = str(e)
-                return jsonify({'status': False, 'message': message}), 500
-            except BadQueryError as e:
-                message: str = str(e)
-                return jsonify({'status': False, 'message': message}), 500
-            except ConnectionRefusedError as e:
-                message: str = str(e)
-                return jsonify({'status': False, 'message': message}), 500
-            except RetryError as e:
-                message: str = str(e.message or e)
-                return jsonify({'status': False, 'message': message}), 500
-            except Aborted as e:
-                message: str = str(e.message or e)
-                return jsonify({'status': False, 'message': message}), 500
-
-            message: str = "Successfully update membership status"
-            return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message})
+        message: str = "Successfully update membership status"
+        return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message})
 
     @use_context
     def change_membership(self, uid: str, origin_plan_id: str, dest_plan_id: str) -> tuple:
         try:
-            membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
-            if isinstance(membership_list, list) and len(membership_list) > 0:
-                membership_instance: Memberships = membership_list[0]
-                if membership_instance.plan_id == origin_plan_id:
-                    if self.plan_exist(plan_id=dest_plan_id):
-                        membership_instance.plan_id = dest_plan_id
-                        key = membership_instance.put(use_cache=True, retries=self._max_retries,
-                                                      timeout=self._max_timeout)
-                    else:
-                        # This maybe be because the original plan is deleted but its a rare case
-                        membership_instance.plan_id = dest_plan_id
-                        key = membership_instance.put(use_cache=True, retries=self._max_retries,
-                                                      timeout=self._max_timeout)
-
-                    if key is None:
-                        message: str = "Unable to Change Membership, please try again later"
-                        raise DataServiceError(message)
+            membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+            if membership_instance.plan_id == origin_plan_id:
+                if self.plan_exist(plan_id=dest_plan_id):
+                    membership_instance.plan_id = dest_plan_id
+                    key = membership_instance.put(use_cache=True, retries=self._max_retries,
+                                                  timeout=self._max_timeout)
                 else:
-                    message: str = "Unable to change membership, cannot find original membership record"
-                    return jsonify({'status': False, 'message': message}), 500
+                    # This maybe be because the original plan is deleted but its a rare case
+                    membership_instance.plan_id = dest_plan_id
+                    key = membership_instance.put(use_cache=True, retries=self._max_retries,
+                                                  timeout=self._max_timeout)
 
+                if key is None:
+                    message: str = "Unable to Change Membership, please try again later"
+                    raise DataServiceError(message)
             else:
                 message: str = "Unable to change membership, cannot find original membership record"
                 return jsonify({'status': False, 'message': message}), 500
@@ -291,12 +288,10 @@ class MembershipsView(Validators):
         """
             for a specific user return payment amount
         """
-
         try:
-            membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
-            if isinstance(membership_list, list) and len(membership_list) > 0:
-                membership_instance: Memberships = membership_list[0]
-                plan_id = membership_instance.plan_id
+            membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+            if isinstance(membership_instance, Memberships):
+                plan_id: str = membership_instance.plan_id
                 membership_plan_instance: MembershipPlans = MembershipPlansView().get_plan(plan_id=plan_id)
                 if membership_plan_instance is None:
                     message: str = 'could not find plan associate with the plan_id'
@@ -325,9 +320,8 @@ class MembershipsView(Validators):
             for a specific user set payment status
         """
         try:
-            membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
-            if isinstance(membership_list, list) and len(membership_list) > 0:
-                membership_instance: Memberships = membership_list[0]
+            membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+            if isinstance(membership_instance, Memberships):
                 membership_instance.status = status
                 key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
@@ -366,8 +360,6 @@ class MembershipsView(Validators):
 class MembershipPlansView(Validators):
     def __init__(self):
         super(MembershipPlansView, self).__init__()
-        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
-        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
     def add_plan(self, plan_name: str, description: str, schedule_day: int, schedule_term: str,
@@ -377,7 +369,7 @@ class MembershipPlansView(Validators):
 
         """
         try:
-            if self.can_add_plan(plan_name=plan_name) is True:
+            if self.can_add_plan(plan_name=plan_name).result() is True:
                 total_members: int = 0
                 # Creating Amount Mixins to represent real currency
                 curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
@@ -429,15 +421,13 @@ class MembershipPlansView(Validators):
     def update_plan(self, plan_id: str, plan_name: str, description: str, schedule_day: int, schedule_term: str,
                     term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
         try:
-            if self.can_update_plan(plan_id=plan_id, plan_name=plan_name) is True:
-                membership_plans_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                    MembershipPlans.plan_id == plan_id).fetch()
-                if isinstance(membership_plans_list, list) and len(membership_plans_list) > 0:
+            if self.can_update_plan(plan_id=plan_id, plan_name=plan_name).result() is True:
+                membership_plans_instance: MembershipPlans = MembershipPlans.query(
+                    MembershipPlans.plan_id == plan_id).get()
+                if isinstance(membership_plans_instance, MembershipPlans):
                     curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
                     curr_registration_amount: AmountMixin = AmountMixin(amount=registration_amount,
                                                                         currency=currency)
-
-                    membership_plans_instance: MembershipPlans = membership_plans_list[0]
                     membership_plans_instance.plan_name = plan_name
                     membership_plans_instance.description = description
                     membership_plans_instance.schedule_day = schedule_day
@@ -487,12 +477,11 @@ class MembershipPlansView(Validators):
     @use_context
     def set_is_active(self, plan_id: str, is_active: bool) -> tuple:
         try:
-            membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).fetch()
-            if isinstance(membership_plan_list, list) and len(membership_plan_list) > 0:
-                membership_plans_instance: MembershipPlans = membership_plan_list[0]
+            membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
+            if isinstance(membership_plans_instance, MembershipPlans):
                 membership_plans_instance.is_active = is_active
-                key = membership_plans_instance.put(use_cache=True, retries=self.max_put_retries)
+                key = membership_plans_instance.put(use_cache=True, retries=self._max_retries,
+                                                    timeout=self._max_timeout)
                 if key is None:
                     message: str = 'for some reason we are unable to create a new plan'
                     return jsonify({'status': False, 'message': message}), 500
@@ -590,9 +579,8 @@ class AccessRightsView:
     def get_access_rights(self, plan_id: str) -> typing.Union[None, AccessRights]:
         if isinstance(plan_id, str):
             try:
-                access_rights_list: typing.List[AccessRights] = AccessRights.query(AccessRights.plan_id == plan_id)
-                if isinstance(access_rights_list, list) and len(access_rights_list) > 0:
-                    access_rights_instance: AccessRights = access_rights_list[0]
+                access_rights_instance: AccessRights = AccessRights.query(AccessRights.plan_id == plan_id).get()
+                if isinstance(access_rights_instance, AccessRights):
                     return access_rights_instance
                 return None
             except ConnectionRefusedError:

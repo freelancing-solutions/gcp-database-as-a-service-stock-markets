@@ -10,6 +10,7 @@ from data_service.store.mixins import AmountMixin
 class MembershipValidators:
 
     @staticmethod
+    @ndb.tasklet
     def start_date_valid(start_date: date) -> bool:
         """
             check if date is from today and falls within normal parameters
@@ -23,6 +24,7 @@ class MembershipValidators:
 class PlanValidators:
 
     @staticmethod
+    @ndb.tasklet
     def plan_exist(plan_id: str) -> typing.Union[None, bool]:
         """
             return True or False
@@ -35,7 +37,7 @@ class PlanValidators:
             return False
         try:
             plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).fetch()
+                MembershipPlans.plan_id == plan_id).get_async(keys_only=True)
         except ConnectionRefusedError:
             return None
         except RetryError:
@@ -47,6 +49,7 @@ class PlanValidators:
         return False
 
     @staticmethod
+    @ndb.tasklet
     def plan_name_exist(plan_name: str) -> typing.Union[None, bool]:
         """
             returns True or False if plan exist or dont exist
@@ -59,7 +62,7 @@ class PlanValidators:
             return False
         try:
             plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                MembershipPlans.plan_name == plan_name)
+                MembershipPlans.plan_name == plan_name).get_async(keys_only=True)
             if isinstance(plan_instance_list, list) and len(plan_instance_list) > 0:
                 return True
 

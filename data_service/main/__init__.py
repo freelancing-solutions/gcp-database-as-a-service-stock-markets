@@ -2,9 +2,10 @@ from flask import Flask
 from flask_caching import Cache
 from data_service.config import Config
 
-cache_stock_buys_sells:  Cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache_stocks:  Cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache_affiliates: Cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache_memberships: Cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache_users: Cache = Cache(config={'CACHE_TYPE': 'simple'})
 # Cache data for six hours- cached data should be volume data
 # TODO - there should be a function to purge the cache when not needed
 # but normally when the data-service is not being used it will shutdwon and thereby auto purging cache
@@ -15,10 +16,10 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    cache_stock_buys_sells.init_app(app=app, config={'CACHE_TYPE': 'simple',
-                                                     'CACHE_DEFAULT_TIMEOUT': default_timeout})
+    cache_stocks.init_app(app=app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': default_timeout})
     cache_affiliates.init_app(app=app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': default_timeout})
     cache_memberships.init_app(app=app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': default_timeout})
+    cache_users.init_app(app=app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': default_timeout})
 
     from data_service.api.users.routes import users_bp
     from data_service.api.stocks.routes import stocks_bp

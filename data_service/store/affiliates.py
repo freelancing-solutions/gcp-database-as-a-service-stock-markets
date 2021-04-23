@@ -7,6 +7,8 @@ from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequ
 
 
 class AffiliatesValidators:
+    def __init__(self):
+        super(AffiliatesValidators, self).__init__()
 
     @staticmethod
     def affiliate_exist(affiliate_id: str) -> typing.Union[None, bool]:
@@ -41,6 +43,8 @@ class AffiliatesValidators:
             return None
 
 class RecruitsValidators:
+    def __init__(self):
+        super(RecruitsValidators, self).__init__()
 
     @staticmethod
     def user_already_recruited(uid: str) -> typing.Union[None, bool]:
@@ -76,6 +80,8 @@ class RecruitsValidators:
             return None
 
 class EarningsValidators:
+    def __init__(self):
+        super(EarningsValidators, self).__init__()
 
     @staticmethod
     def unclosed_earnings_already_exist(affiliate_id: str) -> typing.Union[None, bool]:
@@ -94,7 +100,10 @@ class EarningsValidators:
         except Aborted:
             return None
 
-class ClassValidators:
+class ClassSetters:
+    def __init__(self):
+        super(ClassSetters, self).__init__()
+
     def set_id(self, value: str) -> str:
         if (value == "") or (value is None):
             raise ValueError("{} cannot be Null".format(self.name))
@@ -140,13 +149,13 @@ class Affiliates(ndb.Model):
     """
         class used to track affiliates registered
     """
-    affiliate_id: str = ndb.StringProperty(validator=ClassValidators.set_id)
-    uid: str = ndb.StringProperty(validator=ClassValidators.set_id)
+    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
     last_updated: datetime = ndb.DateTimeProperty(auto_now=True)
     datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True)
-    total_recruits: int = ndb.IntegerProperty(default=0, validator=ClassValidators.set_number)
-    is_active: bool = ndb.BooleanProperty(default=True, validator=ClassValidators.set_bool)
-    is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+    total_recruits: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_number)
+    is_active: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
+    is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -168,14 +177,14 @@ class Recruits(ndb.Model):
     """
         class used to track recruited affiliates
     """
-    affiliate_id: str = ndb.StringProperty(validator=ClassValidators.set_id)
-    referrer_uid: str = ndb.StringProperty(validator=ClassValidators.set_id)
-    datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassValidators.set_date)
-    datetime_updated: datetime = ndb.DateTimeProperty(auto_now=True, validator=ClassValidators.set_date)
-    is_member: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
-    plan_id: str = ndb.StringProperty(validator=ClassValidators.set_id)  # Membership plan id allows to get payment fees
-    is_active: bool = ndb.BooleanProperty(default=True, validator=ClassValidators.set_bool)
-    is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    referrer_uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_date)
+    datetime_updated: datetime = ndb.DateTimeProperty(auto_now=True, validator=ClassSetters.set_date)
+    is_member: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)  # Membership plan id allows to get payment fees
+    is_active: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
+    is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -202,12 +211,12 @@ class EarningsData(ndb.Model):
             raise ValueError("{} is invalid".format(self.name))
         return value
 
-    affiliate_id: str = ndb.StringProperty(validator=ClassValidators.set_id)
+    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     start_date: date = ndb.DateProperty(auto_now_add=True)
     last_updated: date = ndb.DateProperty(validator=set_date)
-    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
-    is_paid: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
-    on_hold: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
+    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    is_paid: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    on_hold: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -231,7 +240,7 @@ class AffiliateEarningsTransactions(ndb.Model):
         keeps track of amounts paid from earningsData
     """
     affiliate_id: str = ndb.StringProperty()
-    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
+    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
 
@@ -256,8 +265,8 @@ class AffiliateTransactionItems(ndb.Model):
         keeps track of singular transaction items
     """
     transaction_id: str = ndb.StringProperty()
-    amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
-    transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassValidators.set_date)
+    amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_date)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -275,14 +284,31 @@ class AffiliateTransactionItems(ndb.Model):
         return self.__str__()
 
 
-class AffiliateSettings(ndb.Model):
+class AffiliateSettingsStats(ndb.Model):
     """
         if earnings are recurring then an affiliate will continue to earn income
         on their down-line , if not then income will be earned once off when a recruited user becomes a member.
     """
-    earnings_percent: int = ndb.IntegerProperty(validator=ClassValidators.set_percent)
-    recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
-    total_affiliates_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
-    total_affiliates: int = ndb.IntegerProperty(default=0, validator=ClassValidators.set_number)
+    earnings_percent: int = ndb.IntegerProperty(validator=ClassSetters.set_percent)
+    recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    total_affiliates_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    total_affiliates: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_number)
 
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.earnings_percent != other.earnings_percent:
+            return False
+        if self.total_affiliates_earnings != other.total_affiliates_earnings:
+            return False
+        if self.total_affiliates != other.total_affiliates:
+            return False
+        return True
 
+    def __str__(self) -> str:
+        return "Earnings Percent: {}, Recurring Earnings: {}, Total Affiliates Earnings: {}, " \
+               "Total Affiliates: {}".format(str(self.earnings_percent), str(self.recurring_earnings),
+                                             str(self.total_affiliates_earnings), str(self.total_affiliates))
+
+    def __repr__(self) -> str:
+        return self.__str__()

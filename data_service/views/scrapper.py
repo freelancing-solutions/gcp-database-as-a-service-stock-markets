@@ -1,5 +1,5 @@
 import typing
-from flask import jsonify
+from flask import jsonify, current_app
 from data_service.store.scrapper import ScrapperTempStore
 from data_service.utils.utils import create_id
 from data_service.views.use_context import use_context
@@ -8,7 +8,8 @@ from data_service.views.use_context import use_context
 class ScrapperView:
 
     def __init__(self):
-        pass
+        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
+        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
     def add_data(self, scrapper_data: dict) -> tuple:
@@ -18,12 +19,11 @@ class ScrapperView:
                 scrapper_instance.status = scrapper_data.get('status') or False
                 scrapper_instance.data_id = create_id()
                 scrapper_instance.data = scrapper_data.get('data')
-                scrapper_instance.put()
+                scrapper_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
             except ValueError as e:
                 return jsonify({'status': False, 'message': str(e)}), 500
             except TypeError as e:
                 return jsonify({'status': False, 'message': str(e)}), 500
-
         else:
             return jsonify({'status': False, 'message': "invalid data format"}), 500
 

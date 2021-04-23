@@ -47,7 +47,7 @@ def get_update_status(uid: str) -> tuple:
         plan_id for the status to get or update
     """
     if request.method == "PUT":
-        json_data = request.get_json()
+        json_data: dict = request.get_json()
         if "status" in json_data and json_data["status"] != "":
             status: str = json_data["status"]
         else:
@@ -71,9 +71,9 @@ def get_plan_members_by_payment_status(plan_id: str, status: str) -> tuple:
 @memberships_bp.route("/api/v1/membership/plan/<path:plan_id>")
 def change_membership_plan(plan_id: str) -> tuple:
     if plan_id != "":
-        json_data = request.get_json()
+        json_data: dict = request.get_json()
         if "uid" in json_data and json_data['uid'] != "":
-            uid = json_data["uid"]
+            uid: str = json_data["uid"]
         else:
             return jsonify({'status': False, 'message': 'User Id is required'}), 500
 

@@ -1,7 +1,7 @@
 from datetime import date as date_class
 from datetime import datetime
 from flask import Blueprint, request, jsonify
-from data_service.main import cache_stock_buys_sells, default_timeout
+from data_service.main import cache_stocks, default_timeout
 from data_service.store.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
 from data_service.views.stocks import StockView

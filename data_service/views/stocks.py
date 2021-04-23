@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from google.api_core.exceptions import RetryError, Aborted
 from flask import current_app, jsonify
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
-from data_service.main import cache_stock_buys_sells
+from data_service.main import cache_stocks
 from data_service.store.exceptions import DataServiceError
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
 from data_service.utils.utils import date_string_to_date, create_id, return_ttl, end_of_month
@@ -14,7 +14,13 @@ from data_service.views.use_context import use_context
 
 stock_list_type = typing.List[Stock]
 
-# NOTES: request wrappers for stock, broker, buy_volume sell_volume, and net_volume
+class StockDataWrappers:
+    """
+        # NOTES: request wrappers for stock, broker, buy_volume sell_volume, and net_volume
+    """
+    def __init__(self):
+        pass
+
 def get_stock_data(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -240,6 +246,8 @@ class StockViewContext:
 class CatchStockErrors(StockViewContext):
     def __int__(self):
         super(CatchStockErrors, self).__int__()
+        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
+        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @staticmethod
     def symbol_exist(symbol: str) -> typing.Union[None, bool]:
@@ -397,7 +405,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             if self.can_add_broker(broker_id=broker_id, broker_code=broker_code):
                 broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code,
                                                  broker_name=broker_name)
-                key = broker_instance.put()
+                key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
                     message: str = "For some strange reason we could not save your data to database"
                     raise DataServiceError(message)
@@ -449,7 +457,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                                                  buy_ave_price=buy_ave_price,
                                                                  buy_market_val_percent=buy_market_val_percent,
                                                                  buy_trade_count=buy_trade_count)
-            key = buy_volume_instance.put()
+            key = buy_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -475,7 +483,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                                                     sell_ave_price=sell_ave_price,
                                                                     sell_market_val_percent=sell_market_val_percent,
                                                                     sell_trade_count=sell_trade_count)
-            key = sell_volume_instance.put()
+            key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -512,7 +520,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             net_volume_instance.total_value = total_value
             net_volume_instance.total_volume = total_volume
 
-            key = net_volume_instance.put()
+            key = net_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -536,7 +544,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                 stock_instance.stock_code = stock_code
                 stock_instance.stock_name = stock_name
                 stock_instance.symbol = symbol
-                key = stock_instance.put()
+                key = stock_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is not None:
                     return jsonify({'status': True, 'payload': stock_instance.to_dict(),
                                     'message': 'successfully updated stock'}), 200
@@ -564,7 +572,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                 broker_instance.broker_id = broker_id
                 broker_instance.broker_code = broker_code
                 broker_instance.broker_name = broker_name
-                key = broker_instance.put()
+                key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is not None:
                     return jsonify({'status': True, 'payload': broker_instance.to_dict(),
                                     'message': 'broker instance updated successfully'}), 200
@@ -610,7 +618,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                 stock_model.exchange_id = exchange_id
                 stock_model.stock = stock
                 stock_model.broker = broker
-                key = stock_model.put()
+                key = stock_model.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is not None:
                     return jsonify({'status': True, 'payload': stock_model.to_dict(),
                                     'message': 'stock model is update'}), 200
@@ -646,7 +654,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                 buy_instance.buy_ave_price = buy_ave_price
                 buy_instance.buy_market_val_percent = buy_market_val_percent
                 buy_instance.buy_trade_count = buy_trade_count
-                key = buy_instance.put()
+                key = buy_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
                     message: str = "For some strange reason we could not save your data to database"
                     raise DataServiceError(message)
@@ -683,7 +691,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                 sell_volume_instance.sell_market_val_percent = sell_market_val_percent
                 sell_volume_instance.sell_trade_count = sell_trade_count
                 sell_volume_instance.transaction_id = transaction_id
-                key = sell_volume_instance.put()
+                key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
 
                 if key is not None:
                     return jsonify({'status': True, 'payload': sell_volume_instance.to_dict(),
@@ -699,7 +707,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         except KeyError as e:
             return jsonify({'status': False, 'message': str(e)}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
@@ -733,13 +741,13 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             "message": "Stock not found",
         }), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_all_stocks(self) -> tuple:
         stock_list: typing.List[dict] = [stock.to_dict() for stock in Stock.query().fetch()]
         return jsonify({"status": True, "payload": stock_list, "message": "stocks returns"}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_broker_data(self, broker_id: str = None, broker_code: str = None) -> tuple:
         """
@@ -769,7 +777,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             "message": "Broker not found"
         }), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_all_brokers(self) -> tuple:
         brokers_list: typing.List[dict] = [broker.to_dict() for broker in Broker.query().fetch()]
@@ -778,7 +786,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             "payload": brokers_list,
             "message": "successfully fetched all brokers"}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_stock_model(self, transaction_id: str = None) -> tuple:
         if transaction_id is not None:
@@ -795,7 +803,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
         return jsonify({"status": False, "message": "transaction id is required"}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_all_stock_models(self) -> tuple:
         """
@@ -806,7 +814,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             "status": True, "payload": stock_model_list,
             "message": "successfully fetched all stock model data"}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_buy_volume(self, transaction_id: str = None, date_created: date_class = None,
                        stock_id: str = None) -> tuple:
@@ -827,7 +835,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "buy volume data successfully found"
         return jsonify({"status": True, "payload": buy_volume_list[0].to_dict(), "message": message}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_day_buy_volumes(self, date_created: date_class = None) -> tuple:
         """
@@ -841,7 +849,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "successfully fetched day buy volume data"
         return jsonify({"status": True, "payload": payload, "message": message}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_daily_buy_volumes_by_stock(self, stock_id: str = None) -> tuple:
         """
@@ -853,7 +861,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "successfully daily buy volumes by stock"
         return jsonify({"status": True, "payload": payload, "message": message}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_sell_volume(self, transaction_id: str = None, date_created: date_class = None,
                         stock_id: str = None) -> tuple:
@@ -881,7 +889,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
         return jsonify({"status": False, "message": "sell volume not found"}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_day_sell_volumes(self, date_created: date_class) -> tuple:
         """
@@ -893,7 +901,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "day sell volumes returned"
         return jsonify({"status": False, "payload": sell_volumes, "message": message}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_daily_sell_volumes_by_stock(self, stock_id: str = None) -> tuple:
         sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
@@ -903,7 +911,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "successfully fetched sell volume by stock"
         return jsonify({'status': False, "payload": payload, "message": message}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_net_volume(self, transaction_id: str = None, date_created: date_class = None,
                        stock_id: str = None) -> tuple:
@@ -921,7 +929,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "successfully fetched net volume"
         return jsonify({"status": True, "payload": payload, "message": message}), 200
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_day_net_volumes(self, date_created: date_class = None) -> tuple:
         if date_class is not None:
@@ -936,7 +944,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "day net volume data not found"
         return jsonify({"status": True, "payload": payload, "message": message}), 500
 
-    @cache_stock_buys_sells.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     def get_daily_net_volumes_by_stock(self, stock_id: str = None) -> tuple:
         if stock_id is not None:

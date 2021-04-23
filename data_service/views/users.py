@@ -1,9 +1,10 @@
 import typing
-from flask import jsonify
+from flask import jsonify, current_app
 from werkzeug.security import check_password_hash
 from data_service.config.types import dict_list_type
+from data_service.main import cache_users
 from data_service.store.users import UserModel
-from data_service.utils.utils import create_id
+from data_service.utils.utils import create_id, return_ttl
 from data_service.views.use_context import use_context
 
 users_type = typing.List[UserModel]
@@ -11,7 +12,8 @@ users_type = typing.List[UserModel]
 
 class UserView:
     def __init__(self):
-        pass
+        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
+        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
     def add_user(self, names: str, surname: str, cell: str, email: str, password: str, uid: str = None) -> tuple:
@@ -55,7 +57,7 @@ class UserView:
             user_instance.set_email(email=email)
             user_instance.set_password(password=password)
             user_instance.set_is_active(is_active=True)
-            user_instance.put()
+            user_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
             return jsonify({'status': True,
                             "message": "Successfully created new user",
                             "payload": user_instance.to_dict()
@@ -88,7 +90,7 @@ class UserView:
                 user_instance.set_surname(surname=surname)
                 user_instance.set_cell(cell=cell)
                 user_instance.set_email(email=email)
-                user_instance.put()
+                user_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 return jsonify({'status': True, 'message': 'successfully updated user details'}), 200
             except ValueError as e:
                 return jsonify({"status": False, "message": str(e)}), 500
@@ -126,6 +128,7 @@ class UserView:
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
         return jsonify({'status': False, 'message': 'user not found'}), 500
 
+    @cache_users.cached(timeout=return_ttl(name='short'))
     @use_context
     def get_active_users(self) -> tuple:
         """
@@ -133,9 +136,9 @@ class UserView:
         :return:
         """
         users_list: dict_list_type = [user.to_dict() for user in UserModel.query(UserModel.is_active == True).fetch()]
-        return jsonify(
-            {'status': True, 'payload': users_list, 'message': 'successfully retrieved active users'}), 200
+        return jsonify({'status': True, 'payload': users_list, 'message': 'successfully retrieved active users'}), 200
 
+    @cache_users.cached(timeout=return_ttl(name='short'))
     @use_context
     def get_in_active_users(self) -> tuple:
         """
@@ -143,9 +146,9 @@ class UserView:
         :return:
         """
         users_list: dict_list_type = [user.to_dict() for user in UserModel.query(UserModel.is_active == False).fetch()]
-        return jsonify(
-            {'status': True, 'payload': users_list, 'message': 'successfully retrieved active users'}), 200
+        return jsonify({'status': True, 'payload': users_list, 'message': 'successfully retrieved active users'}), 200
 
+    @cache_users.cached(timeout=return_ttl(name='short'))
     @use_context
     def get_all_users(self) -> tuple:
         """
@@ -156,6 +159,7 @@ class UserView:
         message: str = 'successfully retrieved active users'
         return jsonify({'status': True, 'payload': users_list, 'message': message}), 200
 
+    @cache_users.cached(timeout=return_ttl(name='medium'))
     @use_context
     def get_user(self, uid: str = None, cell: str = None, email: str = None) -> tuple:
         """
@@ -183,8 +187,7 @@ class UserView:
                 message: str = 'successfully retrieved user by email'
                 return jsonify({'status': True, 'payload': users_list[0], 'message': message}), 200
 
-        return jsonify(
-            {'status': False, 'message': 'to retrieve a user either submit an email, cell or user id'}), 500
+        return jsonify({'status': False, 'message': 'to retrieve a user either submit an email, cell or user id'}), 500
 
     @use_context
     def check_password(self, uid: str, password: str) -> tuple:

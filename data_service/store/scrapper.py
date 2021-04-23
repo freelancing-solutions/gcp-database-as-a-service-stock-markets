@@ -37,4 +37,17 @@ class ScrapperTempStore(ndb.Model):
     data = ndb.PickleProperty(validator=set_data)
     status = ndb.BooleanProperty(default=True, validator=set_status)
 
-    # TODO - finish this
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        if self.data_id != other.data_id:
+            return False
+        if self.status != other.status:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "Status: {} Data: {}".format(str(self.status), str(self.data))
+
+    def __repr__(self) -> str:
+        return self.__str__()
