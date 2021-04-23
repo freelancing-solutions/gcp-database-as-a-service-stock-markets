@@ -733,6 +733,7 @@ class CouponsView(Validators):
 
         return jsonify({'status': False, 'message': 'unable to cancel coupon code'}), 500
 
+    @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
     def get_all_coupons(self) -> tuple:
         coupons_list: typing.List[Coupons] = Coupons.query().fetch()
@@ -740,6 +741,7 @@ class CouponsView(Validators):
         message: str = "coupons successfully created"
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
 
+    @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
     def get_valid_coupons(self) -> tuple:
         coupons_list: typing.List[Coupons] = Coupons.query(Coupons.is_valid == True).fetch()
@@ -747,6 +749,7 @@ class CouponsView(Validators):
         message: str = "coupons successfully created"
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
 
+    @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
     def get_expired_coupons(self) -> tuple:
         coupons_list: typing.List[Coupons] = Coupons.query(Coupons.expiration_time < timestamp()).fetch()
