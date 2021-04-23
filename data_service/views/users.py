@@ -79,10 +79,8 @@ class UserView:
         if uid is None:
             return jsonify({'status': False, 'message': 'User ID is required'}), 500
 
-        user_list: users_type = UserModel.query(UserModel.uid == uid).fetch()
-
-        if isinstance(user_list, list) and len(user_list) > 0:
-            user_instance: UserModel = user_list[0]
+        user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
+        if isinstance(user_instance, UserModel):
             user_instance.set_names(names=names)
             user_instance.set_surname(surname=surname)
             user_instance.set_cell(cell=cell)
@@ -103,21 +101,19 @@ class UserView:
         :return:
         """
         if uid != "" and (uid is not None):
-            user_list: users_type = UserModel.query(UserModel.uid == uid).fetch()
-            if len(user_list) > 0:
-                user_instance: UserModel = user_list[0]
+            user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
+            if isinstance(user_instance, UserModel):
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
         if email != "" and (email is not None):
-            user_list: users_type = UserModel.query(UserModel.email == email).fetch()
-            if len(user_list) > 0:
-                user_instance: UserModel = user_list[0]
+            user_instance: UserModel = UserModel.query(UserModel.email == email).get()
+            if isinstance(user_instance, UserModel):
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
         if cell != "" and (cell is not None):
-            user_list: users_type = UserModel.query(UserModel.cell == cell).fetch()
-            if len(user_list) > 0:
-                user_instance: UserModel = user_list[0]
+            user_instance: UserModel = UserModel.query(UserModel.cell == cell).get()
+            if isinstance(user_instance, UserModel):
+                # TODO- rather mark user as deleted
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
         return jsonify({'status': False, 'message': 'user not found'}), 500
@@ -168,22 +164,22 @@ class UserView:
         :return:
         """
         if uid is not None:
-            users_list: dict_list_type = [user.to_dict() for user in UserModel.query(UserModel.uid == uid).fetch()]
-            if len(users_list) > 0:
+            user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
+            if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by uid'
-                return jsonify({'status': True, 'payload': users_list[0], 'message': message}), 200
+                return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
         if cell is not None:
-            users_list: dict_list_type = [user.to_dict() for user in UserModel.query(UserModel.cell == cell).fetch()]
-            if len(users_list) > 0:
+            user_instance: UserModel = UserModel.query(UserModel.cell == cell).get()
+            if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by cell'
-                return jsonify({'status': True, 'payload': users_list[0], 'message': message}), 200
+                return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
         if email is not None:
-            users_list: dict_list_type = [user.to_dict() for user in UserModel.query(UserModel.email == email).fetch()]
-            if len(users_list) > 0:
+            user_instance: UserModel = UserModel.query(UserModel.email == email).get()
+            if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by email'
-                return jsonify({'status': True, 'payload': users_list[0], 'message': message}), 200
+                return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
         return jsonify({'status': False, 'message': 'to retrieve a user either submit an email, cell or user id'}), 500
 
@@ -195,9 +191,8 @@ class UserView:
         if password is None:
             return jsonify({'status': False, 'message': 'please submit password'}), 500
 
-        users_list: users_type = UserModel.query(UserModel.uid == uid).fetch()
-        if len(users_list) > 0:
-            user_instance: UserModel = users_list[0]
+        user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
+        if isinstance(user_instance, UserModel):
             if check_password_hash(password=password, pwhash=user_instance.password) is True:
                 return jsonify({'status': True, 'message': 'passwords match'}), 200
             else:
@@ -210,9 +205,8 @@ class UserView:
     def deactivate_user(self, uid: str) -> tuple:
         if uid is None:
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
-        users_list: users_type = UserModel.query(UserModel.uid == uid).fetch()
-        if len(users_list) > 0:
-            user_instance: UserModel = users_list[0]
+        user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
+        if isinstance(user_instance, UserModel):
             if user_instance.set_is_active(is_active=False) is True:
                 user_instance.put()
                 return jsonify({'status': True, 'message': 'user deactivated'}), 200
