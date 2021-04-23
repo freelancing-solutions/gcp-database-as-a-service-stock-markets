@@ -9,6 +9,7 @@ from data_service.store.affiliates import EarningsValidators as ValidEarnings
 from data_service.store.affiliates import Affiliates, AffiliateSettingsStats, Recruits, EarningsData
 from data_service.store.exceptions import DataServiceError
 from data_service.utils.utils import create_id, return_ttl, end_of_month
+from data_service.views.exception_handlers import handle_ndb_errors
 from data_service.views.use_context import use_context
 
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
@@ -31,6 +32,7 @@ class AffiliatesView(Validator):
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
+    @handle_ndb_errors
     def register_affiliate(self, affiliate_data: dict) -> tuple:
         """
             Register new affiliate
@@ -38,32 +40,20 @@ class AffiliatesView(Validator):
         uid: typing.Union[None, str] = affiliate_data.get('uid')
         if uid is None or uid == "":
             return jsonify({'status': False, 'message': 'user id cannot be Null'}), 500
-
         if self.can_register_affiliate(uid=uid) is True:
-            try:
-                affiliate_instance: Affiliates = Affiliates(affiliate_id=create_id(), uid=uid)
-                key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = "There was an error creating Affiliate"
-                    raise DataServiceError(message)
-                return jsonify({'status': True,
-                                'message': 'successfully registered an affiliate',
-                                'payload': affiliate_instance.to_dict()}), 200
-
-            except BadRequestError as e:
-                return jsonify({'status': False, 'message': str(e)}), 500
-            except BadQueryError as e:
-                return jsonify({'status': False, 'message': str(e)}), 500
-            except ConnectionRefusedError as e:
-                return jsonify({'status': False, 'message': str(e)}), 500
-            except RetryError as e:
-                return jsonify({'status': False, 'message': str(e)}), 500
-            except Aborted as e:
-                return jsonify({'status': False, 'message': str(e)}), 500
+            affiliate_instance: Affiliates = Affiliates(affiliate_id=create_id(), uid=uid)
+            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "There was an error creating Affiliate"
+                raise DataServiceError(message)
+            return jsonify({'status': True,
+                            'message': 'successfully registered an affiliate',
+                            'payload': affiliate_instance.to_dict()}), 200
         else:
             return jsonify({'status': False, 'message': 'User already registered as an Affiliate'}), 500
 
     @use_context
+    @handle_ndb_errors
     def increment_total_recruits(self, affiliate_data: dict) -> tuple:
         """
             update an existing affiliate
@@ -71,33 +61,22 @@ class AffiliatesView(Validator):
         affiliate_id = affiliate_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
-        try:
-            affiliate_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-            if isinstance(affiliate_list, list) and len(affiliate_list) > 0:
-                affiliate_instance = affiliate_list[0]
-                affiliate_instance.total_recruits += 1
-                key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = "Something went wrong while updating affiliate"
-                    raise DataServiceError(message)
-                return jsonify({'status': True,
-                                'message': 'successfully incremented total recruits',
-                                'payload': affiliate_instance.to_dict()}), 200
-            else:
-                return jsonify({'status': False, 'message': 'Failed to locate affiliate'}), 500
-
-        except BadRequestError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except BadQueryError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except ConnectionRefusedError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except RetryError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except Aborted as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        affiliate_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
+        if isinstance(affiliate_list, list) and len(affiliate_list) > 0:
+            affiliate_instance = affiliate_list[0]
+            affiliate_instance.total_recruits += 1
+            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "Something went wrong while updating affiliate"
+                raise DataServiceError(message)
+            return jsonify({'status': True,
+                            'message': 'successfully incremented total recruits',
+                            'payload': affiliate_instance.to_dict()}), 200
+        else:
+            return jsonify({'status': False, 'message': 'Failed to locate affiliate'}), 500
 
     @use_context
+    @handle_ndb_errors
     def delete_affiliate(self, affiliate_data: dict) -> tuple:
         """
             delete affiliate
@@ -106,34 +85,23 @@ class AffiliatesView(Validator):
         affiliate_id: typing.Union[None, str] = affiliate_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
-        try:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-            if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
-                affiliate_instance = affiliates_list[0]
-                affiliate_instance.is_active = False
-                affiliate_instance.is_deleted = True
-                key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = 'something went wrong while deleting affiliate'
-                    return jsonify({'status': False, 'message': message}), 500
-                return jsonify({'status': True,
-                                'message': 'successfully deleted the affiliate',
-                                'payload': affiliate_instance.to_dict()}), 200
-            else:
-                return jsonify({'status': False, 'message': 'error locating that affiliate'}), 500
-
-        except BadRequestError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except BadQueryError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except ConnectionRefusedError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except RetryError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except Aborted as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
+        if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
+            affiliate_instance = affiliates_list[0]
+            affiliate_instance.is_active = False
+            affiliate_instance.is_deleted = True
+            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = 'something went wrong while deleting affiliate'
+                return jsonify({'status': False, 'message': message}), 500
+            return jsonify({'status': True,
+                            'message': 'successfully deleted the affiliate',
+                            'payload': affiliate_instance.to_dict()}), 200
+        else:
+            return jsonify({'status': False, 'message': 'error locating that affiliate'}), 500
 
     @use_context
+    @handle_ndb_errors
     def mark_active(self, affiliate_data: dict, is_active: bool) -> tuple:
         """
             mark a specific affiliate as active or not active
@@ -143,34 +111,23 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
         if not isinstance(is_active, bool):
             raise ValueError("is_active is required and can only be a boolean")
-
-        try:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-            if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
-                affiliate_instance: Affiliates = affiliates_list[0]
-                affiliate_instance.is_active = is_active
-                key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = "An Unknown Error occurred while trying to mark affiliate as in-active"
-                    return jsonify({'status': False, 'message': message}), 500
-                return jsonify({'status': True, 'message': 'successfully marked affiliate as inactive',
-                                'payload': affiliate_instance.to_dict()}), 200
-            else:
-                message: str = "Unable to locate affiliate record"
+        affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
+        if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
+            affiliate_instance: Affiliates = affiliates_list[0]
+            affiliate_instance.is_active = is_active
+            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "An Unknown Error occurred while trying to mark affiliate as in-active"
                 return jsonify({'status': False, 'message': message}), 500
-        except BadRequestError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except BadQueryError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except ConnectionRefusedError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except RetryError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except Aborted as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+            return jsonify({'status': True, 'message': 'successfully marked affiliate as inactive',
+                            'payload': affiliate_instance.to_dict()}), 200
+        else:
+            message: str = "Unable to locate affiliate record"
+            return jsonify({'status': False, 'message': message}), 500
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_affiliate(self, affiliate_data: dict) -> tuple:
         """
             with affiliate_id or uid return affiliate
@@ -180,21 +137,11 @@ class AffiliatesView(Validator):
 
         if (uid is None) and (affiliate_id is None):
             return jsonify({'status': False, 'message': 'uid or affiliate_id is required to fetch affiliate'}), 500
-        try:
-            if uid is not None:
-                affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.uid == uid).fetch()
-            else:
-                affiliates_list: typing.List[Affiliates] = Affiliates.query(
-                    Affiliates.affiliate_id == affiliate_id).fetch()
-        except ConnectionRefusedError as e:
-            message: str = str(e)
-            return jsonify({'status': False, 'message': message}), 500
-        except RetryError as e:
-            message: str = str(e.message or e)
-            return jsonify({'status': False, 'message': message}), 500
-        except Aborted as e:
-            message: str = str(e.message or e)
-            return jsonify({'status': False, 'message': message}), 500
+        if uid is not None:
+            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.uid == uid).fetch()
+        else:
+            affiliates_list: typing.List[Affiliates] = Affiliates.query(
+                Affiliates.affiliate_id == affiliate_id).fetch()
 
         if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
             affiliate_instance: Affiliates = affiliates_list[0]
@@ -206,6 +153,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_all_affiliates(self) -> tuple:
         """
             return all affiliates
@@ -217,6 +165,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_active_affiliates(self) -> tuple:
         """
             return affiliates who are not deleted and are active
@@ -229,6 +178,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_in_active_affiliates(self) -> tuple:
         """
             return affiliates who are not active
@@ -241,6 +191,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_deleted_affiliates(self) -> tuple:
         """
             return affiliates who are not active
@@ -252,6 +203,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_not_deleted_affiliates(self) -> tuple:
         """
             return affiliates who are not active
@@ -272,6 +224,7 @@ class RecruitsView(Validator):
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
+    @handle_ndb_errors
     def add_recruit(self, recruit_data: dict) -> tuple:
         """
             recruit_data: dict
@@ -290,6 +243,7 @@ class RecruitsView(Validator):
                         'payload': recruit_instance.to_dict()}), 200
 
     @use_context
+    @handle_ndb_errors
     def delete_recruit(self, recruit_data: dict) -> tuple:
 
         affiliate_id: str = recruit_data.get('affiliate_id')
@@ -311,6 +265,7 @@ class RecruitsView(Validator):
             return jsonify({'status': False, 'message': message}), 500
 
     @use_context
+    @handle_ndb_errors
     def mark_active(self, recruit_data: dict, is_active: bool) -> tuple:
         affiliate_id: str = recruit_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
@@ -334,6 +289,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_recruit(self, recruit_data: dict) -> tuple:
         affiliate_id: str = recruit_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
@@ -349,6 +305,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_recruits_by_active_status(self, is_active: bool) -> tuple:
         if not isinstance(is_active, bool):
             return jsonify({'status': False, 'message': 'is_active status is required'}), 500
@@ -360,6 +317,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_recruits_by_deleted_status(self, is_deleted: bool) -> tuple:
         if not isinstance(is_deleted, bool):
             return jsonify({'status': False, 'message': 'is_deleted status is required'}), 500
@@ -371,6 +329,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_recruits_by_affiliate(self, affiliate_data: dict) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
         if referrer_uid is None or referrer_uid == "":
@@ -383,6 +342,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_recruits_by_active_and_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
         if referrer_uid is None or referrer_uid == "":

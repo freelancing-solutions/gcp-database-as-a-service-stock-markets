@@ -10,6 +10,7 @@ from data_service.store.exceptions import DataServiceError
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
 from data_service.utils.utils import date_string_to_date, create_id, return_ttl, end_of_month
 from data_service.config import Config
+from data_service.views.exception_handlers import handle_ndb_errors
 from data_service.views.use_context import use_context
 
 stock_list_type = typing.List[Stock]
@@ -387,23 +388,17 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_stock_data
     @use_context
+    @handle_ndb_errors
     def create_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
-        try:
-            if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol) is True:
-                stock_instance: Stock = Stock(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name,
-                                              symbol=symbol)
-                key = stock_instance.put()
-                if key is None:
-                    message: str = "For some strange reason we could not save your data to database"
-                    raise DataServiceError(message)
-            else:
-                message: str = "Stock Duplicate detected, you cannot add duplicate stock in here"
-                return jsonify({'status': False, 'message': message}), 500
-        except ValueError as e:
-            message: str = str(e)
-            return jsonify({'status': False, 'message': message}), 500
-        except TypeError as e:
-            message: str = str(e)
+        if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol) is True:
+            stock_instance: Stock = Stock(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name,
+                                          symbol=symbol)
+            key = stock_instance.put()
+            if key is None:
+                message: str = "For some strange reason we could not save your data to database"
+                raise DataServiceError(message)
+        else:
+            message: str = "Stock Duplicate detected, you cannot add duplicate stock in here"
             return jsonify({'status': False, 'message': message}), 500
         return jsonify({'status': True,
                         'message': 'successfully saved stock data',
@@ -411,194 +406,151 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_broker_data
     @use_context
+    @handle_ndb_errors
     def create_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
-        try:
-            if self.can_add_broker(broker_id=broker_id, broker_code=broker_code):
-                broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code,
-                                                 broker_name=broker_name)
-                key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = "For some strange reason we could not save your data to database"
-                    raise DataServiceError(message)
-            else:
-                message: str = "cannot create broker data, duplicates would be created"
-                return jsonify({'status': False, 'message': message}), 500
-        except ValueError as e:
-            message: str = str(e)
+        if self.can_add_broker(broker_id=broker_id, broker_code=broker_code):
+            broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code,
+                                             broker_name=broker_name)
+            key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "For some strange reason we could not save your data to database"
+                raise DataServiceError(message)
+        else:
+            message: str = "cannot create broker data, duplicates would be created"
             return jsonify({'status': False, 'message': message}), 500
-        except TypeError as e:
-            message: str = str(e)
-            return jsonify({'status': False, 'message': message}), 500
-
         return jsonify({'status': True, 'message': 'successfully saved broker data',
                         'payload': broker_instance.to_dict()}), 200
 
     @use_context
+    @handle_ndb_errors
     def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
-        try:
-            stock_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
-            stock: Stock = stock_list[0]
-            broker_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
-            broker: Broker = broker_list[0]
-            stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
-                                                          sid=sid, stock=stock, broker=broker)
-            key = stock_model_instance.put()
-            if key is None:
-                message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
-
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except KeyError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        stock_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
+        stock: Stock = stock_list[0]
+        broker_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
+        broker: Broker = broker_list[0]
+        stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
+                                                      sid=sid, stock=stock, broker=broker)
+        key = stock_model_instance.put()
+        if key is None:
+            message: str = "For some strange reason we could not save your data to database"
+            raise DataServiceError(message)
         return jsonify({'status': True, 'message': 'Stock Model Successfully created',
                         'payload': stock_model_instance.to_dict()}), 200
 
     @data_wrappers.get_buy_volume_data
     @use_context
+    @handle_ndb_errors
     def create_buy_model(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                          buy_ave_price: int, buy_market_val_percent: int,
                          buy_trade_count: int) -> tuple:
 
-        try:
-            buy_volume_instance: BuyVolumeModel = BuyVolumeModel(stock_id=stock_id, date_created=date_created,
-                                                                 buy_volume=buy_volume, buy_value=buy_value,
-                                                                 buy_ave_price=buy_ave_price,
-                                                                 buy_market_val_percent=buy_market_val_percent,
-                                                                 buy_trade_count=buy_trade_count)
-            key = buy_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-            if key is None:
-                message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
-
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        buy_volume_instance: BuyVolumeModel = BuyVolumeModel(stock_id=stock_id, date_created=date_created,
+                                                             buy_volume=buy_volume, buy_value=buy_value,
+                                                             buy_ave_price=buy_ave_price,
+                                                             buy_market_val_percent=buy_market_val_percent,
+                                                             buy_trade_count=buy_trade_count)
+        key = buy_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        if key is None:
+            message: str = "For some strange reason we could not save your data to database"
+            raise DataServiceError(message)
 
         message: str = "Buy volume successfully created"
         return jsonify({'status': True, 'message': message, 'payload': buy_volume_instance.to_dict()}), 200
 
     @data_wrappers.get_sell_volume_data
     @use_context
+    @handle_ndb_errors
     def create_sell_volume(self, stock_id: str, date_created: date_class, sell_volume: int, sell_value: int,
                            sell_ave_price: int, sell_market_val_percent: int,
                            sell_trade_count: int) -> tuple:
-        try:
-            sell_volume_instance: SellVolumeModel = SellVolumeModel(stock_id=stock_id,
-                                                                    date_created=date_created,
-                                                                    sell_volume=sell_volume,
-                                                                    sell_value=sell_value,
-                                                                    sell_ave_price=sell_ave_price,
-                                                                    sell_market_val_percent=sell_market_val_percent,
-                                                                    sell_trade_count=sell_trade_count)
-            key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-            if key is None:
-                message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-
+        sell_volume_instance: SellVolumeModel = SellVolumeModel(stock_id=stock_id,
+                                                                date_created=date_created,
+                                                                sell_volume=sell_volume,
+                                                                sell_value=sell_value,
+                                                                sell_ave_price=sell_ave_price,
+                                                                sell_market_val_percent=sell_market_val_percent,
+                                                                sell_trade_count=sell_trade_count)
+        key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        if key is None:
+            message: str = "For some strange reason we could not save your data to database"
+            raise DataServiceError(message)
         return jsonify({'status': True, 'message': 'Sell Volume Successfully created',
                         'payload': sell_volume_instance.to_dict()}), 200
 
     # noinspection DuplicatedCode
     @data_wrappers.get_net_volume_data
     @use_context
+    @handle_ndb_errors
     def create_net_volume(self, stock_id: str, date_created: date_class, transaction_id: str, net_volume: str,
                           net_value: str, total_value: str, total_volume: str) -> tuple:
         """
             if net volume already exist update net volume
         """
+        net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
+            NetVolumeModel.transaction_id == transaction_id).fetch()
+        if isinstance(net_volume_list, list) and len(net_volume_list) > 0:
+            net_volume_instance: NetVolumeModel = net_volume_list[0]
+        else:
+            net_volume_instance: NetVolumeModel = NetVolumeModel()
 
-        try:
-            net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
-                NetVolumeModel.transaction_id == transaction_id).fetch()
-            if isinstance(net_volume_list, list) and len(net_volume_list) > 0:
-                net_volume_instance: NetVolumeModel = net_volume_list[0]
-            else:
-                net_volume_instance: NetVolumeModel = NetVolumeModel()
+        net_volume_instance.stock_id = stock_id
+        net_volume_instance.transaction_id = transaction_id
+        net_volume_instance.date_created = date_created
+        net_volume_instance.net_volume = net_volume
+        net_volume_instance.net_value = net_value
+        net_volume_instance.total_value = total_value
+        net_volume_instance.total_volume = total_volume
 
-            net_volume_instance.stock_id = stock_id
-            net_volume_instance.transaction_id = transaction_id
-            net_volume_instance.date_created = date_created
-            net_volume_instance.net_volume = net_volume
-            net_volume_instance.net_value = net_value
-            net_volume_instance.total_value = total_value
-            net_volume_instance.total_volume = total_volume
-
-            key = net_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-            if key is None:
-                message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-
+        key = net_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        if key is None:
+            message: str = "For some strange reason we could not save your data to database"
+            raise DataServiceError(message)
         message: str = 'Net Volume Successfully created'
         return jsonify({'status': True, 'message': message,
                         'payload': net_volume_instance.to_dict()}), 200
 
     @data_wrappers.get_stock_data
     @use_context
+    @handle_ndb_errors
     def update_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
-        try:
-            stock_instance_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
-            if len(stock_instance_list) > 0:
-                stock_instance: Stock = stock_instance_list[0]
-                stock_instance.stock_id = stock_id
-                stock_instance.stock_code = stock_code
-                stock_instance.stock_name = stock_name
-                stock_instance.symbol = symbol
-                key = stock_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is not None:
-                    return jsonify({'status': True, 'payload': stock_instance.to_dict(),
-                                    'message': 'successfully updated stock'}), 200
-                else:
-                    message: str = "Unable to update stock data due to database erros"
-                    raise DataServiceError(message)
+        stock_instance_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
+        if len(stock_instance_list) > 0:
+            stock_instance: Stock = stock_instance_list[0]
+            stock_instance.stock_id = stock_id
+            stock_instance.stock_code = stock_code
+            stock_instance.stock_name = stock_name
+            stock_instance.symbol = symbol
+            key = stock_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is not None:
+                return jsonify({'status': True, 'payload': stock_instance.to_dict(),
+                                'message': 'successfully updated stock'}), 200
             else:
-                message: str = "Could not find stock please try again later"
-                return jsonify({'status': False, 'message': message}), 500
-
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except KeyError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+                message: str = "Unable to update stock data due to database erros"
+                raise DataServiceError(message)
+        else:
+            message: str = "Could not find stock please try again later"
+            return jsonify({'status': False, 'message': message}), 500
 
     @data_wrappers.get_broker_data
     @use_context
+    @handle_ndb_errors
     def update_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
-        try:
-            broker_instance_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
-            if isinstance(broker_instance_list, list) and len(broker_instance_list) > 0:
-                broker_instance: Broker = broker_instance_list[0]
-                broker_instance.broker_id = broker_id
-                broker_instance.broker_code = broker_code
-                broker_instance.broker_name = broker_name
-                key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is not None:
-                    return jsonify({'status': True, 'payload': broker_instance.to_dict(),
-                                    'message': 'broker instance updated successfully'}), 200
-                else:
-                    message: str = 'while updating broker something snapped'
-                    raise DataServiceError(message)
-
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except KeyError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        broker_instance_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
+        if isinstance(broker_instance_list, list) and len(broker_instance_list) > 0:
+            broker_instance: Broker = broker_instance_list[0]
+            broker_instance.broker_id = broker_id
+            broker_instance.broker_code = broker_code
+            broker_instance.broker_name = broker_name
+            key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is not None:
+                return jsonify({'status': True, 'payload': broker_instance.to_dict(),
+                                'message': 'broker instance updated successfully'}), 200
+            else:
+                message: str = 'while updating broker something snapped'
+                raise DataServiceError(message)
 
     @use_context
+    @handle_ndb_errors
     def update_stock_model(self, stock_model: dict) -> tuple:
         if 'transaction_id' in stock_model and stock_model['transaction_id'] != "":
             transaction_id: str = stock_model['transaction_id']
@@ -619,107 +571,84 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             broker: Broker = stock_model['broker']
         else:
             return jsonify({'status': False, 'message': 'Broker is required'}), 500
-        try:
-            stock_model_list: typing.List[StockModel] = StockModel.query(
-                StockModel.transaction_id == transaction_id).fetch()
+        stock_model_list: typing.List[StockModel] = StockModel.query(
+            StockModel.transaction_id == transaction_id).fetch()
 
-            if isinstance(stock_model_list, list) and len(stock_model_list) > 0:
-                stock_model = stock_model_list[0]
-                stock_model.transaction_id = transaction_id
-                stock_model.exchange_id = exchange_id
-                stock_model.stock = stock
-                stock_model.broker = broker
-                key = stock_model.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is not None:
-                    return jsonify({'status': True, 'payload': stock_model.to_dict(),
-                                    'message': 'stock model is update'}), 200
-                else:
-                    message: str = 'Something snapped while updating stock model'
-                    raise DataServiceError(message)
-
+        if isinstance(stock_model_list, list) and len(stock_model_list) > 0:
+            stock_model = stock_model_list[0]
+            stock_model.transaction_id = transaction_id
+            stock_model.exchange_id = exchange_id
+            stock_model.stock = stock
+            stock_model.broker = broker
+            key = stock_model.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is not None:
+                return jsonify({'status': True, 'payload': stock_model.to_dict(),
+                                'message': 'stock model is update'}), 200
             else:
-                return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
+                message: str = 'Something snapped while updating stock model'
+                raise DataServiceError(message)
 
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except KeyError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        else:
+            return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
 
     @data_wrappers.get_buy_volume_data
     @use_context
+    @handle_ndb_errors
     def update_buy_volume(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                           buy_ave_price: int, buy_market_val_percent: int,
                           buy_trade_count: int, transaction_id: str) -> tuple:
-
-        try:
-            buy_transactions_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
-                BuyVolumeModel.transaction_id == transaction_id).fetch()
-            if isinstance(buy_transactions_list, list) > 0:
-                buy_instance: BuyVolumeModel = buy_transactions_list[0]
-                buy_instance.stock_id = stock_id
-                buy_instance.date_created = date_created
-                buy_instance.buy_volume = buy_volume
-                buy_instance.buy_value = buy_value
-                buy_instance.buy_ave_price = buy_ave_price
-                buy_instance.buy_market_val_percent = buy_market_val_percent
-                buy_instance.buy_trade_count = buy_trade_count
-                key = buy_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-                if key is None:
-                    message: str = "For some strange reason we could not save your data to database"
-                    raise DataServiceError(message)
-            else:
-                return jsonify({'status': False, 'message': 'buy volume not found'}), 500
-
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except KeyError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+        buy_transactions_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
+            BuyVolumeModel.transaction_id == transaction_id).fetch()
+        if isinstance(buy_transactions_list, list) > 0:
+            buy_instance: BuyVolumeModel = buy_transactions_list[0]
+            buy_instance.stock_id = stock_id
+            buy_instance.date_created = date_created
+            buy_instance.buy_volume = buy_volume
+            buy_instance.buy_value = buy_value
+            buy_instance.buy_ave_price = buy_ave_price
+            buy_instance.buy_market_val_percent = buy_market_val_percent
+            buy_instance.buy_trade_count = buy_trade_count
+            key = buy_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "For some strange reason we could not save your data to database"
+                raise DataServiceError(message)
+        else:
+            return jsonify({'status': False, 'message': 'buy volume not found'}), 500
 
         return jsonify({"status": True, "message": "successfully updated buy volume",
                         "payload": buy_instance.to_dict()})
 
     @data_wrappers.get_sell_volume_data
     @use_context
+    @handle_ndb_errors
     def update_sell_volume(self, stock_id: str, date_created: date_class, sell_volume: int, sell_value: int,
                            sell_ave_price: int, sell_market_val_percent: int,
                            sell_trade_count: int, transaction_id: str) -> tuple:
+        sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
+            SellVolumeModel.transaction_id == transaction_id).fetch()
 
-        try:
-            sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
-                SellVolumeModel.transaction_id == transaction_id).fetch()
+        if isinstance(sell_volume_list, list) and len(sell_volume_list) > 0:
+            sell_volume_instance: SellVolumeModel = sell_volume_list[0]
+            sell_volume_instance.stock_id = stock_id
+            sell_volume_instance.date_created = date_created
+            sell_volume_instance.sell_volume = sell_volume
+            sell_volume_instance.sell_value = sell_value
+            sell_volume_instance.sell_ave_price = sell_ave_price
+            sell_volume_instance.sell_market_val_percent = sell_market_val_percent
+            sell_volume_instance.sell_trade_count = sell_trade_count
+            sell_volume_instance.transaction_id = transaction_id
+            key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
 
-            if isinstance(sell_volume_list, list) and len(sell_volume_list) > 0:
-                sell_volume_instance: SellVolumeModel = sell_volume_list[0]
-                sell_volume_instance.stock_id = stock_id
-                sell_volume_instance.date_created = date_created
-                sell_volume_instance.sell_volume = sell_volume
-                sell_volume_instance.sell_value = sell_value
-                sell_volume_instance.sell_ave_price = sell_ave_price
-                sell_volume_instance.sell_market_val_percent = sell_market_val_percent
-                sell_volume_instance.sell_trade_count = sell_trade_count
-                sell_volume_instance.transaction_id = transaction_id
-                key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
-
-                if key is not None:
-                    return jsonify({'status': True, 'payload': sell_volume_instance.to_dict(),
-                                    'message': 'sell volume successfully updated'}), 200
-                else:
-                    message: str = "something snapped updating sell volume"
-                    raise DataServiceError(message)
-
-        except ValueError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except TypeError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
-        except KeyError as e:
-            return jsonify({'status': False, 'message': str(e)}), 500
+            if key is not None:
+                return jsonify({'status': True, 'payload': sell_volume_instance.to_dict(),
+                                'message': 'sell volume successfully updated'}), 200
+            else:
+                message: str = "something snapped updating sell volume"
+                raise DataServiceError(message)
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
             with either stock_id or stock_code or symbol return stock_data
@@ -733,7 +662,6 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         elif symbol is not None:
             stock_list: typing.List[dict] = [stock.to_dict() for stock in
                                              Stock.query(Stock.symbol == symbol).fetch()]
-
         else:
             return jsonify({
                 "status": False,
@@ -754,12 +682,14 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_all_stocks(self) -> tuple:
         stock_list: typing.List[dict] = [stock.to_dict() for stock in Stock.query().fetch()]
         return jsonify({"status": True, "payload": stock_list, "message": "stocks returns"}), 200
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_broker_data(self, broker_id: str = None, broker_code: str = None) -> tuple:
         """
             with either broker_id or broker_code return broker data
@@ -790,6 +720,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_all_brokers(self) -> tuple:
         brokers_list: typing.List[dict] = [broker.to_dict() for broker in Broker.query().fetch()]
         return jsonify({
@@ -799,6 +730,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_stock_model(self, transaction_id: str = None) -> tuple:
         if transaction_id is not None:
             stock_model_list: typing.List[StockModel] = StockModel.query(
@@ -816,6 +748,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_all_stock_models(self) -> tuple:
         """
             retu
@@ -827,6 +760,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_buy_volume(self, transaction_id: str = None, date_created: date_class = None,
                        stock_id: str = None) -> tuple:
         """
@@ -848,6 +782,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_day_buy_volumes(self, date_created: date_class = None) -> tuple:
         """
             return buy volumes for all stocks for a specific date_class
@@ -863,6 +798,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_daily_buy_volumes_by_stock(self, stock_id: str = None) -> tuple:
         """
             for a specific stock return daily buy volumes
@@ -875,6 +811,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_sell_volume(self, transaction_id: str = None, date_created: date_class = None,
                         stock_id: str = None) -> tuple:
         """
@@ -903,6 +840,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_day_sell_volumes(self, date_created: date_class) -> tuple:
         """
             fetch all daily sell volumes
@@ -915,6 +853,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_daily_sell_volumes_by_stock(self, stock_id: str = None) -> tuple:
         sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
             SellVolumeModel.stock_id == stock_id).fetch()
@@ -925,6 +864,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_net_volume(self, transaction_id: str = None, date_created: date_class = None,
                        stock_id: str = None) -> tuple:
         if transaction_id is not None:
@@ -943,6 +883,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_day_net_volumes(self, date_created: date_class = None) -> tuple:
         if date_class is not None:
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
@@ -958,6 +899,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_daily_net_volumes_by_stock(self, stock_id: str = None) -> tuple:
         if stock_id is not None:
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(

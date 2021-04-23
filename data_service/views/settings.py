@@ -5,6 +5,7 @@ from data_service.main import cache_stocks
 from data_service.store.settings import (UserSettingsModel, AdminSettingsModel, ExchangeDataModel,
                                          ScrappingPagesModel, StockAPIEndPointModel)
 from data_service.utils.utils import return_ttl, end_of_month
+from data_service.views.exception_handlers import handle_ndb_errors
 from data_service.views.use_context import use_context
 
 exc_list_type = typing.List[ExchangeDataModel]
@@ -28,6 +29,7 @@ class ExchangeDataView:
         pass
 
     @use_context
+    @handle_ndb_errors
     def add_exchange(self, country: str = None, name: str = None) -> tuple:
         exchange_instance: ExchangeDataModel = ExchangeDataModel()
         exchange_instance.set_exchange_country(country=country)
@@ -38,6 +40,7 @@ class ExchangeDataView:
                         "payload": exchange_instance.to_dict()}), 200
 
     @use_context
+    @handle_ndb_errors
     def update_exchange(self, exchange_id: str = None, country: str = None, name: str = None) -> tuple:
         exchanges_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
         if len(exchanges_list) > 0:
@@ -49,6 +52,7 @@ class ExchangeDataView:
         return jsonify({'status': False, 'message': 'exchange was not found'}), 500
 
     @use_context
+    @handle_ndb_errors
     def add_complete_stock_tickers_list(self, exchange_id: str, tickers_list: list) -> tuple:
         exchange_id: str = exchange_id.strip()
         exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
@@ -66,6 +70,7 @@ class ExchangeDataView:
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_exchange_tickers(self, exchange_id: str) -> tuple:
         exchange_id: str = exchange_id.strip()
         exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
@@ -80,6 +85,7 @@ class ExchangeDataView:
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def get_exchange(self, exchange_id: str) -> tuple:
         exchange_id: str = exchange_id.strip()
         exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
@@ -92,6 +98,7 @@ class ExchangeDataView:
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def return_all_exchanges(self) -> tuple:
         exchange_list: exc_list_type = ExchangeDataModel.query().fetch()
         payload: dict_list_type = [exchange.to_dict() for exchange in exchange_list]
@@ -100,6 +107,7 @@ class ExchangeDataView:
 
     @cache_stocks.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def return_exchange_errors(self, exchange_id: str) -> tuple:
         exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
         if len(exchange_list) > 0:
@@ -112,6 +120,7 @@ class ExchangeDataView:
         return jsonify({'status': False, 'message': 'error unable to locate exchange'}), 500
 
     @use_context
+    @handle_ndb_errors
     def delete_exchange(self, exchange_id: str) -> tuple:
         exchange_id: str = exchange_id.strip()
         exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
@@ -140,6 +149,7 @@ class ScrappingPagesView:
 
     @cache_stocks.cached(timeout=return_ttl(name='long'), unless=end_of_month)
     @use_context
+    @handle_ndb_errors
     def return_scrappers_settings(self) -> tuple:
         scrapping_instance_list: scrape_list_type = ScrappingPagesModel.query().fetch()
         payload: dict_list_type = [scrapping_instance.to_dict() for scrapping_instance in scrapping_instance_list]
@@ -148,6 +158,7 @@ class ScrappingPagesView:
                         'message': 'scrapping settings fetched successfully'})
 
     @use_context
+    @handle_ndb_errors
     def add_scrapper_settings(self, scrapper_settings: dict) -> tuple:
         if "exchange_id" in scrapper_settings and scrapper_settings['exchange_id'] != "":
             exchange_id: str = scrapper_settings.get('exchange_id') or None
@@ -191,24 +202,17 @@ class ScrappingPagesView:
                 except TypeError as e:
                     return jsonify({'status': False, 'message': str(e)})
             else:
-                pass
-            try:
-                scrapper_settings_instance.set_exchange_id(exchange_id=exchange_id)
-                scrapper_settings_instance.set_page_id()
-                scrapper_settings_instance.set_target_url(target_url=target_url)
-                scrapper_settings_instance.set_access_timestamps(access_timestamps=access_timestamps)
-                scrapper_settings_instance.set_require_login(require_login=require_login)
+                return jsonify({"status": False, "message": "require_login is required"}), 500
+            scrapper_settings_instance.set_exchange_id(exchange_id=exchange_id)
+            scrapper_settings_instance.set_page_id()
+            scrapper_settings_instance.set_target_url(target_url=target_url)
+            scrapper_settings_instance.set_access_timestamps(access_timestamps=access_timestamps)
+            scrapper_settings_instance.set_require_login(require_login=require_login)
 
-                key = scrapper_settings_instance.put()
-                return jsonify({'status': True, 'message': "successfully created new scrapper settings",
-                                'payload': scrapper_settings_instance.to_dict()})
+            key = scrapper_settings_instance.put()
+            return jsonify({'status': True, 'message': "successfully created new scrapper settings",
+                            'payload': scrapper_settings_instance.to_dict()})
 
-            except ValueError as e:
-                return jsonify({'status': False, 'message': str(e)})
-            except TypeError as e:
-                return jsonify({'status': False, 'message': str(e)})
-
-        return jsonify({"status": False, "message": "require_login is required"}), 500
 
 
 class StockAPIEndPointView:
