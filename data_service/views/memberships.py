@@ -86,14 +86,15 @@ class MembershipsView(Validators):
     def _create_or_update_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
         if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date).result() is True:
             # can use get to simplify this and make transactions faster
-            member_ships_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
-            if isinstance(member_ships_list, list) and len(member_ships_list) > 0:
-                membership_instance: Memberships = member_ships_list[0]
+            membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+            if isinstance(membership_instance, Memberships):
+                pass
             else:
                 membership_instance: Memberships = Memberships()
                 membership_instance.plan_id = create_id()
                 membership_instance.status = 'Unpaid'
                 membership_instance.date_created = datetime.now()
+
             membership_instance.uid = uid
             membership_instance.plan_start_date = plan_start_date
             key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
@@ -205,12 +206,10 @@ class MembershipsView(Validators):
         """
             returns user membership details
         """
-        membership_list: typing.List[Memberships] = Memberships.query(Memberships.uid == uid).fetch()
-        response_data: typing.List[dict] = [member.to_dict() for member in membership_list]
-
-        if isinstance(response_data, list) and len(response_data):
+        member_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+        if isinstance(member_instance, Memberships):
             return jsonify(
-                {'status': True, 'payload': response_data[0], 'message': 'successfully fetched members'}), 200
+                {'status': True, 'payload': member_instance.to_dict(), 'message': 'successfully fetched members'}), 200
         else:
             return jsonify({'status': False, 'message': 'user does not have any membership plan'}), 500
 
