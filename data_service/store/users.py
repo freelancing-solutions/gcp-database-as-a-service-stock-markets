@@ -36,6 +36,8 @@ class UserModel(ndb.Model):
     password: str = ndb.StringProperty()
     is_active: bool = ndb.BooleanProperty(default=True)
     time_registered: int = ndb.IntegerProperty(default=timestamp())
+    is_admin: bool = ndb.BooleanProperty(default=False)
+    is_support: bool = ndb.BooleanProperty(default=False)
 
     def set_uid(self, uid: str) -> bool:
         if uid is None:
@@ -102,3 +104,17 @@ class UserModel(ndb.Model):
             raise TypeError('time registered can only be an integer')
         self.time_registered = time_registered
         return True
+
+    def set_admin(self, is_admin: bool) -> bool:
+        if not isinstance(is_admin, bool):
+            raise TypeError("invalid argument")
+        self.is_admin = is_admin
+        return True
+
+    def set_support(self, is_support: bool) -> bool:
+        if not isinstance(is_support, bool):
+            raise TypeError("invalid argument")
+        self.is_support = is_support
+        return True
+
+
