@@ -28,7 +28,7 @@ def handle_ndb_errors(func):
             message: str = str(e)
             return jsonify({'status': False, 'message': message}), 500
         except RetryError as e:
-            message: str = str(e.message or e)
+            message: str = str(e)
             return jsonify({'status': False, 'message': message}), 500
         except Aborted as e:
             message: str = str(e.message or e)

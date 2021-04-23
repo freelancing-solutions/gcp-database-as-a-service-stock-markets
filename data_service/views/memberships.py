@@ -411,6 +411,7 @@ class AccessRightsView:
                 return None
         return None
 
+
 # Coupon data wrapper
 def get_coupon_data(func):
     functools.wraps(func)
@@ -421,17 +422,14 @@ def get_coupon_data(func):
             code: str = coupon_data.get('code')
         else:
             return jsonify({'status': False, 'message': 'coupon code is required'}), 500
-
         if "discount" in coupon_data and coupon_data['discount'] != "":
             discount: int = int(coupon_data.get('discount'))
         else:
             return jsonify({'status': False, 'message': 'discount is required'}), 500
-
         if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
             expiration_time: int = int(coupon_data['expiration_time'])
         else:
             return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
-
         return func(code=code, discount=discount, expiration_time=expiration_time, *args)
 
     return wrapper
@@ -536,4 +534,3 @@ class CouponsView(Validators):
             return jsonify({'status': True, 'message': message, 'payload': coupon_instance.to_dict()}), 200
         message: str = "Invalid Coupon Code"
         return jsonify({'status': True, 'message': message}), 500
-
