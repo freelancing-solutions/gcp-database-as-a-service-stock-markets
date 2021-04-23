@@ -12,7 +12,7 @@ from data_service.store.mixins import AmountMixin
 from data_service.store.users import UserValidators as UserValid
 from data_service.store.memberships import MembershipValidators as MemberValid
 from data_service.store.memberships import CouponsValidator as CouponValid
-from data_service.utils.utils import create_id, end_of_month, return_ttl
+from data_service.utils.utils import create_id, end_of_month, return_ttl, timestamp
 from data_service.main import cache_memberships
 from data_service.views.use_context import use_context
 
@@ -53,7 +53,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         raise DataServiceError(message)
 
     @ndb.tasklet
-    def can_add_coupon(self, code: str, expiration_time: int) -> any:
+    def can_add_coupon(self, code: str, expiration_time: int, discount: int) -> any:
         coupon_exist: typing.Union[None, bool] = yield self.coupon_exist(code=code)
         expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
         discount_valid: typing.Union[None, bool] = yield self.discount_valid(discount=discount)
@@ -69,7 +69,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
         discount_valid: typing.Union[None, bool] = yield self.discount_valid(discount=discount)
 
-        if isinstance(coupon_exist, bool) and isinstance(expiration_valid,bool) and isinstance(discount_valid, bool):
+        if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return coupon_exist and expiration_valid and discount_valid
 
         message: str = "Unable to verify input data"
@@ -703,23 +703,53 @@ class CouponsView(Validators):
             message: str = "Unable to update coupon code"
             return jsonify({'status': False, 'message': message}), 500
 
-    def set_expiration_date(self, coupon_data: dict, expiration_time: int) -> tuple:
-        pass
-
+    @use_context
     def cancel_coupon(self, coupon_data: dict) -> tuple:
-        pass
+        if "code" in coupon_data and coupon_data['code'] != "":
+            code : str = coupon_data['code']
+        else:
+            message: str = "Coupon Code is required"
+            return jsonify({'status': False, 'message': message}), 500
 
+        try:
+            coupon_instace: Coupons = Coupons.query(Coupons.code == code).get()
+            if isinstance(coupon_instace, Coupons):
+                coupon_instace.is_valid = False
+                key = coupon_instace.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+                if key is None:
+                    message: str = "Unable to cancel coupon"
+                    return jsonify({'status': False, 'message': message}), 500
+                return jsonify({'status': True, 'message': 'successfully cancelled coupon code'}), 200
+
+        except ConnectionRefusedError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except RetryError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except Aborted as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+
+        return jsonify({'status': False, 'message': 'unable to cancel coupon code'}), 500
+
+    @use_context
     def get_all_coupons(self) -> tuple:
-        pass
+        coupons_list: typing.List[Coupons] = Coupons.query().fetch()
+        payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
+        message: str = "coupons successfully created"
+        return jsonify({'status': True, 'payload': payload, 'message': message}), 200
 
+    @use_context
     def get_valid_coupons(self) -> tuple:
-        pass
+        coupons_list: typing.List[Coupons] = Coupons.query(Coupons.is_valid == True).fetch()
+        payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
+        message: str = "coupons successfully created"
+        return jsonify({'status': True, 'payload': payload, 'message': message}), 200
 
+    @use_context
     def get_expired_coupons(self) -> tuple:
-        pass
-
-    def remove_coupon(self) -> tuple:
-        pass
-
-    def remove_all_expired(self) -> tuple:
-        pass
+        coupons_list: typing.List[Coupons] = Coupons.query(Coupons.expiration_time < timestamp()).fetch()
+        payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
+        message: str = "coupons successfully created"
+        return jsonify({'status': True, 'payload': payload, 'message': message}), 200
