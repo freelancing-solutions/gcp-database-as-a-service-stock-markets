@@ -62,7 +62,6 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         raise DataServiceError(message)
 
 
-
 class MembershipsView(Validators):
 
     def __init__(self):
@@ -626,12 +625,15 @@ class CouponsView(Validators):
         else:
             return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
         try:
-            if self.can_add_coupon(code=code,expiration_time=expiration_time):
+            if self.can_add_coupon(code=code, expiration_time=expiration_time):
                 coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
                 key = coupons_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
                     message: str = "an error occured while creating coupon"
                     return jsonify({'status': False, 'message': message}), 500
+            else:
+                message: str = 'Unable to add coupon, please check expiration time or coupon code'
+                return jsonify({'status': False, 'message': message}), 500
 
         except ConnectionRefusedError as e:
             message: str = str(e)
@@ -643,12 +645,13 @@ class CouponsView(Validators):
             message: str = str(e)
             return jsonify({'status': False, 'message': message}), 500
 
-        return jsonify({'status': True, 'message': 'successfully created coupon code', 'payload': coupons_instance.to_dict()}), 200
+        return jsonify({'status': True, 'message': 'successfully created coupon code',
+                        'payload': coupons_instance.to_dict()}), 200
 
     def update_coupon(self, coupon_data: dict) -> tuple:
         pass
 
-    def set_expiration_date(self, coupon_data: dict, expire_timestamp: int ) -> tuple:
+    def set_expiration_date(self, coupon_data: dict, expire_timestamp: int) -> tuple:
         pass
 
     def cancel_coupon(self, coupon_data: dict) -> tuple:
@@ -668,6 +671,3 @@ class CouponsView(Validators):
 
     def remove_all_expired(self) -> tuple:
         pass
-
-
-

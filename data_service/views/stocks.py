@@ -14,224 +14,235 @@ from data_service.views.use_context import use_context
 
 stock_list_type = typing.List[Stock]
 
+
 class StockDataWrappers:
     """
         # NOTES: request wrappers for stock, broker, buy_volume sell_volume, and net_volume
     """
+
     def __init__(self):
         pass
 
-def get_stock_data(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        stock_data: dict = kwargs.get('stock_data')
-        if 'stock_id' in stock_data and stock_data['stock_id'] != "":
-            stock_id: str = stock_data.get('stock_id') or None
-        else:
-            stock_id = create_id(size=12)
-        if 'stock_code' in stock_data and stock_data['stock_code'] != "":
-            stock_code: str = stock_data.get('stock_code') or None
-        else:
-            return jsonify({'status': False, 'message': 'Stock Code is required'}), 500
+    @staticmethod
+    def get_stock_data(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            stock_data: dict = kwargs.get('stock_data')
+            if 'stock_id' in stock_data and stock_data['stock_id'] != "":
+                stock_id: str = stock_data.get('stock_id') or None
+            else:
+                stock_id = create_id(size=12)
+            if 'stock_code' in stock_data and stock_data['stock_code'] != "":
+                stock_code: str = stock_data.get('stock_code') or None
+            else:
+                return jsonify({'status': False, 'message': 'Stock Code is required'}), 500
 
-        if 'stock_name' in stock_data and stock_data['stock_name'] != "":
-            stock_name: str = stock_data.get('stock_name') or None
-        else:
-            return jsonify({'status': False, 'message': 'Stock Name is required'}), 500
-        if 'symbol' in stock_data and stock_data['symbol'] != "":
-            symbol: str = stock_data.get('symbol') or None
-        else:
-            return jsonify({'status': False, 'message': 'Stock Symbol is required'}), 500
+            if 'stock_name' in stock_data and stock_data['stock_name'] != "":
+                stock_name: str = stock_data.get('stock_name') or None
+            else:
+                return jsonify({'status': False, 'message': 'Stock Name is required'}), 500
+            if 'symbol' in stock_data and stock_data['symbol'] != "":
+                symbol: str = stock_data.get('symbol') or None
+            else:
+                return jsonify({'status': False, 'message': 'Stock Symbol is required'}), 500
 
-        return func(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name, symbol=symbol, *args)
+            return func(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name, symbol=symbol, *args)
 
-    return wrapper
+        return wrapper
 
-def get_broker_data(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        broker_data: dict = kwargs.get('broker_data')
-        if "broker_id" in broker_data and broker_data['broker_id'] != "":
-            broker_id: str = broker_data.get('broker_id') or None
-        else:
-            broker_id: str = create_id(size=12)
-        if "broker_code" in broker_data and broker_data['broker_code'] != "":
-            broker_code: str = broker_data.get('broker_code') or None
-        else:
-            return jsonify({'status': False, 'message': 'Broker Code is required'}), 500
-        if "broker_name" in broker_data and broker_data['broker_name'] != "":
-            broker_name: str = broker_data.get("broker_name")
-        else:
-            return jsonify({'status': False, 'message': 'Broker Name is required'}), 500
+    @staticmethod
+    def get_broker_data(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            broker_data: dict = kwargs.get('broker_data')
+            if "broker_id" in broker_data and broker_data['broker_id'] != "":
+                broker_id: str = broker_data.get('broker_id') or None
+            else:
+                broker_id: str = create_id(size=12)
+            if "broker_code" in broker_data and broker_data['broker_code'] != "":
+                broker_code: str = broker_data.get('broker_code') or None
+            else:
+                return jsonify({'status': False, 'message': 'Broker Code is required'}), 500
+            if "broker_name" in broker_data and broker_data['broker_name'] != "":
+                broker_name: str = broker_data.get("broker_name")
+            else:
+                return jsonify({'status': False, 'message': 'Broker Name is required'}), 500
 
-        return func(broker_id=broker_id, broker_code=broker_code, broker_name=broker_name, *args)
+            return func(broker_id=broker_id, broker_code=broker_code, broker_name=broker_name, *args)
 
-    return wrapper
+        return wrapper
 
-def get_buy_volume_data(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        buy_data: dict = kwargs.get('buy_data')
-        if not isinstance(buy_data, dict):
-            return jsonify({'status': False, 'message': 'Please provide buy volume data'}), 500
+    @staticmethod
+    def get_buy_volume_data(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            buy_data: dict = kwargs.get('buy_data')
+            if not isinstance(buy_data, dict):
+                return jsonify({'status': False, 'message': 'Please provide buy volume data'}), 500
 
-        if "stock_id" in buy_data and buy_data['stock_id'] != "":
-            stock_id: str = buy_data.get('stock_id') or None
-        else:
-            return jsonify({'status': False, 'message': "stock id is required"}), 500
-        if "date_class" in buy_data and buy_data['date_class'] != "":
-            # TODO- insure that FORMAT is DD_MM-YYYY
-            try:
-                date_created: date_class = date_string_to_date(buy_data.get('date_class'))
-            except ValueError:
-                date_created: date_class = datetime.datetime.now().date_class()
-        else:
-            return jsonify({'status': False, 'message': "date_class is required"}), 500
+            if "stock_id" in buy_data and buy_data['stock_id'] != "":
+                stock_id: str = buy_data.get('stock_id') or None
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
+            if "date_class" in buy_data and buy_data['date_class'] != "":
+                # TODO- insure that FORMAT is DD_MM-YYYY
+                try:
+                    date_created: date_class = date_string_to_date(buy_data.get('date_class'))
+                except ValueError:
+                    date_created: date_class = datetime.now().date()
+            else:
+                return jsonify({'status': False, 'message': "date_class is required"}), 500
 
-        if "buy_volume" in buy_data and buy_data['buy_volume'] != "":
-            buy_volume: int = int(buy_data.get('buy_volume'))
-        else:
-            return jsonify({'status': False, 'message': "buy volume is required"}), 500
+            if "buy_volume" in buy_data and buy_data['buy_volume'] != "":
+                buy_volume: int = int(buy_data.get('buy_volume'))
+            else:
+                return jsonify({'status': False, 'message': "buy volume is required"}), 500
 
-        if "buy_value" in buy_data and buy_data["buy_value"] != "":
-            buy_value: int = int(buy_data.get("buy_value"))
-        else:
-            return jsonify({'status': False, 'message': "buy value is required"}), 500
+            if "buy_value" in buy_data and buy_data["buy_value"] != "":
+                buy_value: int = int(buy_data.get("buy_value"))
+            else:
+                return jsonify({'status': False, 'message': "buy value is required"}), 500
 
-        if "buy_ave_price" in buy_data and buy_data["buy_ave_price"] != "":
-            buy_ave_price: int = int(buy_data.get("buy_ave_price"))
-        else:
-            return jsonify({'status': False, 'message': "buy average price is required"}), 500
+            if "buy_ave_price" in buy_data and buy_data["buy_ave_price"] != "":
+                buy_ave_price: int = int(buy_data.get("buy_ave_price"))
+            else:
+                return jsonify({'status': False, 'message': "buy average price is required"}), 500
 
-        if "buy_market_val_percent" in buy_data and buy_data["buy_market_val_percent"] != "":
-            buy_market_val_percent: int = int(buy_data.get("buy_market_val_percent"))
-        else:
-            return jsonify({'status': False, 'message': "buy market value percent is required"}), 500
+            if "buy_market_val_percent" in buy_data and buy_data["buy_market_val_percent"] != "":
+                buy_market_val_percent: int = int(buy_data.get("buy_market_val_percent"))
+            else:
+                return jsonify({'status': False, 'message': "buy market value percent is required"}), 500
 
-        if "buy_trade_count" in buy_data and buy_data["buy_trade_count"] != "":
-            buy_trade_count: int = int(buy_data.get("buy_trade_count"))
-        else:
-            return jsonify({'status': False, 'message': "buy trade account"}), 500
+            if "buy_trade_count" in buy_data and buy_data["buy_trade_count"] != "":
+                buy_trade_count: int = int(buy_data.get("buy_trade_count"))
+            else:
+                return jsonify({'status': False, 'message': "buy trade account"}), 500
 
-        if "transaction_id" in buy_data and buy_data["transaction_id"] != "":
-            transaction_id: str = buy_data.get("transaction_id")
+            if "transaction_id" in buy_data and buy_data["transaction_id"] != "":
+                transaction_id: str = buy_data.get("transaction_id")
 
-            return func(stock_id=stock_id, date_created=date_created, buy_volume=buy_volume,
+                return func(stock_id=stock_id, date_created=date_created, buy_volume=buy_volume,
+                            buy_value=buy_value, buy_ave_price=buy_ave_price,
+                            buy_market_val_percent=buy_market_val_percent, buy_trade_count=buy_trade_count,
+                            transaction_id=transaction_id, *args)
+
+            return func(stock_id=stock_id, date_class=date_created, buy_volume=buy_volume,
                         buy_value=buy_value, buy_ave_price=buy_ave_price,
-                        buy_market_val_percent=buy_market_val_percent, buy_trade_count=buy_trade_count,
-                        transaction_id=transaction_id, *args)
+                        buy_market_val_percent=buy_market_val_percent, buy_trade_count=buy_trade_count, *args)
 
-        return func(stock_id=stock_id, date_class=date_created, buy_volume=buy_volume,
-                    buy_value=buy_value, buy_ave_price=buy_ave_price,
-                    buy_market_val_percent=buy_market_val_percent, buy_trade_count=buy_trade_count, *args)
+        return wrapper
 
-    return wrapper
+    @staticmethod
+    def get_sell_volume_data(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            sell_data: dict = kwargs.get('sell_data')
+            if sell_data is None:
+                return jsonify({'status': False, 'message': 'Unable to get sell volume data'}), 500
 
-def get_sell_volume_data(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        sell_data: dict = kwargs.get('sell_data')
-        if sell_data is None:
-            return jsonify({'status': False, 'message': 'Unable to get sell volume data'}), 500
+            if "stock_id" in sell_data and sell_data['stock_id'] != "":
+                stock_id: str = sell_data.get('stock_id') or None
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
 
-        if "stock_id" in sell_data and sell_data['stock_id'] != "":
-            stock_id: str = sell_data.get('stock_id') or None
-        else:
-            return jsonify({'status': False, 'message': "stock id is required"}), 500
+            if "date_class" in sell_data and sell_data["date_class"] != "":
+                try:
+                    date_created: date_class = date_string_to_date(sell_data.get('date_class'))
+                except ValueError:
+                    date_created: date_class = datetime.date(datetime.now())
+            else:
+                return jsonify({'status': False, 'message': "date_class is required"}), 500
 
-        if "date_class" in sell_data and sell_data["date_class"] != "":
-            try:
-                date_created: date_class = date_string_to_date(sell_data.get('date_class'))
-            except ValueError:
-                date_created: date_class = datetime.datetime.date_class(datetime.datetime.now())
-        else:
-            return jsonify({'status': False, 'message': "date_class is required"}), 500
+            if "sell_volume" in sell_data and sell_data["sell_volume"] != "":
+                sell_volume: int = int(sell_data.get("sell_volume"))
+            else:
+                return jsonify({"status": False, "message": "sell volume is required"}), 500
 
-        if "sell_volume" in sell_data and sell_data["sell_volume"] != "":
-            sell_volume: int = int(sell_data.get("sell_volume"))
-        else:
-            return jsonify({"status": False, "message": "sell volume is required"}), 500
+            if "sell_value" in sell_data and sell_data["sell_value"] != "":
+                sell_value: int = int(sell_data.get("sell_value"))
+            else:
+                return jsonify({"status": False, "message": "sell value is required"}), 500
 
-        if "sell_value" in sell_data and sell_data["sell_value"] != "":
-            sell_value: int = int(sell_data.get("sell_value"))
-        else:
-            return jsonify({"status": False, "message": "sell value is required"}), 500
+            if "sell_ave_price" in sell_data and sell_data["sell_ave_price"] != "":
+                sell_ave_price: int = int(sell_data.get("sell_ave_price"))
+            else:
+                return jsonify({"status": False, "message": "sell ave price is required"}), 500
 
-        if "sell_ave_price" in sell_data and sell_data["sell_ave_price"] != "":
-            sell_ave_price: int = int(sell_data.get("sell_ave_price"))
-        else:
-            return jsonify({"status": False, "message": "sell ave price is required"}), 500
+            if "sell_market_val_percent" in sell_data and sell_data["sell_market_val_percent"] != "":
+                sell_market_val_percent: int = int(sell_data.get("sell_market_val_percent"))
+            else:
+                return jsonify({"status": False, "message": "sell market value percent price is required"}), 500
 
-        if "sell_market_val_percent" in sell_data and sell_data["sell_market_val_percent"] != "":
-            sell_market_val_percent: int = int(sell_data.get("sell_market_val_percent"))
-        else:
-            return jsonify({"status": False, "message": "sell market value percent price is required"}), 500
+            if "sell_trade_count" in sell_data and sell_data["sell_trade_count"] != "":
+                sell_trade_count: int = int(sell_data.get("sell_trade_count"))
+            else:
+                return jsonify({"status": False, "message": "sell trade account percent price is required"}), 500
+            if 'transaction_id' in sell_data and sell_data['transaction_id'] != "":
+                transaction_id: str = sell_data['transaction_id']
 
-        if "sell_trade_count" in sell_data and sell_data["sell_trade_count"] != "":
-            sell_trade_count: int = int(sell_data.get("sell_trade_count"))
-        else:
-            return jsonify({"status": False, "message": "sell trade account percent price is required"}), 500
-        if 'transaction_id' in sell_data and sell_data['transaction_id'] != "":
-            transaction_id: str = sell_data['transaction_id']
+                return func(stock_id=stock_id, date_created=date_created, sell_volume=sell_volume,
+                            sell_value=sell_value,
+                            sell_ave_price=sell_ave_price, sell_market_val_percent=sell_market_val_percent,
+                            sell_trade_count=sell_trade_count, transaction_id=transaction_id, *args)
 
             return func(stock_id=stock_id, date_created=date_created, sell_volume=sell_volume, sell_value=sell_value,
                         sell_ave_price=sell_ave_price, sell_market_val_percent=sell_market_val_percent,
-                        sell_trade_count=sell_trade_count, transaction_id=transaction_id, *args)
+                        sell_trade_count=sell_trade_count, *args)
 
-        return func(stock_id=stock_id, date_created=date_created, sell_volume=sell_volume, sell_value=sell_value,
-                    sell_ave_price=sell_ave_price, sell_market_val_percent=sell_market_val_percent,
-                    sell_trade_count=sell_trade_count, *args)
+        return wrapper
 
-    return wrapper
+    @staticmethod
+    def get_net_volume_data(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            net_volume_data: dict = kwargs.get('net_volume_data')
 
-def get_net_volume_data(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        net_volume_data: dict = kwargs.get('net_volume_data')
+            if net_volume_data is None:
+                return jsonify({'status': False, 'message': 'please define net volume data'}), 500
 
-        if net_volume_data is None:
-            return jsonify({'status': False, 'message': 'please define net volume data'}), 500
+            if "stock_id" in net_volume_data and net_volume_data["stock_id"] != "":
+                stock_id: str = net_volume_data.get("stock_id") or None
+            else:
+                return jsonify({'status': False, 'message': "stock id is required"}), 500
+            if "date_class" in net_volume_data and net_volume_data['date_class'] != "":
+                # assumed format DD/MM/YYYY
+                date_created: date_class = date_string_to_date(net_volume_data['date_class'])
+            else:
+                return jsonify({'status': False, 'message': "date_class is required"}), 500
 
-        if "stock_id" in net_volume_data and net_volume_data["stock_id"] != "":
-            stock_id: str = net_volume_data.get("stock_id") or None
-        else:
-            return jsonify({'status': False, 'message': "stock id is required"}), 500
-        if "date_class" in net_volume_data and net_volume_data['date_class'] != "":
-            # assumed format DD/MM/YYYY
-            date_created: date_class = date_string_to_date(net_volume_data['date_class'])
-        else:
-            return jsonify({'status': False, 'message': "date_class is required"}), 500
+            if "transaction_id" in net_volume_data and net_volume_data["transaction_id"] != "":
+                transaction_id: str = net_volume_data.get("transaction_id") or None
+            else:
+                return jsonify({'status': False, 'message': "transaction id is required"}), 500
 
-        if "transaction_id" in net_volume_data and net_volume_data["transaction_id"] != "":
-            transaction_id: str = net_volume_data.get("transaction_id") or None
-        else:
-            return jsonify({'status': False, 'message': "transaction id is required"}), 500
+            if "net_volume" in net_volume_data and net_volume_data["net_volume"] != "":
+                net_volume: int = int(net_volume_data.get("net_volume"))
+            else:
+                return jsonify({'status': False, 'message': "net volume is required"}), 500
 
-        if "net_volume" in net_volume_data and net_volume_data["net_volume"] != "":
-            net_volume: int = int(net_volume_data.get("net_volume"))
-        else:
-            return jsonify({'status': False, 'message': "net volume is required"}), 500
+            if "net_value" in net_volume_data and net_volume_data["net_value"] != "":
+                net_value: int = int(net_volume_data.get("net_value"))
+            else:
+                return jsonify({'status': False, 'message': "net value is required"}), 500
 
-        if "net_value" in net_volume_data and net_volume_data["net_value"] != "":
-            net_value: int = int(net_volume_data.get("net_value"))
-        else:
-            return jsonify({'status': False, 'message': "net value is required"}), 500
+            if "total_value" in net_volume_data and net_volume_data["total_value"] != "":
+                total_value: int = int(net_volume_data.get("total_value"))
+            else:
+                return jsonify({'status': False, 'message': "total value is required"}), 500
 
-        if "total_value" in net_volume_data and net_volume_data["total_value"] != "":
-            total_value: int = int(net_volume_data.get("total_value"))
-        else:
-            return jsonify({'status': False, 'message': "total value is required"}), 500
+            if "total_volume" in net_volume_data and net_volume_data["total_volume"] != "":
+                total_volume: int = int(net_volume_data.get('total_volume'))
+            else:
+                return jsonify({'status': False, 'message': "total volume is required"}), 500
 
-        if "total_volume" in net_volume_data and net_volume_data["total_volume"] != "":
-            total_volume: int = int(net_volume_data.get('total_volume'))
-        else:
-            return jsonify({'status': False, 'message': "total volume is required"}), 500
+            return func(stock_id=stock_id, date_created=date_created, transaction_id=transaction_id,
+                        net_volume=net_volume, net_value=net_value, total_value=total_value,
+                        total_volume=total_volume, *args)
 
-        return func(stock_id=stock_id, date_created=date_created, transaction_id=transaction_id, net_volume=net_volume,
-                    net_value=net_value,
-                    total_value=total_value, total_volume=total_volume, *args)
+        return wrapper
 
-    return wrapper
+
+data_wrappers: StockDataWrappers = StockDataWrappers()
 
 
 class StockViewContext:
@@ -306,7 +317,7 @@ class CatchStockErrors(StockViewContext):
             return True
         return False
 
-    # TODO - refactor this
+    # TODO - refactor this to use tasklets
     def can_add_stock(self, stock_code: str, symbol: str, stock_id: str = None) -> bool:
         stock_id_exist: bool = self.stock_id_exist(stock_id=stock_id)
         stock_code_exist: bool = self.stock_code_exist(stock_code=stock_code)
@@ -374,7 +385,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         with current_app.app_context():
             self.timezone = timezone(Config.UTC_OFFSET)
 
-    @get_stock_data
+    @data_wrappers.get_stock_data
     @use_context
     def create_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
         try:
@@ -398,7 +409,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                         'message': 'successfully saved stock data',
                         "payload": {"stock_instance": stock_instance.to_dict()}}), 200
 
-    @get_broker_data
+    @data_wrappers.get_broker_data
     @use_context
     def create_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
         try:
@@ -445,7 +456,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         return jsonify({'status': True, 'message': 'Stock Model Successfully created',
                         'payload': stock_model_instance.to_dict()}), 200
 
-    @get_buy_volume_data
+    @data_wrappers.get_buy_volume_data
     @use_context
     def create_buy_model(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                          buy_ave_price: int, buy_market_val_percent: int,
@@ -470,7 +481,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         message: str = "Buy volume successfully created"
         return jsonify({'status': True, 'message': message, 'payload': buy_volume_instance.to_dict()}), 200
 
-    @get_sell_volume_data
+    @data_wrappers.get_sell_volume_data
     @use_context
     def create_sell_volume(self, stock_id: str, date_created: date_class, sell_volume: int, sell_value: int,
                            sell_ave_price: int, sell_market_val_percent: int,
@@ -496,7 +507,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                         'payload': sell_volume_instance.to_dict()}), 200
 
     # noinspection DuplicatedCode
-    @get_net_volume_data
+    @data_wrappers.get_net_volume_data
     @use_context
     def create_net_volume(self, stock_id: str, date_created: date_class, transaction_id: str, net_volume: str,
                           net_value: str, total_value: str, total_volume: str) -> tuple:
@@ -533,7 +544,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         return jsonify({'status': True, 'message': message,
                         'payload': net_volume_instance.to_dict()}), 200
 
-    @get_stock_data
+    @data_wrappers.get_stock_data
     @use_context
     def update_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
         try:
@@ -562,7 +573,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         except KeyError as e:
             return jsonify({'status': False, 'message': str(e)}), 500
 
-    @get_broker_data
+    @data_wrappers.get_broker_data
     @use_context
     def update_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
         try:
@@ -636,7 +647,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         except KeyError as e:
             return jsonify({'status': False, 'message': str(e)}), 500
 
-    @get_buy_volume_data
+    @data_wrappers.get_buy_volume_data
     @use_context
     def update_buy_volume(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                           buy_ave_price: int, buy_market_val_percent: int,
@@ -671,7 +682,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         return jsonify({"status": True, "message": "successfully updated buy volume",
                         "payload": buy_instance.to_dict()})
 
-    @get_sell_volume_data
+    @data_wrappers.get_sell_volume_data
     @use_context
     def update_sell_volume(self, stock_id: str, date_created: date_class, sell_volume: int, sell_value: int,
                            sell_ave_price: int, sell_market_val_percent: int,
@@ -841,11 +852,12 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         """
             return buy volumes for all stocks for a specific date_class
         """
-        if date_class is not None:
-            buy_volume_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
-                BuyVolumeModel.date_created == date_created).fetch()
-            payload: typing.List[dict] = [buy_volume.to_dict() for buy_volume in buy_volume_list]
+        if date_created is None:
+            return jsonify({'status': True, 'message': 'date is required'}), 500
 
+        buy_volume_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
+            BuyVolumeModel.date_created == date_created).fetch()
+        payload: typing.List[dict] = [buy_volume.to_dict() for buy_volume in buy_volume_list]
         message: str = "successfully fetched day buy volume data"
         return jsonify({"status": True, "payload": payload, "message": message}), 200
 
