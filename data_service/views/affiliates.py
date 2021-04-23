@@ -9,7 +9,7 @@ from data_service.store.affiliates import EarningsValidators as ValidEarnings
 from data_service.store.affiliates import Affiliates, AffiliateSettings, Recruits, EarningsData
 from data_service.store.exceptions import DataServiceError
 from data_service.utils.utils import create_id, return_ttl, end_of_month
-from data_service.views.context_utils import use_context
+from data_service.views.use_context import use_context
 
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
 

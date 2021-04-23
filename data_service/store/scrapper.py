@@ -1,5 +1,4 @@
 from google.cloud import ndb
-from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
 class ScrapperTempStore(ndb.Model):
     """
@@ -38,4 +37,4 @@ class ScrapperTempStore(ndb.Model):
     data = ndb.PickleProperty(validator=set_data)
     status = ndb.BooleanProperty(default=True, validator=set_status)
 
-
+    # TODO - finish this

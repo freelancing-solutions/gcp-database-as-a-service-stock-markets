@@ -1,6 +1,5 @@
 import os
 from data_service.main import create_app
-
 data_service = create_app()
 
 # Press the green button in the gutter to run the script.

@@ -82,7 +82,8 @@ class EarningsValidators:
         if not isinstance(affiliate_id, str) or affiliate_id == "":
             raise ValueError("Affiliate_id cannot be Null, and can only be a string")
         try:
-            earnings_list: typing.List[EarningsData] = EarningsData.query(EarningsData.affiliate_id == affiliate_id).fetch()
+            earnings_list: typing.List[EarningsData] = EarningsData.query(
+                EarningsData.affiliate_id == affiliate_id).fetch()
             if isinstance(earnings_list, list) and len(earnings_list) > 0:
                 return True
             return False
@@ -283,7 +284,5 @@ class AffiliateSettings(ndb.Model):
     recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassValidators.set_bool)
     total_affiliates_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassValidators.set_amount)
     total_affiliates: int = ndb.IntegerProperty(default=0, validator=ClassValidators.set_number)
-
-
 
 

@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
-
 from data_service.store.exceptions import DataServiceError, InputError
 
 default_handlers_bp = Blueprint('handlers', __name__)
@@ -9,6 +8,7 @@ default_handlers_bp = Blueprint('handlers', __name__)
 @default_handlers_bp.route('/_ah/warmup')
 def warmup():
     """
+        Use Context will create a database connection
         APP-Engine Warm UP Handler
         # TODO - read settings database
     """

@@ -6,11 +6,14 @@ from data_service.utils.utils import create_id
 
 class UserSettingsModel(ndb.Model):
     uid: str = ndb.StringProperty()
+    #  TODO- complete this model
+    # TODO - complete the neccessary dunder functions
 
 
 class AdminSettingsModel(ndb.Model):
     uid: str = ndb.StringProperty()
-
+    #  TODO- complete this model
+    # TODO - complete the neccessary dunder functions
 
 class ExchangeDataModel(ndb.Model):
     exchange_id: str = ndb.StringProperty()
@@ -52,7 +55,7 @@ class ExchangeDataModel(ndb.Model):
             raise TypeError("exchange tickers can only be a list")
         self.exchange_tickers_list = tickers_list
         return True
-
+    # TODO - complete the neccessary dunder functions
 
 class ScrappingPagesModel(ndb.Model):
     """
@@ -139,7 +142,7 @@ class ScrappingPagesModel(ndb.Model):
             raise TypeError("password can only be a string")
         self.password = password
         return True
-
+    # TODO - complete the neccessary dunder functions
 
 class StockAPIEndPointModel(ndb.Model):
     """
@@ -200,3 +203,4 @@ class StockAPIEndPointModel(ndb.Model):
         self.api_key = api_key
         return True
 
+    # TODO - complete the neccessary dunder functions

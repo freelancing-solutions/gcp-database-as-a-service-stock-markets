@@ -7,8 +7,8 @@ def use_context(func):
     def wrapper(*args, **kwargs):
         client = ndb.Client(namespace="main", project=current_app.config.get('PROJECT'))
         # TODO - setup everything related to cache policy and all else here
-        context = client.context()
-        with context:
+
+        with client.context():
             return func(*args, **kwargs)
 
     return wrapper

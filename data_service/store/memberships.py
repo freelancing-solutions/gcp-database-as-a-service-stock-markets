@@ -146,7 +146,8 @@ class Memberships(ndb.Model):
     status: str = ndb.StringProperty(validator=ClassSetters.set_status)  # Paid/ Unpaid
     date_created: date = ndb.DateTimeProperty(auto_now_add=True,
                                               validator=ClassSetters.set_datetime)
-    plan_start_date: date = ndb.DateProperty(validator=ClassSetters.set_datetime)  # the date this plan will become active
+    plan_start_date: date = ndb.DateProperty(validator=ClassSetters.set_datetime)  # the date this plan will
+    # become active
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -175,7 +176,8 @@ class MembershipPlans(ndb.Model):
     plan_name: str = ndb.StringProperty(validator=ClassSetters.set_string)
     description: str = ndb.StringProperty(validator=ClassSetters.set_string)
     total_members: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
-    schedule_day: int = ndb.IntegerProperty(validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or week, or three months
+    schedule_day: int = ndb.IntegerProperty(validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or
+    # week, or three months
     schedule_term: str = ndb.StringProperty(validator=ClassSetters.set_schedule_term)  # Monthly, Quarterly, Annually
     term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     registration_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
@@ -192,7 +194,7 @@ class MembershipPlans(ndb.Model):
     def __str__(self) -> str:
         return "<MembershipPlans: plan_name: {}, description: {}, total_members: {}, schedule_day: {}, " \
                "term : {}".format(self.plan_name, self.description, self.total_members,
-                                   self.schedule_day, self.schedule_term)
+                                  self.schedule_day, self.schedule_term)
 
     def __repr__(self) -> str:
         return "<Memberships: {}{}".format(self.plan_id, self.plan_name)
@@ -209,6 +211,7 @@ class AccessRights(ndb.Model):
     plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     access_rights_list: typing.List[str] = ndb.StringProperty(repeated=True)  # a list containing the rights of users
 
+    # TODO - finish this
 
 class MembershipDailyStats(ndb.Model):
     """
@@ -225,3 +228,4 @@ class MembershipDailyStats(ndb.Model):
     expected_earnings_this_month: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     total_earned_so_far: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
 
+    # TODO - finish this

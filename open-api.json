@@ -16,6 +16,21 @@
     }
   ],
   "paths": {
-
-  }
+         "/api/v1/affiliates/get": {
+            "post": {
+              "description": "Returns a specific affiliate information",
+              "produces": [
+                "application/json"
+              ],
+              "responses": {
+                "200": {
+                  "description": "affiliate data"
+                },
+                "500": {
+                  "description": "unable to fetch affiliate"
+                }
+              }
+            }
+          }
+          }
 }
