@@ -618,35 +618,36 @@ class AccessRightsView:
                 return None
         return None
 
+# Coupon data wrapper
+def get_coupon_data(func):
+    functools.wraps(func)
+
+    def wrapper(*args, **kwargs):
+        coupon_data: dict = kwargs.get('coupon_data')
+        if "code" in coupon_data and coupon_data['code'] != "":
+            code: str = coupon_data.get('code')
+        else:
+            return jsonify({'status': False, 'message': 'coupon code is required'}), 500
+
+        if "discount" in coupon_data and coupon_data['discount'] != "":
+            discount: int = int(coupon_data.get('discount'))
+        else:
+            return jsonify({'status': False, 'message': 'discount is required'}), 500
+
+        if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
+            expiration_time: int = int(coupon_data['expiration_time'])
+        else:
+            return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
+
+        return func(code=code, discount=discount, expiration_time=expiration_time, *args)
+
+    return wrapper
+
 
 class CouponsView(Validators):
     def __init__(self):
         super(CouponsView, self).__init__()
 
-    @staticmethod
-    def get_coupon_data(func):
-        functools.wraps(func)
-
-        def wrapper(*args, **kwargs):
-            coupon_data: dict = kwargs.get('coupon_data')
-            if "code" in coupon_data and coupon_data['code'] != "":
-                code: str = coupon_data.get('code')
-            else:
-                return jsonify({'status': False, 'message': 'coupon code is required'}), 500
-
-            if "discount" in coupon_data and coupon_data['discount'] != "":
-                discount: int = int(coupon_data.get('discount'))
-            else:
-                return jsonify({'status': False, 'message': 'discount is required'}), 500
-
-            if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
-                expiration_time: int = int(coupon_data['expiration_time'])
-            else:
-                return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
-
-            return func(code=code, discount=discount, expiration_time=expiration_time, *args)
-
-        return wrapper
 
     @get_coupon_data
     @use_context
