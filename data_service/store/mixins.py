@@ -1,5 +1,5 @@
 from google.cloud import ndb
-
+from datetime import datetime
 
 class AmountMixin(ndb.Model):
     amount: int = ndb.IntegerProperty(default=0)
@@ -38,3 +38,15 @@ class UserMixin(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+
+class AddressMixin(ndb.Model):
+    line_1: str = ndb.StringProperty()
+    city: str = ndb.StringProperty()
+    zip_code: str = ndb.StringProperty()
+    province: str = ndb.StringProperty()
+
+
+
+
+

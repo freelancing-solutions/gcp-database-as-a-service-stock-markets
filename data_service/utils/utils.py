@@ -14,6 +14,7 @@ def create_id(size: int = 64, chars: str = char_set) -> str: return ''.join(rand
 
 def timestamp() -> int: return int(float(time.time()) * 1000)
 
+def get_days(days: int) -> int: return int(24*days*60*60*1000)
 
 def timestamp_difference(stamp1, stamp2) -> int: return int(stamp1 - stamp2)
 

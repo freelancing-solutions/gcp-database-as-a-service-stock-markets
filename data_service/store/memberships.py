@@ -5,6 +5,7 @@ from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
 from data_service.store.mixins import AmountMixin
+from data_service.utils.utils import timestamp, get_days
 
 
 class MembershipValidators:
@@ -201,6 +202,20 @@ class MembershipPlans(ndb.Model):
 
     def __repr__(self) -> str:
         return "<Memberships: {}{}".format(self.plan_id, self.plan_name)
+
+
+class Coupons(ndb.Model):
+    """
+        applied on checkout of memberships
+        front end should read coupons on checkout and apply the code to registration fees only ...
+        the admin app should setup the coupon codes.
+        endpoints should be provided via view and api
+    """
+    code: str = ndb.StringProperty()
+    discount_percent: int = ndb.IntegerProperty()
+    is_valid: bool = ndb.BooleanProperty()
+    date_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
+    expiration_time: int = ndb.IntegerProperty(default=lambda expire_date: (timestamp() + get_days(days=30)))
 
 
 class AccessRights(ndb.Model):

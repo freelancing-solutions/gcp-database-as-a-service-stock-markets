@@ -4,7 +4,6 @@ from google.api_core.exceptions import RetryError
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from werkzeug.security import generate_password_hash
-
 from data_service.store.mixins import AmountMixin
 from data_service.utils.utils import timestamp
 
@@ -41,10 +40,3 @@ class WalletModel(ndb.Model):
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
     paypal_address: str = ndb.StringProperty(validator=ClassSetters.set_paypal)
-
-
-
-
-
-
-

@@ -4,6 +4,8 @@ from google.api_core.exceptions import RetryError
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from werkzeug.security import generate_password_hash
+
+from data_service.store.mixins import AddressMixin
 from data_service.utils.utils import timestamp
 
 
@@ -38,6 +40,7 @@ class UserModel(ndb.Model):
     time_registered: int = ndb.IntegerProperty(default=timestamp())
     is_admin: bool = ndb.BooleanProperty(default=False)
     is_support: bool = ndb.BooleanProperty(default=False)
+    address: AddressMixin = ndb.StructuredProperty(AddressMixin)
 
     def set_uid(self, uid: str) -> bool:
         if uid is None:
