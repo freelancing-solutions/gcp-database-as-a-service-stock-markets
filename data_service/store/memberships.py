@@ -37,15 +37,15 @@ class PlanValidators:
         if plan_id == "":
             return False
         try:
-            plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).get_async(keys_only=True)
+            plan_instance: MembershipPlans = MembershipPlans.query(
+                MembershipPlans.plan_id == plan_id).get_async(keys_only=True).get_result()
         except ConnectionRefusedError:
             return None
         except RetryError:
             return None
         except Aborted:
             return None
-        if isinstance(plan_instance_list, list) and len(plan_instance_list) > 0:
+        if isinstance(plan_instance, MembershipPlans):
             return True
         return False
 
@@ -62,9 +62,9 @@ class PlanValidators:
         if plan_name == "":
             return False
         try:
-            plan_instance_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                MembershipPlans.plan_name == plan_name).get_async(keys_only=True)
-            if isinstance(plan_instance_list, list) and len(plan_instance_list) > 0:
+            plan_instance: MembershipPlans = MembershipPlans.query(
+                MembershipPlans.plan_name == plan_name).get_async(keys_only=True).get_result()
+            if isinstance(plan_instance, MembershipPlans):
                 return True
 
         except ConnectionRefusedError:
@@ -73,6 +73,35 @@ class PlanValidators:
             return None
         return False
 
+class CouponsValidator:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    @ndb.tasklet
+    def coupon_exist(code: str) -> typing.Union[None, bool]:
+        if not isinstance(code, str):
+            return False
+        if code == "":
+            return False
+        try:
+            coupons_instance: Coupons = Coupons.query(Coupons.code == code).get_async().get_result()
+            if isinstance(coupons_instance, Coupons):
+                return True
+            return False
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+
+    @staticmethod
+    @ndb.tasklet
+    def expiration_valid(expiration_time: int) -> bool:
+        if not isinstance(expiration_time, int):
+            return False
+        if expiration_time < get_days(days=1):
+            return False
+        return True
 
 class ClassSetters:
     def set_id(self, value: str) -> str:
@@ -212,7 +241,7 @@ class Coupons(ndb.Model):
         endpoints should be provided via view and api
     """
     code: str = ndb.StringProperty()
-    discount_percent: int = ndb.IntegerProperty()
+    discount: int = ndb.IntegerProperty()
     is_valid: bool = ndb.BooleanProperty()
     date_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
     expiration_time: int = ndb.IntegerProperty(default=lambda expire_date: (timestamp() + get_days(days=30)))

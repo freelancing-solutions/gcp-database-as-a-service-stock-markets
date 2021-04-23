@@ -5,17 +5,18 @@ from google.cloud.ndb.exceptions import BadQueryError, BadRequestError
 from flask import jsonify, current_app
 from datetime import datetime, date
 from data_service.store.exceptions import DataServiceError
-from data_service.store.memberships import MembershipPlans, AccessRights, Memberships
+from data_service.store.memberships import MembershipPlans, AccessRights, Memberships, Coupons
 from data_service.store.memberships import PlanValidators as PlanValid
 from data_service.store.mixins import AmountMixin
 from data_service.store.users import UserValidators as UserValid
 from data_service.store.memberships import MembershipValidators as MemberValid
+from data_service.store.memberships import CouponsValidator as CouponValid
 from data_service.utils.utils import create_id, end_of_month, return_ttl
 from data_service.main import cache_memberships
 from data_service.views.use_context import use_context
 
 
-class Validators(UserValid, PlanValid, MemberValid):
+class Validators(UserValid, PlanValid, MemberValid, CouponValid):
 
     def __init__(self):
         super(Validators, self).__init__()
@@ -49,6 +50,18 @@ class Validators(UserValid, PlanValid, MemberValid):
             return plan_exist and plan_name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
+
+    @ndb.tasklet
+    def can_add_coupon(self, code: str, expiration_time: int) -> any:
+        coupon_exist: typing.Union[None, bool] = yield self.coupon_exist(code=code)
+        expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
+
+        if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool):
+            return coupon_exist and expiration_valid
+        message: str = "Unable to verify input data"
+        raise DataServiceError(message)
+
+
 
 class MembershipsView(Validators):
 
@@ -592,12 +605,45 @@ class AccessRightsView:
         return None
 
 
-class CouponsView:
+class CouponsView(Validators):
     def __init__(self):
-        pass
+        super(CouponsView, self).__init__()
 
+    @use_context
     def add_coupon(self, coupon_data: dict) -> tuple:
-        pass
+        if "code" in coupon_data and coupon_data['code'] != "":
+            code: str = coupon_data.get('code')
+        else:
+            return jsonify({'status': False, 'message': 'coupon code is required'}), 500
+
+        if "discount" in coupon_data and coupon_data['discount'] != "":
+            discount: int = int(coupon_data.get('discount'))
+        else:
+            return jsonify({'status': False, 'message': 'discount is required'}), 500
+
+        if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
+            expiration_time: int = int(coupon_data['expiration_time'])
+        else:
+            return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
+        try:
+            if self.can_add_coupon(code=code,expiration_time=expiration_time):
+                coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
+                key = coupons_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+                if key is None:
+                    message: str = "an error occured while creating coupon"
+                    return jsonify({'status': False, 'message': message}), 500
+
+        except ConnectionRefusedError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except RetryError as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+        except Aborted as e:
+            message: str = str(e)
+            return jsonify({'status': False, 'message': message}), 500
+
+        return jsonify({'status': True, 'message': 'successfully created coupon code', 'payload': coupons_instance.to_dict()}), 200
 
     def update_coupon(self, coupon_data: dict) -> tuple:
         pass
@@ -607,5 +653,21 @@ class CouponsView:
 
     def cancel_coupon(self, coupon_data: dict) -> tuple:
         pass
+
+    def get_all_coupons(self) -> tuple:
+        pass
+
+    def get_valid_coupons(self) -> tuple:
+        pass
+
+    def get_expired_coupons(self) -> tuple:
+        pass
+
+    def remove_coupon(self) -> tuple:
+        pass
+
+    def remove_all_expired(self) -> tuple:
+        pass
+
 
 
