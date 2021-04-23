@@ -756,3 +756,18 @@ class CouponsView(Validators):
         payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
         message: str = "coupons successfully created"
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
+
+    @cache_memberships.cached(timeout=return_ttl(name='long'))
+    @use_context
+    def get_coupon(self, coupon_data: dict) -> tuple:
+        if 'code' in coupon_data and coupon_data['code'] != "":
+            code: str = coupon_data['code']
+        else:
+            return jsonify({'status': False, 'message': 'coupon is required'}), 500
+        coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
+        if isinstance(coupon_instance, Coupons):
+            message: str = "Coupon has be found"
+            return jsonify({'status': True, 'message': message, 'payload': coupon_instance.to_dict()}), 200
+        message: str = "Invalid Coupon Code"
+        return jsonify({'status': True, 'message': message}), 500
+
