@@ -590,3 +590,22 @@ class AccessRightsView:
             except Aborted:
                 return None
         return None
+
+
+class CouponsView:
+    def __init__(self):
+        pass
+
+    def add_coupon(self, coupon_data: dict) -> tuple:
+        pass
+
+    def update_coupon(self, coupon_data: dict) -> tuple:
+        pass
+
+    def set_expiration_date(self, coupon_data: dict, expire_timestamp: int ) -> tuple:
+        pass
+
+    def cancel_coupon(self, coupon_data: dict) -> tuple:
+        pass
+
+
