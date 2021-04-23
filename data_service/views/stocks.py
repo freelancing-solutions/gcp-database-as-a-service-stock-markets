@@ -424,10 +424,10 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_ndb_errors
     def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
-        stock_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
-        stock: Stock = stock_list[0]
-        broker_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
-        broker: Broker = broker_list[0]
+        # TODO - use tasklets to fetch both stock and broker at the same time
+        stock: Stock = Stock.query(Stock.stock_id == stock_id).get()
+        broker: Broker = Broker.query(Broker.broker_id == broker_id).get()
+
         stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
                                                       sid=sid, stock=stock, broker=broker)
         key = stock_model_instance.put()
