@@ -663,22 +663,13 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             stock_list: typing.List[dict] = [stock.to_dict() for stock in
                                              Stock.query(Stock.symbol == symbol).fetch()]
         else:
-            return jsonify({
-                "status": False,
-                "message": "Stock not found",
-            }), 500
+            return jsonify({ "status": False, "message": "Stock not found", }), 500
 
         if len(stock_list) > 0:
-            return jsonify({
-                "status": True,
-                "payload": stock_list[0],
-                "message": "successfully fetched stock data with stock_id"
-            }), 200
+            return jsonify({ "status": True, "payload": stock_list[0],
+                "message": "successfully fetched stock data with stock_id" }), 200
 
-        return jsonify({
-            "status": False,
-            "message": "Stock not found",
-        }), 500
+        return jsonify({ "status": False, "message": "Stock not found", }), 500
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
@@ -695,28 +686,13 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             with either broker_id or broker_code return broker data
         """
         if broker_id is not None:
-            broker_list: typing.List[dict] = [broker.to_dict() for broker in Broker.query(
-                Broker.broker_id == broker_id)]
+            broker_instance: Broker = Broker.query(Broker.broker_id == broker_id).get()
         elif broker_code is not None:
-            broker_list: typing.List[dict] = [broker.to_dict() for broker in Broker.query(
-                Broker.broker_code == broker_code)]
+            broker_instance: Broker = Broker.query(Broker.broker_code == broker_code).get()
         else:
-            return jsonify({
-                "status": False,
-                "message": "Broker not found"
-            }), 500
-
-        if len(broker_list) > 0:
-            return jsonify({
-                "status": True,
-                "payload": broker_list[0],
-                "message": "successfully fetched broker data"
-            }), 200
-
-        return jsonify({
-            "status": False,
-            "message": "Broker not found"
-        }), 500
+            return jsonify({"status": False, "message": "Broker not found"}), 500
+        return jsonify({"status": True, "payload": broker_instance.to_dict(),
+             "message": "successfully fetched broker data"}), 200
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
@@ -732,19 +708,14 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_ndb_errors
     def get_stock_model(self, transaction_id: str = None) -> tuple:
-        if transaction_id is not None:
-            stock_model_list: typing.List[StockModel] = StockModel.query(
-                StockModel.transaction_id == transaction_id).fetch()
+        if transaction_id is None:
+            return jsonify({"status": False, "message": "transaction id is required"}), 500
 
-            if len(stock_model_list) > 0:
-                return jsonify({
-                    "status": False, "message": "stock found",
-                    "payload": stock_model_list[0].to_dict()
-                }), 200
+        stock_model: StockModel = StockModel.query(StockModel.transaction_id == transaction_id).get()
+        if isinstance(stock_model, StockModel):
+            return jsonify({"status": False, "message": "stock found", "payload": stock_model.to_dict()}), 200
 
-            return jsonify({"status": False, "message": "that transaction does not exist"}), 500
-
-        return jsonify({"status": False, "message": "transaction id is required"}), 500
+        return jsonify({"status": False, "message": "that transaction does not exist"}), 500
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
@@ -768,17 +739,16 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             by date_class and stock_id
         """
         if transaction_id is not None:
-            buy_volume_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
-                BuyVolumeModel.transaction_id == transaction_id).fetch()
-        elif date_class is not None:
+            buy_volume: BuyVolumeModel = BuyVolumeModel.query(BuyVolumeModel.transaction_id == transaction_id).get()
+        elif date_created is not None:
             # for a specific date_class buy volume should be filtered by stock
-            buy_volume_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
-                BuyVolumeModel.date_created == date_created, BuyVolumeModel.stock_id == stock_id).fetch()
+            buy_volume: BuyVolumeModel = BuyVolumeModel.query(
+                BuyVolumeModel.date_created == date_created, BuyVolumeModel.stock_id == stock_id).get()
         else:
             message: str = "transaction id or transaction date_class need to be specified"
             return jsonify({"status": False, "message": message}), 500
         message: str = "buy volume data successfully found"
-        return jsonify({"status": True, "payload": buy_volume_list[0].to_dict(), "message": message}), 200
+        return jsonify({"status": True, "payload": buy_volume.to_dict(), "message": message}), 200
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
