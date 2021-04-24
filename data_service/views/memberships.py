@@ -4,7 +4,7 @@ from google.api_core.exceptions import RetryError, Aborted
 from google.cloud import ndb
 from flask import jsonify, current_app
 from datetime import datetime, date
-from data_service.store.exceptions import DataServiceError
+from data_service.config.exceptions import DataServiceError
 from data_service.store.memberships import MembershipPlans, AccessRights, Memberships, Coupons
 from data_service.store.memberships import PlanValidators as PlanValid
 from data_service.store.mixins import AmountMixin

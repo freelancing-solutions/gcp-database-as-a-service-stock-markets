@@ -1,3 +1,5 @@
+import typing
+
 from werkzeug.exceptions import HTTPException
 
 class DataServiceError(HTTPException):
@@ -15,6 +17,16 @@ class InputError(HTTPException):
     code: int = 513
     description: str = "Unable to process input"
 
-    def __init__(self, description: str):
-        self.description = description
+    def __init__(self, description: typing.Union[None, str] = None):
+        if description is not None:
+            self.description = description
         super(InputError, self).__init__()
+
+class UnAuthenticatedError(HTTPException):
+    code: int = 401
+    description: str = "You are not authorized to use this resources"
+
+    def __init__(self, description: typing.Union[None, str]= None):
+        if description is not None:
+            self.description = description
+        super(UnAuthenticatedError, self).__init__()

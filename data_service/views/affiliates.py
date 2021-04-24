@@ -4,8 +4,8 @@ from data_service.main import cache_affiliates
 from data_service.store.affiliates import AffiliatesValidators as ValidAffiliate
 from data_service.store.affiliates import RecruitsValidators as ValidRecruit
 from data_service.store.affiliates import EarningsValidators as ValidEarnings
-from data_service.store.affiliates import Affiliates, AffiliateSettingsStats, Recruits, EarningsData
-from data_service.store.exceptions import DataServiceError
+from data_service.store.affiliates import Affiliates, Recruits
+from data_service.config.exceptions import DataServiceError
 from data_service.utils.utils import create_id, return_ttl, end_of_month
 from data_service.views.exception_handlers import handle_ndb_errors
 from data_service.views.use_context import use_context

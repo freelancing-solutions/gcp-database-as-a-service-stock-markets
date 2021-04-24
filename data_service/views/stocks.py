@@ -6,7 +6,7 @@ from google.api_core.exceptions import RetryError, Aborted
 from flask import current_app, jsonify
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
 from data_service.main import cache_stocks
-from data_service.store.exceptions import DataServiceError
+from data_service.config.exceptions import DataServiceError
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
 from data_service.utils.utils import date_string_to_date, create_id, return_ttl, end_of_month
 from data_service.config import Config

@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.users import UserView
 users_bp = Blueprint("users", __name__)
@@ -88,7 +87,7 @@ def user(path: str) -> tuple:
 
 @users_bp.route("/api/v1/users/<path:path>", methods=["GET"])
 @handle_auth
-def users(path: str) -> tuple:
+def get_all(path: str) -> tuple:
     """
         get all , active or in-active users
     :param path:
