@@ -1,6 +1,6 @@
 # Google App Engine generated folder
 appengine-generated/
-*.yaml
+app.yaml
 .env
 *.pyc
 open-api.json
