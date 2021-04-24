@@ -53,3 +53,4 @@ def handle_data_service_error(e: DataServiceError):
 @default_handlers_bp.app_errorhandler(InputError)
 def handle_input_error(e: InputError) -> tuple:
     return jsonify({'status': False, 'message': e.description}), e.code
+
