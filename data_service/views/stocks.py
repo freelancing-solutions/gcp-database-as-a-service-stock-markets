@@ -654,22 +654,19 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             with either stock_id or stock_code or symbol return stock_data
         """
         if stock_id is not None:
-            stock_list: typing.List[dict] = [stock.to_dict() for stock in
-                                             Stock.query(Stock.stock_id == stock_id).fetch()]
+            stock_instance: Stock = Stock.query(Stock.stock_id == stock_id).get()
         elif stock_code is not None:
-            stock_list: typing.List[dict] = [stock.to_dict() for stock in
-                                             Stock.query(Stock.stock_code == stock_code).fetch()]
+            stock_instance: Stock = Stock.query(Stock.stock_code == stock_code).get()
         elif symbol is not None:
-            stock_list: typing.List[dict] = [stock.to_dict() for stock in
-                                             Stock.query(Stock.symbol == symbol).fetch()]
+            stock_instance: Stock = Stock.query(Stock.symbol == symbol).get()
         else:
-            return jsonify({ "status": False, "message": "Stock not found", }), 500
+            return jsonify({"status": False, "message": "Stock not found", }), 500
 
-        if len(stock_list) > 0:
-            return jsonify({ "status": True, "payload": stock_list[0],
-                "message": "successfully fetched stock data with stock_id" }), 200
+        if isinstance(stock_instance, Stock):
+            return jsonify({"status": True, "payload": stock_instance.to_dict(),
+                            "message": "successfully fetched stock data with stock_id"}), 200
 
-        return jsonify({ "status": False, "message": "Stock not found", }), 500
+        return jsonify({"status": False, "message": "Stock not found", }), 500
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
@@ -692,7 +689,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         else:
             return jsonify({"status": False, "message": "Broker not found"}), 500
         return jsonify({"status": True, "payload": broker_instance.to_dict(),
-             "message": "successfully fetched broker data"}), 200
+                        "message": "successfully fetched broker data"}), 200
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context

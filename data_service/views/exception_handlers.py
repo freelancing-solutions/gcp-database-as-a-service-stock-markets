@@ -1,10 +1,7 @@
 import functools
-
 from flask import jsonify
-from google.api_core.exceptions import Aborted
+from google.api_core.exceptions import Aborted, RetryError
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
-from requests.exceptions import RetryError
-
 
 def handle_ndb_errors(func):
     functools.wraps(func)

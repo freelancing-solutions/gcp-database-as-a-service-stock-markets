@@ -2,6 +2,7 @@ from flask import Flask
 from flask_caching import Cache
 from data_service.config import Config
 
+# TODO find a way to insure errors are not cached
 cache_stocks:  Cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache_affiliates: Cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache_memberships: Cache = Cache(config={'CACHE_TYPE': 'simple'})

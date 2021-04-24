@@ -1,7 +1,5 @@
 import typing
 from flask import current_app, jsonify
-from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
-from google.api_core.exceptions import Aborted, RetryError
 from data_service.main import cache_affiliates
 from data_service.store.affiliates import AffiliatesValidators as ValidAffiliate
 from data_service.store.affiliates import RecruitsValidators as ValidRecruit
@@ -80,7 +78,6 @@ class AffiliatesView(Validator):
     def delete_affiliate(self, affiliate_data: dict) -> tuple:
         """
             delete affiliate
-            azwifarwi justice
         """
         affiliate_id: typing.Union[None, str] = affiliate_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
