@@ -1,10 +1,13 @@
 from flask import Blueprint, request, jsonify
+
+from data_service.api.api_authenticator import handle_auth
 from data_service.views.scrapper import ScrapperView
 
 scrapper_bp = Blueprint("scrapper", __name__)
 
 
 @scrapper_bp.route('/api/v1/scrapper/<path:path>', methods=['POST'])
+@handle_auth
 def scrapper(path: str) -> tuple:
     scrapper_temp_storage: ScrapperView = ScrapperView()
     if path == "add":

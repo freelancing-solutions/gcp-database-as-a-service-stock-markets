@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime, date
 
+from data_service.api.api_authenticator import handle_auth
 from data_service.store.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
 from data_service.views.affiliates import AffiliatesView, RecruitsView
@@ -8,6 +9,7 @@ from data_service.views.affiliates import AffiliatesView, RecruitsView
 affiliates_bp = Blueprint('affiliates', __name__)
 
 @affiliates_bp.route('/api/v1/affiliate/<path:path>', methods=['POST'])
+@handle_auth
 def affiliate(path: str) -> tuple:
     affiliate_view_instance: AffiliatesView = AffiliatesView()
     affiliate_data: dict = request.get_json()
@@ -41,6 +43,7 @@ def affiliate(path: str) -> tuple:
 
 
 @affiliates_bp.route('/api/v1/recruits/<path:path>', methods=['POST'])
+@handle_auth
 def recruits(path: str) -> tuple:
     recruits_view_instance: RecruitsView = RecruitsView()
     recruit_data: dict = request.get_json()

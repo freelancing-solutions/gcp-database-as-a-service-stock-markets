@@ -1,9 +1,12 @@
 from flask import Blueprint, request, jsonify
+
+from data_service.api.api_authenticator import handle_auth
 from data_service.views.users import UserView
 users_bp = Blueprint("users", __name__)
 
 
 @users_bp.route("/api/v1/create-user", methods=["POST"])
+@handle_auth
 def create_user() -> tuple:
     """
         given user details create new user
@@ -23,6 +26,7 @@ def create_user() -> tuple:
 
 
 @users_bp.route("/api/v1/user/<path:path>", methods=["GET", "POST"])
+@handle_auth
 def user(path: str) -> tuple:
     """
         update or get a specific user by uid
@@ -83,6 +87,7 @@ def user(path: str) -> tuple:
 
 
 @users_bp.route("/api/v1/users/<path:path>", methods=["GET"])
+@handle_auth
 def users(path: str) -> tuple:
     """
         get all , active or in-active users
@@ -103,6 +108,7 @@ def users(path: str) -> tuple:
 
 
 @users_bp.route("/api/v1/check-password", methods=["POST"])
+@handle_auth
 def check_password() -> tuple:
     """
         given a password in json check if it matches the hash in file
@@ -116,6 +122,7 @@ def check_password() -> tuple:
 
 
 @users_bp.route("/api/v1/deactivate-user", methods=["POST"])
+@handle_auth
 def de_activate_user() -> tuple:
     """
         given uid in json de-activate user
@@ -128,6 +135,7 @@ def de_activate_user() -> tuple:
 
 
 @users_bp.route("/api/v1/auth/login", methods=["POST"])
+@handle_auth
 def login() -> tuple:
     user_view_instance: UserView = UserView()
     user_data: dict = request.get_json()
@@ -144,6 +152,7 @@ def login() -> tuple:
 
 
 @users_bp.route("/api/v1/auth/logout", methods=["POST"])
+@handle_auth
 def logout() -> tuple:
     user_view_instance: UserView = UserView()
     user_data: dict = request.get_json()
@@ -151,6 +160,7 @@ def logout() -> tuple:
 
 
 @users_bp.route("/api/v1/auth/register", methods=["POST"])
+@handle_auth
 def register() -> tuple:
     user_view_instance: UserView = UserView()
     user_data: dict = request.get_json()

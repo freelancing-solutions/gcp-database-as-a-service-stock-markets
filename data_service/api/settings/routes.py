@@ -1,10 +1,13 @@
 from flask import Blueprint, request, jsonify
+
+from data_service.api.api_authenticator import handle_auth
 from data_service.views.settings import ExchangeDataView, ScrappingPagesView
 
 settings_bp = Blueprint('settings_bp', __name__)
 
 
 @settings_bp.route('/api/v1/settings/<path:path>', methods=['GET', 'POST'])
+@handle_auth
 def settings(path):
 
     if request.method == "GET":
@@ -27,6 +30,7 @@ def settings(path):
 
 
 @settings_bp.route('/api/v1/exchange/<path:path>', methods=['POST', 'GET'])
+@handle_auth
 def exchange_data(path: str) -> tuple:
     exchange_data_instance = ExchangeDataView()
     if request.method == "GET":

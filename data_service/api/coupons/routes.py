@@ -1,8 +1,11 @@
 from flask import Blueprint, request
+
+from data_service.api.api_authenticator import handle_auth
 from data_service.views.memberships import CouponsView
 coupons_bp = Blueprint('coupons', __name__)
 
 @coupons_bp.route('/api/v1/coupons/<path:path>', methods=['POST'])
+@handle_auth
 def coupons(path: str) -> tuple:
     coupons_view_instance: CouponsView = CouponsView()
     if path == "get":

@@ -1,7 +1,7 @@
 from datetime import date as date_class
-from datetime import datetime
 from flask import Blueprint, request, jsonify
-from data_service.main import cache_stocks, default_timeout
+
+from data_service.api.api_authenticator import handle_auth
 from data_service.store.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
 from data_service.views.stocks import StockView
@@ -10,6 +10,7 @@ stocks_bp = Blueprint('stocks_bp', __name__)
 
 
 @stocks_bp.route('/api/v1/stocks/create/<path:path>', methods=['POST'])
+@handle_auth
 def stocks(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     try:
@@ -59,6 +60,7 @@ def stocks(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/all/<path:path>', methods=['POST'])
+@handle_auth
 def stocks_all(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     if path == "stocks":
@@ -72,6 +74,7 @@ def stocks_all(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/daily/<path:path>', methods=['POST'])
+@handle_auth
 def daily_stocks(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     try:
@@ -91,6 +94,7 @@ def daily_stocks(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/item/<path:path>', methods=['POST'])
+@handle_auth
 def stock_item(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     try:
@@ -137,6 +141,7 @@ def stock_item(path: str) -> tuple:
 
 
 @stocks_bp.route('/api/v1/stocks/day-volumes/<path:path>', methods=['POST'])
+@handle_auth
 def day_volumes(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     try:
