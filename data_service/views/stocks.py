@@ -10,7 +10,7 @@ from data_service.config.exceptions import DataServiceError
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
 from data_service.utils.utils import date_string_to_date, create_id, return_ttl, end_of_month
 from data_service.config import Config
-from data_service.views.exception_handlers import handle_ndb_errors
+from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 stock_list_type = typing.List[Stock]
@@ -388,7 +388,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_stock_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def create_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
         if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol) is True:
             stock_instance: Stock = Stock(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name,
@@ -406,7 +406,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_broker_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def create_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
         if self.can_add_broker(broker_id=broker_id, broker_code=broker_code):
             broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code,
@@ -422,7 +422,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                         'payload': broker_instance.to_dict()}), 200
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
         # TODO - use tasklets to fetch both stock and broker at the same time
         stock: Stock = Stock.query(Stock.stock_id == stock_id).get()
@@ -439,7 +439,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_buy_volume_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def create_buy_model(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                          buy_ave_price: int, buy_market_val_percent: int,
                          buy_trade_count: int) -> tuple:
@@ -459,7 +459,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_sell_volume_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def create_sell_volume(self, stock_id: str, date_created: date_class, sell_volume: int, sell_value: int,
                            sell_ave_price: int, sell_market_val_percent: int,
                            sell_trade_count: int) -> tuple:
@@ -480,7 +480,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     # noinspection DuplicatedCode
     @data_wrappers.get_net_volume_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def create_net_volume(self, stock_id: str, date_created: date_class, transaction_id: str, net_volume: str,
                           net_value: str, total_value: str, total_volume: str) -> tuple:
         """
@@ -511,7 +511,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_stock_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
         stock_instance_list: typing.List[Stock] = Stock.query(Stock.stock_id == stock_id).fetch()
         if len(stock_instance_list) > 0:
@@ -533,7 +533,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_broker_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
         broker_instance_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
         if isinstance(broker_instance_list, list) and len(broker_instance_list) > 0:
@@ -550,7 +550,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                 raise DataServiceError(message)
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_stock_model(self, stock_model: dict) -> tuple:
         if 'transaction_id' in stock_model and stock_model['transaction_id'] != "":
             transaction_id: str = stock_model['transaction_id']
@@ -593,7 +593,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_buy_volume_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_buy_volume(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                           buy_ave_price: int, buy_market_val_percent: int,
                           buy_trade_count: int, transaction_id: str) -> tuple:
@@ -620,7 +620,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @data_wrappers.get_sell_volume_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_sell_volume(self, stock_id: str, date_created: date_class, sell_volume: int, sell_value: int,
                            sell_ave_price: int, sell_market_val_percent: int,
                            sell_trade_count: int, transaction_id: str) -> tuple:
@@ -648,7 +648,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_stock_data(self, stock_id: str = None, stock_code: str = None, symbol: str = None) -> tuple:
         """
             with either stock_id or stock_code or symbol return stock_data
@@ -670,14 +670,14 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_all_stocks(self) -> tuple:
         stock_list: typing.List[dict] = [stock.to_dict() for stock in Stock.query().fetch()]
         return jsonify({"status": True, "payload": stock_list, "message": "stocks returns"}), 200
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_broker_data(self, broker_id: str = None, broker_code: str = None) -> tuple:
         """
             with either broker_id or broker_code return broker data
@@ -693,7 +693,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_all_brokers(self) -> tuple:
         brokers_list: typing.List[dict] = [broker.to_dict() for broker in Broker.query().fetch()]
         return jsonify({
@@ -703,7 +703,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_stock_model(self, transaction_id: str = None) -> tuple:
         if transaction_id is None:
             return jsonify({"status": False, "message": "transaction id is required"}), 500
@@ -716,7 +716,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_all_stock_models(self) -> tuple:
         """
             retu
@@ -728,7 +728,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_buy_volume(self, transaction_id: str = None, date_created: date_class = None,
                        stock_id: str = None) -> tuple:
         """
@@ -749,7 +749,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_day_buy_volumes(self, date_created: date_class = None) -> tuple:
         """
             return buy volumes for all stocks for a specific date_class
@@ -765,7 +765,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_daily_buy_volumes_by_stock(self, stock_id: str = None) -> tuple:
         """
             for a specific stock return daily buy volumes
@@ -778,7 +778,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_sell_volume(self, transaction_id: str = None, date_created: date_class = None,
                         stock_id: str = None) -> tuple:
         """
@@ -807,7 +807,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_day_sell_volumes(self, date_created: date_class) -> tuple:
         """
             fetch all daily sell volumes
@@ -820,7 +820,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_daily_sell_volumes_by_stock(self, stock_id: str = None) -> tuple:
         sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
             SellVolumeModel.stock_id == stock_id).fetch()
@@ -831,7 +831,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_net_volume(self, transaction_id: str = None, date_created: date_class = None,
                        stock_id: str = None) -> tuple:
         if transaction_id is not None:
@@ -850,7 +850,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_day_net_volumes(self, date_created: date_class = None) -> tuple:
         if date_class is not None:
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
@@ -866,7 +866,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_daily_net_volumes_by_stock(self, stock_id: str = None) -> tuple:
         if stock_id is not None:
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(

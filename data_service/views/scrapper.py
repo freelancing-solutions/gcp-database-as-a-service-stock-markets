@@ -2,7 +2,7 @@ import typing
 from flask import jsonify, current_app
 from data_service.store.scrapper import ScrapperTempStore
 from data_service.utils.utils import create_id
-from data_service.views.exception_handlers import handle_ndb_errors
+from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 
@@ -13,7 +13,7 @@ class ScrapperView:
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def add_data(self, scrapper_data: dict) -> tuple:
         if isinstance(scrapper_data, dict):
             scrapper_instance = ScrapperTempStore()
@@ -25,7 +25,7 @@ class ScrapperView:
             return jsonify({'status': False, 'message': "invalid data format"}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def delete_data(self, data_id: str) -> tuple:
         if isinstance(data_id, str):
             scrapper_temp_list: typing.List[ScrapperTempStore] = ScrapperTempStore.query(ScrapperTempStore.data_id == data_id).fetch()

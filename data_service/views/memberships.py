@@ -13,7 +13,7 @@ from data_service.store.memberships import MembershipValidators as MemberValid
 from data_service.store.memberships import CouponsValidator as CouponValid
 from data_service.utils.utils import create_id, end_of_month, return_ttl, timestamp
 from data_service.main import cache_memberships
-from data_service.views.exception_handlers import handle_ndb_errors
+from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 
@@ -82,7 +82,7 @@ class MembershipsView(Validators):
         super(MembershipsView, self).__init__()
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def _create_or_update_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
         if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date).result() is True:
             # can use get to simplify this and make transactions faster
@@ -115,7 +115,7 @@ class MembershipsView(Validators):
         return self._create_or_update_membership(uid=uid, plan_id=plan_id, plan_start_date=plan_start_date)
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def set_membership_status(self, uid: str, status: str) -> tuple:
 
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
@@ -129,7 +129,7 @@ class MembershipsView(Validators):
         return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message})
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def change_membership(self, uid: str, origin_plan_id: str, dest_plan_id: str) -> tuple:
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         if membership_instance.plan_id == origin_plan_id:
@@ -154,7 +154,7 @@ class MembershipsView(Validators):
 
     # noinspection PyUnusedLocal
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def send_welcome_email(self, uid: str, plan_id: str) -> tuple:
         """
             just send a request to the email service to send emails
@@ -163,7 +163,7 @@ class MembershipsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='long'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def return_plan_members_by_payment_status(self, plan_id: str, status: str) -> tuple:
         """
             for members of this plan_id return members by payment_status
@@ -182,7 +182,7 @@ class MembershipsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def return_plan_members(self, plan_id) -> tuple:
         """
             return all members of a plan
@@ -201,7 +201,7 @@ class MembershipsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def is_member_off(self, uid: str) -> tuple:
         """
             returns user membership details
@@ -215,7 +215,7 @@ class MembershipsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def payment_amount(self, uid: str) -> tuple:
         """
             for a specific user return payment amount
@@ -237,7 +237,7 @@ class MembershipsView(Validators):
         return jsonify({'status': False, 'message': message}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def set_payment_status(self, uid: str, status: str) -> tuple:  # status is paid or unpaid
         """
             for a specific user set payment status
@@ -263,7 +263,7 @@ class MembershipPlansView(Validators):
         super(MembershipPlansView, self).__init__()
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def add_plan(self, plan_name: str, description: str, schedule_day: int, schedule_term: str,
                  term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
         """
@@ -296,7 +296,7 @@ class MembershipPlansView(Validators):
                         'payload': plan_instance.to_dict()}), 200
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_plan(self, plan_id: str, plan_name: str, description: str, schedule_day: int, schedule_term: str,
                     term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
         if self.can_update_plan(plan_id=plan_id, plan_name=plan_name).result() is True:
@@ -331,7 +331,7 @@ class MembershipPlansView(Validators):
             return jsonify({'status': False, 'message': message}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def set_is_active(self, plan_id: str, is_active: bool) -> tuple:
         membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
         if isinstance(membership_plans_instance, MembershipPlans):
@@ -351,7 +351,7 @@ class MembershipPlansView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def return_plans_by_schedule_term(self, schedule_term: str) -> tuple:
         membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query(
             MembershipPlans.schedule_term == schedule_term).fetch()
@@ -441,7 +441,7 @@ class CouponsView(Validators):
 
     @get_coupon_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
         if self.can_add_coupon(code=code, expiration_time=expiration_time).result():
             coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
@@ -457,7 +457,7 @@ class CouponsView(Validators):
 
     @get_coupon_data
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
         if self.can_update_coupon(code=code, expiration_time=expiration_time).result():
             coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
@@ -474,7 +474,7 @@ class CouponsView(Validators):
             return jsonify({'status': False, 'message': message}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def cancel_coupon(self, coupon_data: dict) -> tuple:
         if "code" in coupon_data and coupon_data['code'] != "":
             code: str = coupon_data['code']
@@ -495,7 +495,7 @@ class CouponsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_all_coupons(self) -> tuple:
         coupons_list: typing.List[Coupons] = Coupons.query().fetch()
         payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
@@ -504,7 +504,7 @@ class CouponsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_valid_coupons(self) -> tuple:
         coupons_list: typing.List[Coupons] = Coupons.query(Coupons.is_valid == True).fetch()
         payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
@@ -513,7 +513,7 @@ class CouponsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_expired_coupons(self) -> tuple:
         coupons_list: typing.List[Coupons] = Coupons.query(Coupons.expiration_time < timestamp()).fetch()
         payload: typing.List[dict] = [coupon.to_dict() for coupon in coupons_list]
@@ -522,7 +522,7 @@ class CouponsView(Validators):
 
     @cache_memberships.cached(timeout=return_ttl(name='long'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_coupon(self, coupon_data: dict) -> tuple:
         if 'code' in coupon_data and coupon_data['code'] != "":
             code: str = coupon_data['code']

@@ -7,7 +7,7 @@ from data_service.store.affiliates import EarningsValidators as ValidEarnings
 from data_service.store.affiliates import Affiliates, Recruits
 from data_service.config.exceptions import DataServiceError
 from data_service.utils.utils import create_id, return_ttl, end_of_month
-from data_service.views.exception_handlers import handle_ndb_errors
+from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
@@ -30,7 +30,7 @@ class AffiliatesView(Validator):
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def register_affiliate(self, affiliate_data: dict) -> tuple:
         """
             Register new affiliate
@@ -51,7 +51,7 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'User already registered as an Affiliate'}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def increment_total_recruits(self, affiliate_data: dict) -> tuple:
         """
             update an existing affiliate
@@ -74,7 +74,7 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'Failed to locate affiliate'}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def delete_affiliate(self, affiliate_data: dict) -> tuple:
         """
             delete affiliate
@@ -98,7 +98,7 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'error locating that affiliate'}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def mark_active(self, affiliate_data: dict, is_active: bool) -> tuple:
         """
             mark a specific affiliate as active or not active
@@ -124,7 +124,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_affiliate(self, affiliate_data: dict) -> tuple:
         """
             with affiliate_id or uid return affiliate
@@ -150,7 +150,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_all_affiliates(self) -> tuple:
         """
             return all affiliates
@@ -162,7 +162,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_active_affiliates(self) -> tuple:
         """
             return affiliates who are not deleted and are active
@@ -175,7 +175,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_in_active_affiliates(self) -> tuple:
         """
             return affiliates who are not active
@@ -188,7 +188,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_deleted_affiliates(self) -> tuple:
         """
             return affiliates who are not active
@@ -200,7 +200,7 @@ class AffiliatesView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_not_deleted_affiliates(self) -> tuple:
         """
             return affiliates who are not active
@@ -221,7 +221,7 @@ class RecruitsView(Validator):
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def add_recruit(self, recruit_data: dict) -> tuple:
         """
             recruit_data: dict
@@ -240,7 +240,7 @@ class RecruitsView(Validator):
                         'payload': recruit_instance.to_dict()}), 200
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def delete_recruit(self, recruit_data: dict) -> tuple:
 
         affiliate_id: str = recruit_data.get('affiliate_id')
@@ -262,7 +262,7 @@ class RecruitsView(Validator):
             return jsonify({'status': False, 'message': message}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def mark_active(self, recruit_data: dict, is_active: bool) -> tuple:
         affiliate_id: str = recruit_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
@@ -286,7 +286,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_recruit(self, recruit_data: dict) -> tuple:
         affiliate_id: str = recruit_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
@@ -302,7 +302,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_recruits_by_active_status(self, is_active: bool) -> tuple:
         if not isinstance(is_active, bool):
             return jsonify({'status': False, 'message': 'is_active status is required'}), 500
@@ -314,7 +314,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_recruits_by_deleted_status(self, is_deleted: bool) -> tuple:
         if not isinstance(is_deleted, bool):
             return jsonify({'status': False, 'message': 'is_deleted status is required'}), 500
@@ -326,7 +326,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_recruits_by_affiliate(self, affiliate_data: dict) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
         if referrer_uid is None or referrer_uid == "":
@@ -339,7 +339,7 @@ class RecruitsView(Validator):
 
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_recruits_by_active_and_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
         if referrer_uid is None or referrer_uid == "":

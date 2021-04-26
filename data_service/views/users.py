@@ -5,7 +5,7 @@ from data_service.config.types import dict_list_type
 from data_service.main import cache_users
 from data_service.store.users import UserModel
 from data_service.utils.utils import create_id, return_ttl
-from data_service.views.exception_handlers import handle_ndb_errors
+from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 users_type = typing.List[UserModel]
@@ -17,7 +17,7 @@ class UserView:
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def add_user(self, names: str, surname: str, cell: str, email: str, password: str, uid: str = None) -> tuple:
         """
             create new user
@@ -65,7 +65,7 @@ class UserView:
                         }), 200
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def update_user(self, uid: str, names: str, surname: str, cell: str, email: str) -> tuple:
         """
             update user details
@@ -91,7 +91,7 @@ class UserView:
             return jsonify({'status': False, 'message': 'user not found cannot update user details'}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def delete_user(self, uid: str = None, email: str = None, cell: str = None) -> tuple:
         """
             given either, uid, email or cell delete user
@@ -120,7 +120,7 @@ class UserView:
 
     @cache_users.cached(timeout=return_ttl(name='short'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_active_users(self) -> tuple:
         """
             return a list of all users
@@ -131,7 +131,7 @@ class UserView:
 
     @cache_users.cached(timeout=return_ttl(name='short'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_in_active_users(self) -> tuple:
         """
             return a list of non active users
@@ -142,7 +142,7 @@ class UserView:
 
     @cache_users.cached(timeout=return_ttl(name='short'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_all_users(self) -> tuple:
         """
             get a list of all users
@@ -154,7 +154,7 @@ class UserView:
 
     @cache_users.cached(timeout=return_ttl(name='medium'))
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def get_user(self, uid: str = None, cell: str = None, email: str = None) -> tuple:
         """
             return a user either by uid, cell or email
@@ -184,7 +184,7 @@ class UserView:
         return jsonify({'status': False, 'message': 'to retrieve a user either submit an email, cell or user id'}), 500
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def check_password(self, uid: str, password: str) -> tuple:
         if uid is None:
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
@@ -201,7 +201,7 @@ class UserView:
             return jsonify({'status': False, 'message': 'user not found'}), 200
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def deactivate_user(self, uid: str) -> tuple:
         if uid is None:
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
@@ -216,7 +216,7 @@ class UserView:
             return jsonify({'status': False, 'message': 'user not found'}), 200
 
     @use_context
-    @handle_ndb_errors
+    @handle_view_errors
     def login(self, email: str, password: str) -> tuple:
         """
             this login utility may support client app , not necessary for admin and service to service calls
