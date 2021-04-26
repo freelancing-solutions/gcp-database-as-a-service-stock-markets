@@ -393,7 +393,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol) is True:
             stock_instance: Stock = Stock(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name,
                                           symbol=symbol)
-            key = stock_instance.put()
+            key = stock_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -430,7 +430,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
         stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
                                                       sid=sid, stock=stock, broker=broker)
-        key = stock_model_instance.put()
+        key = stock_model_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
             raise DataServiceError(message)
