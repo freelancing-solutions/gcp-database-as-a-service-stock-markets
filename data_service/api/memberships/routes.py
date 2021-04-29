@@ -97,5 +97,9 @@ def change_membership_plan(plan_id: str) -> tuple:
 def create_membership_plan() -> tuple:
     membership_plan_data: dict = request.get_json()
     member_ship_instance_view: MembershipPlansView = MembershipPlansView()
+    return member_ship_instance_view.add_plan(membership_plan_data=membership_plan_data)
 
-    member_ship_instance_view.add_plan(membership_plan_data=membership_plan_data)
+@memberships_bp.route('/api/v1/membership-plans', methods=["GET"])
+def get_membership_plans() -> tuple:
+    member_ship_instance_view: MembershipPlansView = MembershipPlansView()
+    return member_ship_instance_view.return_all_plans()

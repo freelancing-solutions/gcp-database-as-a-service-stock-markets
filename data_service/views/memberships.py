@@ -430,6 +430,11 @@ class MembershipPlansView(Validators):
             return jsonify({'status': True, 'payload': plan_instance.to_dict(), 'message': message}), 200
         return jsonify({'status': False, 'message': 'Unable to get plan'}), 500
 
+    @staticmethod
+    def return_all_plans(self) -> tuple:
+        membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query().fetch()
+        return jsonify({'status': True, 'payload': membership_plan_list,
+                        'message': 'successfully fetched all memberships'}), 200
 
 class AccessRightsView:
     def __init__(self):
