@@ -17,10 +17,11 @@ class ScrapperView:
     def add_data(self, scrapper_data: dict) -> tuple:
         if isinstance(scrapper_data, dict):
             scrapper_instance = ScrapperTempStore()
-            scrapper_instance.status = scrapper_data.get('status') or False
+            scrapper_instance.status = scrapper_data.get('status')
             scrapper_instance.data_id = create_id()
             scrapper_instance.data = scrapper_data.get('data')
-            scrapper_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = scrapper_instance.put()
+            return jsonify({'status': False, 'message': "succesfully created scrapped data"}), 200
         else:
             return jsonify({'status': False, 'message': "invalid data format"}), 500
 

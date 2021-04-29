@@ -25,9 +25,12 @@ def settings(path):
         else:
             pass
     else:
-        # TODO - save settings files
-        pass
-
+        if path == "scrapper":
+            scrapper_instances: ScrappingPagesView = ScrappingPagesView()
+            json_data: dict = request.get_json()
+            return scrapper_instances.add_scrapper_settings(scrapper_settings=json_data)
+        else:
+            pass
 
 @settings_bp.route('/api/v1/exchange/<path:path>', methods=['POST', 'GET'])
 @handle_auth

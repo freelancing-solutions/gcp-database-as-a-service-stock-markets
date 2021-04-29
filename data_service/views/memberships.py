@@ -97,7 +97,7 @@ class MembershipsView(Validators):
 
             membership_instance.uid = uid
             membership_instance.plan_start_date = plan_start_date
-            key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = membership_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
                 raise DataServiceError(message)
@@ -120,7 +120,7 @@ class MembershipsView(Validators):
 
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         membership_instance.status = status
-        key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        key = membership_instance.put( retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "Unable to save membership instance to database, please try again"
             raise DataServiceError(message)
@@ -135,12 +135,12 @@ class MembershipsView(Validators):
         if membership_instance.plan_id == origin_plan_id:
             if self.plan_exist(plan_id=dest_plan_id):
                 membership_instance.plan_id = dest_plan_id
-                key = membership_instance.put(use_cache=True, retries=self._max_retries,
+                key = membership_instance.put( retries=self._max_retries,
                                               timeout=self._max_timeout)
             else:
                 # This maybe be because the original plan is deleted but its a rare case
                 membership_instance.plan_id = dest_plan_id
-                key = membership_instance.put(use_cache=True, retries=self._max_retries,
+                key = membership_instance.put( retries=self._max_retries,
                                               timeout=self._max_timeout)
 
             if key is None:
@@ -246,7 +246,7 @@ class MembershipsView(Validators):
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         if isinstance(membership_instance, Memberships):
             membership_instance.status = status
-            key = membership_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = membership_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to set payment status'
                 return jsonify({'status': False, 'message': message}), 500
@@ -264,12 +264,52 @@ class MembershipPlansView(Validators):
 
     @use_context
     @handle_view_errors
-    def add_plan(self, plan_name: str, description: str, schedule_day: int, schedule_term: str,
-                 term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
+    def add_plan(self, membership_plan_data: dict) -> tuple:
         """
-            checks to see if the plan actually exists and the new plan name wont cause a conflict with an existing name
+            checks to see if the plan actually exists and the new plan name wont cause a conflict with
+            an existing name
+             plan_name: str, description: str, schedule_day: int, schedule_term: str,
+                 term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
 
         """
+
+        if "plan_name" in membership_plan_data and membership_plan_data['plan_name'] != "":
+            plan_name = membership_plan_data.get('plan_name')
+        else:
+            return jsonify({'status': False, 'message': 'plan name is required'}), 500
+
+        if 'description' in membership_plan_data and membership_plan_data['description'] != "":
+            description: str = membership_plan_data.get('description')
+        else:
+            return jsonify({'status': False, 'message': 'description is required'}), 500
+
+        if 'schedule_day' in membership_plan_data and membership_plan_data['schedule_day'] != "":
+            schedule_day: str = membership_plan_data.get('schedule_day')
+        else:
+            return jsonify({'status': False, 'message': 'scheduled day is required'}), 500
+
+        if 'schedule_term' in membership_plan_data and membership_plan_data['schedule_term'] != "":
+            schedule_term: str = membership_plan_data.get('schedule_term')
+        else:
+            return jsonify({'status': False, 'message': 'schedule term is required'}), 500
+
+        if 'term_payment' in membership_plan_data and membership_plan_data['term_payment'] != "":
+            term_payment: int = int(membership_plan_data.get('term_payment'))
+        else:
+            return jsonify({'status': False, 'message': 'term payment is required'}), 500
+
+        if 'registration_amount' in membership_plan_data and membership_plan_data['registration_amount'] != "":
+            registration_amount: int = int(membership_plan_data.get('registration_amount'))
+        else:
+            return jsonify({'status': False, 'message': 'registration amount is required'}), 500
+
+        if 'currency' in membership_plan_data and membership_plan_data['currency'] != "":
+            currency: str = str(membership_plan_data.get('currency'))
+        else:
+            return jsonify({'status': False, 'message': 'currency is required'}), 500
+
+        is_active = True
+
         if self.can_add_plan(plan_name=plan_name).result() is True:
             total_members: int = 0
             # Creating Amount Mixins to represent real currency
@@ -285,7 +325,7 @@ class MembershipPlansView(Validators):
                                                              registration_amount=curr_registration_amount,
                                                              is_active=is_active,
                                                              date_created=datetime.now().date())
-            key = plan_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = plan_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
                 return jsonify({'status': False, 'message': message}), 500
@@ -313,7 +353,7 @@ class MembershipPlansView(Validators):
                 membership_plans_instance.term_payment_amount = curr_term_payment
                 membership_plans_instance.registration_amount = curr_registration_amount
                 membership_plans_instance.is_active = is_active
-                key = membership_plans_instance.put(use_cache=True, retries=self._max_retries,
+                key = membership_plans_instance.put( retries=self._max_retries,
                                                     timeout=self._max_timeout)
                 if key is None:
                     message: str = 'for some reason we are unable to create a new plan'
@@ -336,7 +376,7 @@ class MembershipPlansView(Validators):
         membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
         if isinstance(membership_plans_instance, MembershipPlans):
             membership_plans_instance.is_active = is_active
-            key = membership_plans_instance.put(use_cache=True, retries=self._max_retries,
+            key = membership_plans_instance.put( retries=self._max_retries,
                                                 timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
@@ -445,7 +485,7 @@ class CouponsView(Validators):
     def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
         if self.can_add_coupon(code=code, expiration_time=expiration_time).result():
             coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
-            key = coupons_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = coupons_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "an error occured while creating coupon"
                 return jsonify({'status': False, 'message': message}), 500
@@ -463,7 +503,7 @@ class CouponsView(Validators):
             coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
             coupon_instance.discount = discount
             coupon_instance.expiration_time = expiration_time
-            key = coupon_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = coupon_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Error updating coupon"
                 return jsonify({'status': False, 'message': message}), 500
@@ -485,7 +525,7 @@ class CouponsView(Validators):
         coupon_instace: Coupons = Coupons.query(Coupons.code == code).get()
         if isinstance(coupon_instace, Coupons):
             coupon_instace.is_valid = False
-            key = coupon_instace.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = coupon_instace.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to cancel coupon"
                 return jsonify({'status': False, 'message': message}), 500

@@ -331,6 +331,7 @@ class CatchStockErrors(StockViewContext):
 
 
 class CatchBrokerErrors(StockViewContext):
+
     def __int__(self):
         super(CatchBrokerErrors, self).__init__()
 
@@ -393,7 +394,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol) is True:
             stock_instance: Stock = Stock(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name,
                                           symbol=symbol)
-            key = stock_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = stock_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -411,7 +412,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         if self.can_add_broker(broker_id=broker_id, broker_code=broker_code):
             broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code,
                                              broker_name=broker_name)
-            key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = broker_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -430,7 +431,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
         stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
                                                       sid=sid, stock=stock, broker=broker)
-        key = stock_model_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        key = stock_model_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
             raise DataServiceError(message)
@@ -449,7 +450,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                                              buy_ave_price=buy_ave_price,
                                                              buy_market_val_percent=buy_market_val_percent,
                                                              buy_trade_count=buy_trade_count)
-        key = buy_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        key = buy_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
             raise DataServiceError(message)
@@ -470,7 +471,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                                                 sell_ave_price=sell_ave_price,
                                                                 sell_market_val_percent=sell_market_val_percent,
                                                                 sell_trade_count=sell_trade_count)
-        key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        key = sell_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
             raise DataServiceError(message)
@@ -501,7 +502,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         net_volume_instance.total_value = total_value
         net_volume_instance.total_volume = total_volume
 
-        key = net_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        key = net_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
             raise DataServiceError(message)
@@ -520,7 +521,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             stock_instance.stock_code = stock_code
             stock_instance.stock_name = stock_name
             stock_instance.symbol = symbol
-            key = stock_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = stock_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is not None:
                 return jsonify({'status': True, 'payload': stock_instance.to_dict(),
                                 'message': 'successfully updated stock'}), 200
@@ -541,7 +542,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             broker_instance.broker_id = broker_id
             broker_instance.broker_code = broker_code
             broker_instance.broker_name = broker_name
-            key = broker_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = broker_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is not None:
                 return jsonify({'status': True, 'payload': broker_instance.to_dict(),
                                 'message': 'broker instance updated successfully'}), 200
@@ -580,7 +581,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             stock_model.exchange_id = exchange_id
             stock_model.stock = stock
             stock_model.broker = broker
-            key = stock_model.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = stock_model.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is not None:
                 return jsonify({'status': True, 'payload': stock_model.to_dict(),
                                 'message': 'stock model is update'}), 200
@@ -608,7 +609,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             buy_instance.buy_ave_price = buy_ave_price
             buy_instance.buy_market_val_percent = buy_market_val_percent
             buy_instance.buy_trade_count = buy_trade_count
-            key = buy_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = buy_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
                 raise DataServiceError(message)
@@ -637,7 +638,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             sell_volume_instance.sell_market_val_percent = sell_market_val_percent
             sell_volume_instance.sell_trade_count = sell_trade_count
             sell_volume_instance.transaction_id = transaction_id
-            key = sell_volume_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = sell_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
 
             if key is not None:
                 return jsonify({'status': True, 'payload': sell_volume_instance.to_dict(),

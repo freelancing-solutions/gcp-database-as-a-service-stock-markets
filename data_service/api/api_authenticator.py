@@ -42,9 +42,9 @@ def handle_auth(func):
             message: str = 'You are not authorized to use this resources'
             raise Unauthorized(message)
 
-        if not request_url_valid(url=request.url_root):
-            message: str = 'You are not authorized to use this resources'
-            raise Unauthorized(message)
+        # if not request_url_valid(url=request.url_root):
+        #     message: str = 'You are not authorized to use this resources'
+        #     raise Unauthorized(message)
 
         secret_token = request.headers.get('x-auth-token')
         if secret_token is None:

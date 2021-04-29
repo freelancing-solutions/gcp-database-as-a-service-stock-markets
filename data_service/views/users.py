@@ -58,7 +58,7 @@ class UserView:
         user_instance.set_email(email=email)
         user_instance.set_password(password=password)
         user_instance.set_is_active(is_active=True)
-        user_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        user_instance.put( retries=self._max_retries, timeout=self._max_timeout)
         return jsonify({'status': True,
                         "message": "Successfully created new user",
                         "payload": user_instance.to_dict()
@@ -85,7 +85,7 @@ class UserView:
             user_instance.set_surname(surname=surname)
             user_instance.set_cell(cell=cell)
             user_instance.set_email(email=email)
-            user_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            user_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             return jsonify({'status': True, 'message': 'successfully updated user details'}), 200
         else:
             return jsonify({'status': False, 'message': 'user not found cannot update user details'}), 500

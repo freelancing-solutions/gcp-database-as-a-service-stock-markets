@@ -3,10 +3,11 @@ from datetime import datetime, date
 from data_service.api.api_authenticator import handle_auth
 from data_service.config.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
-from data_service.views.memberships import MembershipsView
+from data_service.views.memberships import MembershipsView, MembershipPlansView
 
 memberships_bp = Blueprint('memberships', __name__)
 
+# TODO Rewrite this to allow data to be passed as JSON variables
 
 @memberships_bp.route("/api/v1/members/<path:plan_id>", methods=['POST'])
 @handle_auth
@@ -91,3 +92,10 @@ def change_membership_plan(plan_id: str) -> tuple:
         return member_ship_instance_view.change_membership(uid=uid, origin_plan_id=plan_id, dest_plan_id=dest_plan_id)
 
 # TODO - Finish up
+
+@memberships_bp.route('/api/v1/membership-plan', methods=["POST"])
+def create_membership_plan() -> tuple:
+    membership_plan_data: dict = request.get_json()
+    member_ship_instance_view: MembershipPlansView = MembershipPlansView()
+
+    member_ship_instance_view.add_plan(membership_plan_data=membership_plan_data)

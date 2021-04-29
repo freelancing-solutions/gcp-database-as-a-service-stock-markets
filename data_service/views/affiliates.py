@@ -40,7 +40,7 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'user id cannot be Null'}), 500
         if self.can_register_affiliate(uid=uid) is True:
             affiliate_instance: Affiliates = Affiliates(affiliate_id=create_id(), uid=uid)
-            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "There was an error creating Affiliate"
                 raise DataServiceError(message)
@@ -63,7 +63,7 @@ class AffiliatesView(Validator):
         if isinstance(affiliate_list, list) and len(affiliate_list) > 0:
             affiliate_instance = affiliate_list[0]
             affiliate_instance.total_recruits += 1
-            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Something went wrong while updating affiliate"
                 raise DataServiceError(message)
@@ -87,7 +87,7 @@ class AffiliatesView(Validator):
             affiliate_instance = affiliates_list[0]
             affiliate_instance.is_active = False
             affiliate_instance.is_deleted = True
-            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'something went wrong while deleting affiliate'
                 return jsonify({'status': False, 'message': message}), 500
@@ -112,7 +112,7 @@ class AffiliatesView(Validator):
         if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
             affiliate_instance: Affiliates = affiliates_list[0]
             affiliate_instance.is_active = is_active
-            key = affiliate_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Unknown Error occurred while trying to mark affiliate as in-active"
                 return jsonify({'status': False, 'message': message}), 500
@@ -232,7 +232,7 @@ class RecruitsView(Validator):
 
         # TODO - check if i can add recruit
         recruit_instance: Recruits = Recruits(affiliate_id=create_id(), referrer_uid=referrer_uid)
-        key = recruit_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+        key = recruit_instance.put( retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "An Error occurred while adding new recruit"
             return jsonify({'status': False, 'message': message}), 500
@@ -252,7 +252,7 @@ class RecruitsView(Validator):
             recruits_instance = recruits_list[0]
             recruits_instance.is_deleted = True
             recruits_instance.is_active = False
-            key = recruits_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = recruits_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Error occurred while deleting recruit"
                 return jsonify({'status': False, 'message': message}), 500
@@ -275,7 +275,7 @@ class RecruitsView(Validator):
         if isinstance(recruits_list, list) and len(recruits_list) > 0:
             recruits_instance: Recruits = recruits_list[0]
             recruits_instance.is_active = is_active
-            key = recruits_instance.put(use_cache=True, retries=self._max_retries, timeout=self._max_timeout)
+            key = recruits_instance.put( retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Error occurred while changing recruit active status"
                 return jsonify({'status': False, 'message': message}), 500

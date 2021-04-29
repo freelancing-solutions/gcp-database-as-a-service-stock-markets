@@ -3,6 +3,7 @@ from flask import jsonify
 from google.api_core.exceptions import Aborted, RetryError
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
 
+
 def handle_view_errors(func):
     functools.wraps(func)
 
@@ -46,4 +47,5 @@ def handle_store_errors(func):
             return None
         except Aborted:
             return None
+
     return wrapper

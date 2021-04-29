@@ -2,7 +2,7 @@ from flask import Blueprint, request
 
 from data_service.views.stocks import StockView
 
-task_bp = Blueprint('tasks_input_pubsub_handlers', __name__)
+task_bp = Blueprint('tasks_input_handlers', __name__)
 
 
 # NOTE: calls to this endpoints will come from pubsub messaging
@@ -13,8 +13,6 @@ def save_api_stock_data() -> tuple:
         this task will be called by
         the function which retrieves data from api
         in order to submit data to be saved to database
-
-
     :return:
     """
     stock_data: dict = request.get_json()
