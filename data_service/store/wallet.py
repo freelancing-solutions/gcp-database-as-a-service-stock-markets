@@ -50,3 +50,14 @@ class WalletModel(ndb.Model):
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
     paypal_address: str = ndb.StringProperty(validator=ClassSetters.set_paypal)
+
+class WalletTransactionsModel(ndb.Model):
+    uid: str = ndb.StringProperty()
+    transaction_id: str = ndb.StringProperty()
+    transaction_type: str = ndb.StringProperty()
+    transaction_date: str = ndb.StringProperty()
+
+class WalletTransactionItemModel(ndb.Model):
+    transaction_id: str = ndb.StringProperty()
+    item_id: str = ndb.StringProperty()
+    amount: AmountMixin = ndb.StructuredProperty(AmountMixin)

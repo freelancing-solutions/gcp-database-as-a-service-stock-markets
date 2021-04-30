@@ -38,8 +38,9 @@ class WalletView(Validator):
     """
         view functions for the wallet
     """
+
     def __init__(self):
-        pass
+        super(WalletView, self).__init__()
 
     @use_context
     @handle_view_errors
