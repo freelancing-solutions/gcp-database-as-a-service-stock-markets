@@ -80,10 +80,15 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def return_all_wallets(self) -> tuple:
-        pass
+        wallet_list: typing.List[WalletModel] = WalletModel.query().fetch()
+        payload: typing.List[dict] = [wallet.to_dict() for wallet in wallet_list]
+        return jsonify({'status': True, 'payload': payload,
+                        'message': 'wallets returned'}), 200
 
     @use_context
     @handle_view_errors
-    def return_wallets_by_balance(self, lower_than: int, higher_than: int) -> tuple:
-        pass
-
+    def return_wallets_by_balance(self, lower_bound: int, higher_bound: int) -> tuple:
+        wallet_list: typing.List[WalletModel] = WalletModel.query(WalletModel.available_funds > lower_bound,
+                                                                  WalletModel.available_funds < higher_bound).fetch()
+        payload: typing.List[dict] = [wallet.to_dict() for wallet in wallet_list]
+        return jsonify({'status': True, 'payload': payload, 'message': 'wallets returned'}), 200
