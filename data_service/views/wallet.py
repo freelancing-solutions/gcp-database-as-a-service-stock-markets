@@ -37,8 +37,11 @@ class WalletView(Validator):
             return jsonify({'status': True, 'message': 'successfully created wallet', 'payload': wallet_instance.to_dict()}), 200
 
     @use_context
-    def create_wallet(self, wallet_data: dict) -> tuple:
-        pass
+    @handle_view_errors
+    def get_wallet(self, uid: str) -> tuple:
+        wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
+        return jsonify({'status': True, 'payload': wallet_instance.to_dict(), 'message': 'wallet found'}), 200
+
 
     @use_context
     def update_wallet(self, wallet_data: dict) -> tuple:
