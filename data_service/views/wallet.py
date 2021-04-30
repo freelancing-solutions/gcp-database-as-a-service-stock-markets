@@ -2,24 +2,27 @@ import typing
 from flask import jsonify, current_app
 
 from data_service.store.mixins import AmountMixin
-from data_service.store.wallet import WalletModel
+from data_service.store.wallet import WalletModel, WalletValidator
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 
-class Validator:
+class Validator(WalletValidator):
 
-    @staticmethod
-    def can_add_wallet(uid: str) -> bool:
-        return True
+    def __init__(self):
+        super(Validator, self).__init__()
 
-    @staticmethod
-    def can_update_wallet(uid: str) -> bool:
-        return True
+    def can_add_wallet(self, uid: str) -> bool:
+        wallet_exist: bool = self.wallet_exist(uid=uid)
+        return wallet_exist
 
-    @staticmethod
-    def can_reset_wallet(uid: str) -> bool:
-        return True
+    def can_update_wallet(self, uid: str) -> bool:
+        wallet_exist: bool = self.wallet_exist(uid=uid)
+        return wallet_exist
+
+    def can_reset_wallet(self, uid: str) -> bool:
+        wallet_exist: bool = self.wallet_exist(uid=uid)
+        return wallet_exist
 
 
 class WalletView(Validator):

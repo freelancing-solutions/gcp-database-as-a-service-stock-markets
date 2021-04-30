@@ -7,6 +7,16 @@ from werkzeug.security import generate_password_hash
 from data_service.store.mixins import AmountMixin
 from data_service.utils.utils import timestamp
 
+
+class WalletValidator:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def wallet_exist(uid: str) -> bool:
+        wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
+        return True if isinstance(wallet_instance, WalletModel) else False
+
 class ClassSetters:
     def __init__(self):
         pass
