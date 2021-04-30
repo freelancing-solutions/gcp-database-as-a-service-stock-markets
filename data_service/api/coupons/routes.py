@@ -28,3 +28,6 @@ def coupons(path: str) -> tuple:
         return coupons_view_instance.get_expired_coupons()
     else:
         pass
+
+    # TODO intergrate Coupons to admin app and allow for the app to
+    # generate and manage them

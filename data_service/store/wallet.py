@@ -1,11 +1,7 @@
 import typing
 from datetime import datetime
-from google.api_core.exceptions import RetryError
 from google.cloud import ndb
-from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
-from werkzeug.security import generate_password_hash
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import timestamp
 
 
 class WalletValidator:
@@ -17,6 +13,8 @@ class WalletValidator:
         wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
         return True if isinstance(wallet_instance, WalletModel) else False
 
+    # TODO complete validations for all Wallet Models
+    # TODO be sure to intergrate all models to the view
 class ClassSetters:
     def __init__(self):
         self.transaction_types = ['withdrawal', 'deposit']

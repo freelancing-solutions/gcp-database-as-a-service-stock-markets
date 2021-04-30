@@ -103,3 +103,6 @@ def create_membership_plan() -> tuple:
 def get_membership_plans() -> tuple:
     member_ship_instance_view: MembershipPlansView = MembershipPlansView()
     return member_ship_instance_view.return_all_plans()
+
+# TODO complete the intergration of memberships view and the
+#  API also refer to admin app

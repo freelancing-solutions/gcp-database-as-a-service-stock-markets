@@ -10,7 +10,7 @@ def warmup():
     """
         Use Context will create a database connection
         APP-Engine Warm UP Handler
-        # TODO - read settings database
+        # TODO - Finalize the WarmUp Handler
     """
     pass
 
