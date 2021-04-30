@@ -11,7 +11,7 @@ def get_exchange_tickers():
     """
         https://eodhistoricaldata.com/api/exchange-symbol-list/PSE?api_token=6082f94d7285f7.55471245
         use the above url to get exchange tickers data
-
+        #TODO see open issue about cron jobs on github 
     """
     pass
 
