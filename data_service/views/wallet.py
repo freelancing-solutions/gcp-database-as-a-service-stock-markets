@@ -12,15 +12,24 @@ class Validator(WalletValidator):
     def __init__(self):
         super(Validator, self).__init__()
 
-    def can_add_wallet(self, uid: str) -> bool:
+    def can_add_wallet(self, uid: typing.Union[None, str] = None) -> bool:
+        if uid is None:
+            return False
+
         wallet_exist: bool = self.wallet_exist(uid=uid)
         return wallet_exist
 
-    def can_update_wallet(self, uid: str) -> bool:
+    def can_update_wallet(self, uid: typing.Union[None, str] = None) -> bool:
+        if uid is None:
+            return False
+
         wallet_exist: bool = self.wallet_exist(uid=uid)
         return wallet_exist
 
-    def can_reset_wallet(self, uid: str) -> bool:
+    def can_reset_wallet(self, uid: typing.Union[None, str]) -> bool:
+        if uid is None:
+            return False
+
         wallet_exist: bool = self.wallet_exist(uid=uid)
         return wallet_exist
 
