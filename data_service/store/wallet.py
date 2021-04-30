@@ -19,7 +19,7 @@ class WalletValidator:
 
 class ClassSetters:
     def __init__(self):
-        pass
+        self.transaction_types = ['withdrawal', 'deposit']
 
     def set_id(self, value: str) -> str:
         if value is None or value == "":
@@ -44,6 +44,22 @@ class ClassSetters:
 
         return value
 
+    def set_transaction_types(self, value: str) -> str:
+        if value not in self.transaction_types:
+            raise ValueError(" {} invalid transaction type".format(self.name))
+        return value
+
+    def set_datetime(self, value: datetime) -> datetime:
+        if not isinstance(value, datetime):
+            raise ValueError("{} invalid argument".format(self.name))
+
+        return value
+
+    def set_bool(self, value: bool) -> bool:
+        if not isinstance(value, bool):
+            raise ValueError("{} invalid argument".format(self.name))
+        return value
+
 class WalletModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
     available_funds: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_funds)
@@ -52,12 +68,13 @@ class WalletModel(ndb.Model):
     paypal_address: str = ndb.StringProperty(validator=ClassSetters.set_paypal)
 
 class WalletTransactionsModel(ndb.Model):
-    uid: str = ndb.StringProperty()
-    transaction_id: str = ndb.StringProperty()
-    transaction_type: str = ndb.StringProperty()
-    transaction_date: str = ndb.StringProperty()
+    uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    transaction_type: str = ndb.StringProperty(validator=ClassSetters.set_transaction_types)
+    transaction_date: str = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
 
 class WalletTransactionItemModel(ndb.Model):
-    transaction_id: str = ndb.StringProperty()
-    item_id: str = ndb.StringProperty()
+    transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    item_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     amount: AmountMixin = ndb.StructuredProperty(AmountMixin)
+    is_verified: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
