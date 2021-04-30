@@ -13,6 +13,20 @@ def get_exchange_tickers():
         use the above url to get exchange tickers data
 
     """
+    pass
+
+@cron_bp.route('/cron/get-sell-volume', methods=["GET"])
+def get_sell_volume():
+    pass
+
+@cron_bp.route('/cron/get-buy-volume', methods=["GET"])
+def get_buy_volume():
+    pass
+
+@cron_bp.route('/cron/get-net-volume', methods=["GET"])
+def get_net_volume():
+    pass
+
 
 
 
