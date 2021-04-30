@@ -27,4 +27,3 @@ class WalletView:
     def return_wallets_by_balance(self, lower_than: int, higher_than: int) -> tuple:
         pass
 
-    
