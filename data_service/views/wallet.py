@@ -1,6 +1,5 @@
 import typing
-from flask import jsonify, current_app
-
+from flask import jsonify
 from data_service.store.mixins import AmountMixin
 from data_service.store.wallet import WalletModel, WalletValidator
 from data_service.views.exception_handlers import handle_view_errors

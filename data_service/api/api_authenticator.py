@@ -26,7 +26,7 @@ def request_url_valid(url: str) -> bool:
         return True
     return False
 
-
+# TODO Insure handle Auth Works in Deployment and create test cases
 def handle_auth(func):
     @functools.wraps(func)
     def auth_wrapper(*args, **kwargs):

@@ -13,6 +13,7 @@
 .git
 .bat
 .gitignore
+.github
 *.pyc
 # Python pycache:
 __pycache__/

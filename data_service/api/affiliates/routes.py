@@ -5,6 +5,7 @@ from data_service.views.affiliates import AffiliatesView, RecruitsView
 
 affiliates_bp = Blueprint('affiliates', __name__)
 
+
 @affiliates_bp.route('/api/v1/affiliate/<path:path>', methods=['POST'])
 @handle_auth
 def affiliate(path: str) -> tuple:
