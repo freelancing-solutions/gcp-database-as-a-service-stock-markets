@@ -49,19 +49,29 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def update_wallet(self, wallet_data: dict) -> tuple:
-        if self.can_update_wallet(uid=wallet_data['uid']) is True:
-            pass
-
+        uid: str = wallet_data.get("uid")
+        available_funds: int = wallet_data.get("available_funs")
+        paypal_address: str = wallet_data.get("paypal_address")
+        if self.can_update_wallet(uid=uid) is True:
+            wall_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
+            wall_instance.uid = uid
+            wall_instance.available_funds = available_funds
+            wall_instance.paypal_address = paypal_address
+            key = wall_instance.put()
+            
 
     @use_context
+    @handle_view_errors
     def reset_wallet(self, wallet_data: dict) -> tuple:
         pass
 
     @use_context
+    @handle_view_errors
     def return_all_wallets(self) -> tuple:
         pass
 
     @use_context
+    @handle_view_errors
     def return_wallets_by_balance(self, lower_than: int, higher_than: int) -> tuple:
         pass
 
