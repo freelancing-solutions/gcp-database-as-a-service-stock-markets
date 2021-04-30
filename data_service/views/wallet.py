@@ -13,6 +13,10 @@ class Validator:
     def can_add_wallet(uid: str) -> bool:
         return True
 
+    @staticmethod
+    def can_update_wallet(uid: str) -> bool:
+        return True
+
 
 class WalletView(Validator):
     """
@@ -24,7 +28,7 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def create_wallet(self, uid: str, currency: str, paypal_address: str) -> tuple:
-        if self.can_add_wallet(uid=uid):
+        if self.can_add_wallet(uid=uid) is True:
             wallet_instance: WalletModel = WalletModel()
             amount_instance: AmountMixin = AmountMixin()
             amount_instance.amount = 0
@@ -42,10 +46,12 @@ class WalletView(Validator):
         wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
         return jsonify({'status': True, 'payload': wallet_instance.to_dict(), 'message': 'wallet found'}), 200
 
-
     @use_context
+    @handle_view_errors
     def update_wallet(self, wallet_data: dict) -> tuple:
-        pass
+        if self.can_update_wallet(uid=wallet_data['uid']) is True:
+            pass
+
 
     @use_context
     def reset_wallet(self, wallet_data: dict) -> tuple:
