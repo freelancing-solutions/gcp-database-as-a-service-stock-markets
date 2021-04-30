@@ -10,7 +10,7 @@ from data_service.views.use_context import use_context
 
 users_type = typing.List[UserModel]
 
-
+# TODO create test cases for User View and Documentations
 class UserView:
     def __init__(self):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')

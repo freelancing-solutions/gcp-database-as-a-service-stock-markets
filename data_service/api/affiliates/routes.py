@@ -70,3 +70,5 @@ def recruits(path: str) -> tuple:
         return recruits_view_instance.get_recruits_by_active_and_affiliate(affiliate_data=recruit_data, is_active=False)
     else:
         pass
+
+    # TODO Fully intergrate the Affiliate API to the Admin App

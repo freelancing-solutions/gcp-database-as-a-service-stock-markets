@@ -12,7 +12,7 @@ exc_list_type = typing.List[ExchangeDataModel]
 scrape_list_type = typing.List[ScrappingPagesModel]
 api_list_type = typing.List[StockAPIEndPointModel]
 
-
+# TODO Refactor Settings View and Write Test Cases and Documentation
 class UserSettingsView:
     def __init__(self):
         pass

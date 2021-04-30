@@ -1,5 +1,4 @@
 from google.cloud import ndb
-from datetime import datetime
 
 class AmountMixin(ndb.Model):
     amount: int = ndb.IntegerProperty(default=0)

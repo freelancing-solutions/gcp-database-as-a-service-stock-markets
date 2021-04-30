@@ -10,6 +10,8 @@ from data_service.utils.utils import create_id, return_ttl, end_of_month
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
+# TODO Create Test Cases for Affiliates View and Documentations
+
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
 
     @staticmethod
@@ -358,6 +360,7 @@ class RecruitsView(Validator):
 class EarningsView(Validator):
     """
         Used by system to register new earnings for affiliates
+        # TODO finalize the Earnings Repository
     """
 
     def __init__(self):
@@ -390,6 +393,7 @@ class EarningsView(Validator):
             wallet earnings can be sent to paypal or through EFT
         """
         pass
+
 
 
 

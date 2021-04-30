@@ -37,7 +37,7 @@ class Validator(WalletValidator):
 class WalletView(Validator):
     """
         view functions for the wallet
-        # TODO - Refactor Wallet View and improve functionality
+        # TODO -  Refactor Wallet View and improve functionality
     """
 
     def __init__(self):
