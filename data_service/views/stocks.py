@@ -4,7 +4,11 @@ from datetime import date as date_class
 from datetime import datetime, timezone
 from google.api_core.exceptions import RetryError, Aborted
 from flask import current_app, jsonify
+from google.cloud import ndb
+from google.cloud.ndb import Future
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
+from google.cloud.ndb.tasklets import _TaskletFuture
+
 from data_service.main import cache_stocks
 from data_service.config.exceptions import DataServiceError
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
@@ -263,10 +267,11 @@ class CatchStockErrors(StockViewContext):
 
     # TODO use ndb.tasklets to refactor stock input validators
     @staticmethod
+    @ndb.tasklet
     def symbol_exist(symbol: str) -> typing.Union[None, bool]:
         # noinspection DuplicatedCode
         try:
-            stock_list: stock_list_type = Stock.query(Stock.symbol == symbol).fetch()
+            stock_list: stock_list_type = Stock.query(Stock.symbol == symbol).get_async().get_result()
         except BadRequestError:
             return None
         except BadQueryError:
@@ -283,9 +288,10 @@ class CatchStockErrors(StockViewContext):
         return False
 
     @staticmethod
+    @ndb.tasklet
     def stock_code_exist(stock_code: str) -> typing.Union[None, bool]:
         try:
-            stock_list: stock_list_type = Stock.query(Stock.stock_code == stock_code).fetch()
+            stock_list: stock_list_type = Stock.query(Stock.stock_code == stock_code).get_async().get_result()
         except BadRequestError:
             return None
         except BadQueryError:
@@ -302,9 +308,10 @@ class CatchStockErrors(StockViewContext):
         return False
 
     @staticmethod
+    @ndb.tasklet
     def stock_id_exist(stock_id: str) -> typing.Union[None, bool]:
         try:
-            stock_list: stock_list_type = Stock.query(Stock.stock_id == stock_id).fetch()
+            stock_list: stock_list_type = Stock.query(Stock.stock_id == stock_id).get_async().get_result()
         except BadRequestError:
             return None
         except BadQueryError:
@@ -320,10 +327,11 @@ class CatchStockErrors(StockViewContext):
         return False
 
     # TODO - refactor this to use tasklets
-    def can_add_stock(self, stock_code: str, symbol: str, stock_id: str = None) -> bool:
-        stock_id_exist: bool = self.stock_id_exist(stock_id=stock_id)
-        stock_code_exist: bool = self.stock_code_exist(stock_code=stock_code)
-        symbol_exist: bool = self.symbol_exist(symbol=symbol)
+    @ndb.tasklet
+    def can_add_stock(self, stock_code: str, symbol: str, stock_id: str = None) -> typing.Union[_TaskletFuture, Future]:
+        stock_id_exist: bool = yield self.stock_id_exist(stock_id=stock_id)
+        stock_code_exist: bool = yield self.stock_code_exist(stock_code=stock_code)
+        symbol_exist: bool = yield self.symbol_exist(symbol=symbol)
         if isinstance(stock_id_exist, bool) and isinstance(stock_code_exist, bool) and isinstance(symbol_exist, bool):
             return stock_id_exist and stock_code_exist and symbol_exist
 
@@ -338,10 +346,11 @@ class CatchBrokerErrors(StockViewContext):
 
     # TODO refactor with taslets to validate input faster
     @staticmethod
+    @ndb.tasklet
     def broker_id_exist(broker_id: str) -> typing.Union[None, bool]:
         try:
-            broker_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
-            if isinstance(broker_list, list) and len(broker_list) > 0:
+            broker_instance: Broker = Broker.query(Broker.broker_id == broker_id).get_async().get_result()
+            if isinstance(broker_instance, Broker):
                 return True
             return False
         except BadRequestError:
@@ -357,10 +366,11 @@ class CatchBrokerErrors(StockViewContext):
 
     # noinspection DuplicatedCode
     @staticmethod
+    @ndb.tasklet
     def broker_code_exist(broker_code: str) -> typing.Union[None, bool]:
         try:
-            broker_list: typing.List[Broker] = Broker.query(Broker.broker_code == broker_code).fetch()
-            if isinstance(broker_list, list) and len(broker_list) > 0:
+            broker_instance: Broker = Broker.query(Broker.broker_code == broker_code).get_async().get_result()
+            if isinstance(broker_instance, Broker):
                 return True
             return False
         except BadRequestError:
@@ -375,9 +385,10 @@ class CatchBrokerErrors(StockViewContext):
             return None
 
     # TODO Refactor with ndb.Tasklets in order to get input validity check resolutions faster
-    def can_add_broker(self, broker_id: str, broker_code: str) -> bool:
-        broker_id_exist: bool = self.broker_id_exist(broker_id=broker_id)
-        broker_code_exist: bool = self.broker_code_exist(broker_code=broker_code)
+    @ndb.tasklet
+    def can_add_broker(self, broker_id: str, broker_code: str) -> typing.Union[_TaskletFuture, Future]:
+        broker_id_exist: bool = yield self.broker_id_exist(broker_id=broker_id)
+        broker_code_exist: bool = yield self.broker_code_exist(broker_code=broker_code)
         if isinstance(broker_id_exist, bool) and isinstance(broker_code_exist, bool):
             return broker_id_exist and broker_code_exist
         message: str = "Unable to verify broker data due to database errors please try again later"
@@ -390,11 +401,23 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         with current_app.app_context():
             self.timezone = timezone(Config.UTC_OFFSET)
 
+    @use_context
+    @ndb.tasklet
+    def fetch_stock(self, stock_id: str):
+        stock: Stock = Stock.query(Stock.stock_id == stock_id).get_async()
+        return stock
+
+    @use_context
+    @ndb.tasklet
+    def fetch_broker(self, broker_id: str):
+        broker: Broker = Broker.query(Broker.broker_id == broker_id).get_async()
+        return broker
+
     @data_wrappers.get_stock_data
     @use_context
     @handle_view_errors
     def create_stock_data(self, stock_id: str, stock_code: str, stock_name: str, symbol: str) -> tuple:
-        if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol) is True:
+        if self.can_add_stock(stock_code=stock_code, stock_id=stock_id, symbol=symbol).get_result() is True:
             stock_instance: Stock = Stock(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name,
                                           symbol=symbol)
             key = stock_instance.put(retries=self._max_retries, timeout=self._max_timeout)
@@ -412,7 +435,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def create_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
-        if self.can_add_broker(broker_id=broker_id, broker_code=broker_code):
+        if self.can_add_broker(broker_id=broker_id, broker_code=broker_code).get_result() is True:
             broker_instance: Broker = Broker(broker_id=broker_id, broker_code=broker_code,
                                              broker_name=broker_name)
             key = broker_instance.put(retries=self._max_retries, timeout=self._max_timeout)
@@ -428,9 +451,10 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
-        # TODO - use tasklets to fetch both stock and broker at the same time
-        stock: Stock = Stock.query(Stock.stock_id == stock_id).get()
-        broker: Broker = Broker.query(Broker.broker_id == broker_id).get()
+        # TODO -  use tasklets to fetch both stock and broker at the same time
+        # TODO - Verify that the tasklets return correct results
+        stock = yield self.fetch_stock(stock_id=stock_id)
+        broker = yield self.fetch_broker(broker_id=broker_id)
 
         stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
                                                       sid=sid, stock=stock, broker=broker)
