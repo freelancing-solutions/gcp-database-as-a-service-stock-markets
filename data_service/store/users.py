@@ -120,4 +120,8 @@ class UserModel(ndb.Model):
         self.is_support = is_support
         return True
 
-
+    def set_address(self, address: AddressMixin) -> bool:
+        if not isinstance(address, AddressMixin):
+            raise TypeError('Invalid Argument')
+        self.address = address
+        return True

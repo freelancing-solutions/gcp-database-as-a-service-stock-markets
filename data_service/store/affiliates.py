@@ -166,11 +166,11 @@ class Affiliates(ndb.Model):
             return False
         return True
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "<Affiliates: date_recruited: {}, total_recruits: {}".format(self.datetime_recruited,
                                                                             self.total_recruits)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Affiliates: {}{}".format(self.affiliate_id, self.uid)
 
 class Recruits(ndb.Model):

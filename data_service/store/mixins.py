@@ -45,7 +45,21 @@ class AddressMixin(ndb.Model):
     zip_code: str = ndb.StringProperty()
     province: str = ndb.StringProperty()
 
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.line_1 != other.line_1:
+            return False
+        if self.city != other.city:
+            return False
+        if self.zip_code != other.zip_code:
+            return False
+        if self.province != other.province:
+            return False
+        return True
 
+    def __str__(self) -> str:
+        return "<Address : {} {} {} {}".format(self.line_1, self.city, self.zip_code, self.province)
 
-
-
+    def __repr__(self) -> str:
+        return self.__str__()

@@ -57,7 +57,7 @@ class TicketThread(ndb.Model):
     message: str = ndb.StringProperty()
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
         if self.ticket_id != other.ticket_id:
