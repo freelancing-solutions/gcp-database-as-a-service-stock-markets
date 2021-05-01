@@ -4,7 +4,7 @@ from data_service.utils.utils import create_id
 
 stock_instance: Stock = Stock()
 
-
+# TODO add ndb put mock- in order to test more options such as error checking on the database level
 def test_stock_instance():
     assert isinstance(stock_instance, Stock), "Stock not properly initialized"
 
@@ -24,7 +24,7 @@ def test_stock_code():
 def test_stock_name():
     stock_name = "ABCD"
     stock_instance.stock_name = stock_name
-    assert stock_instance.stock_name == stock_name, "stock name is not set correctly"
+    assert stock_instance.stock_name == stock_name.lower(), "stock name is not set correctly"
 
 
 def test_stock_symbol():

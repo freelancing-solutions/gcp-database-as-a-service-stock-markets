@@ -1,6 +1,5 @@
 from flask import current_app
 from google.cloud import ndb
-from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 import datetime
 from data_service.config import Config
 from data_service.utils.utils import create_id
@@ -28,12 +27,12 @@ class Stock(ndb.Model):
         """
             verify stock_name
         """
-        value: str = value.strip().lower()
+        value: str = value.strip()
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(self.name))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(self.name))
-        return value
+        return value.lower()
 
     stock_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
     stock_code: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
@@ -83,7 +82,7 @@ class Broker(ndb.Model):
             raise ValueError("{} cannot be Null".format(self.name))
         if not isinstance(broker_name, str):
             raise TypeError("{} can only be a string".format(self.name))
-        return broker_name
+        return broker_name.lower()
 
     broker_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_id)
     broker_code: str = ndb.StringProperty(required=True, indexed=True, validator=set_broker_code)
