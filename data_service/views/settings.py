@@ -214,7 +214,6 @@ class ScrappingPagesView:
                             'payload': scrapper_settings_instance.to_dict()})
 
 
-
 class StockAPIEndPointView:
     def __init__(self):
         pass

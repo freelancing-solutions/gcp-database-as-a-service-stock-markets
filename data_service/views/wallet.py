@@ -1,5 +1,7 @@
 import typing
 from flask import jsonify
+
+from data_service.config.exceptions import DataServiceError
 from data_service.store.mixins import AmountMixin
 from data_service.store.wallet import WalletModel, WalletValidator
 from data_service.views.exception_handlers import handle_view_errors
@@ -15,22 +17,28 @@ class Validator(WalletValidator):
         if uid is None:
             return False
 
-        wallet_exist: bool = self.wallet_exist(uid=uid)
-        return wallet_exist
+        wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
+        if isinstance(wallet_exist, bool):
+            return not wallet_exist
+        raise DataServiceError('Unable to verify wallet data')
 
     def can_update_wallet(self, uid: typing.Union[None, str] = None) -> bool:
         if uid is None:
             return False
 
-        wallet_exist: bool = self.wallet_exist(uid=uid)
-        return wallet_exist
+        wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
+        if isinstance(wallet_exist, bool):
+            return wallet_exist
+        raise DataServiceError('Unable to verify wallet data')
 
     def can_reset_wallet(self, uid: typing.Union[None, str]) -> bool:
         if uid is None:
             return False
 
-        wallet_exist: bool = self.wallet_exist(uid=uid)
-        return wallet_exist
+        wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
+        if isinstance(wallet_exist, bool):
+            return wallet_exist
+        raise DataServiceError('Unable to verify wallet data')
 
 
 class WalletView(Validator):

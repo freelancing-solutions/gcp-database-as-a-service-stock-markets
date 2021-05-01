@@ -2,6 +2,7 @@ import typing
 from datetime import datetime
 from google.cloud import ndb
 from data_service.store.mixins import AmountMixin
+from data_service.views.exception_handlers import handle_store_errors
 
 
 class WalletValidator:
@@ -9,7 +10,8 @@ class WalletValidator:
         pass
 
     @staticmethod
-    def wallet_exist(uid: str) -> bool:
+    @handle_store_errors
+    def wallet_exist(uid: str) -> typing.Union[bool, None]:
         wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
         return True if isinstance(wallet_instance, WalletModel) else False
 
