@@ -11,6 +11,7 @@ from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 # TODO Create Test Cases for Affiliates View and Documentations
+# Dont Edit Just Watch can you see this
 
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
 
@@ -58,20 +59,19 @@ class AffiliatesView(Validator):
         """
             update an existing affiliate
         """
-        affiliate_id = affiliate_data.get('affiliate_id')
+        affiliate_id: typing.Union[str, None] = affiliate_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
-        affiliate_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-        if isinstance(affiliate_list, list) and len(affiliate_list) > 0:
-            affiliate_instance = affiliate_list[0]
-            affiliate_instance.total_recruits += 1
-            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+        affilite_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
+        if isinstance(affilite_instance, Affiliates):
+            affilite_instance.total_recruits += 1
+            key = affilite_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Something went wrong while updating affiliate"
                 raise DataServiceError(message)
             return jsonify({'status': True,
                             'message': 'successfully incremented total recruits',
-                            'payload': affiliate_instance.to_dict()}), 200
+                            'payload': affilite_instance.to_dict()}), 200
         else:
             return jsonify({'status': False, 'message': 'Failed to locate affiliate'}), 500
 
@@ -84,12 +84,11 @@ class AffiliatesView(Validator):
         affiliate_id: typing.Union[None, str] = affiliate_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
-        affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-        if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
-            affiliate_instance = affiliates_list[0]
+        affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
+        if isinstance(affiliate_instance, Affiliates):
             affiliate_instance.is_active = False
             affiliate_instance.is_deleted = True
-            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'something went wrong while deleting affiliate'
                 return jsonify({'status': False, 'message': message}), 500
@@ -110,11 +109,10 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
         if not isinstance(is_active, bool):
             raise ValueError("is_active is required and can only be a boolean")
-        affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-        if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
-            affiliate_instance: Affiliates = affiliates_list[0]
+        affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
+        if isinstance(affiliate_instance, Affiliates):
             affiliate_instance.is_active = is_active
-            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Unknown Error occurred while trying to mark affiliate as in-active"
                 return jsonify({'status': False, 'message': message}), 500
@@ -137,13 +135,11 @@ class AffiliatesView(Validator):
         if (uid is None) and (affiliate_id is None):
             return jsonify({'status': False, 'message': 'uid or affiliate_id is required to fetch affiliate'}), 500
         if uid is not None:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.uid == uid).fetch()
+            affiliate_instance: Affiliates = Affiliates.query(Affiliates.uid == uid).get()
         else:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(
-                Affiliates.affiliate_id == affiliate_id).fetch()
+            affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
 
-        if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
-            affiliate_instance: Affiliates = affiliates_list[0]
+        if isinstance(affiliate_instance, Affiliates):
             return jsonify({'status': True,
                             'message': 'successfully obtained affiliate data',
                             'payload': affiliate_instance.to_dict()}), 200

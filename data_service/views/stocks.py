@@ -326,7 +326,7 @@ class CatchStockErrors(StockViewContext):
             return True
         return False
 
-    # TODO - refactor this to use tasklets
+    # DONE - refactor this to use tasklets
     @ndb.tasklet
     def can_add_stock(self, stock_code: str, symbol: str, stock_id: str = None) -> typing.Union[_TaskletFuture, Future]:
         stock_id_exist: bool = yield self.stock_id_exist(stock_id=stock_id)
@@ -344,7 +344,7 @@ class CatchBrokerErrors(StockViewContext):
     def __int__(self):
         super(CatchBrokerErrors, self).__init__()
 
-    # TODO refactor with taslets to validate input faster
+    # Done refactor with taslets to validate input faster
     @staticmethod
     @ndb.tasklet
     def broker_id_exist(broker_id: str) -> typing.Union[None, bool]:
@@ -384,7 +384,7 @@ class CatchBrokerErrors(StockViewContext):
         except Aborted:
             return None
 
-    # TODO Refactor with ndb.Tasklets in order to get input validity check resolutions faster
+    # Done Refactor with ndb.Tasklets in order to get input validity check resolutions faster
     @ndb.tasklet
     def can_add_broker(self, broker_id: str, broker_code: str) -> typing.Union[_TaskletFuture, Future]:
         broker_id_exist: bool = yield self.broker_id_exist(broker_id=broker_id)
@@ -451,10 +451,14 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
-        # TODO -  use tasklets to fetch both stock and broker at the same time
-        # TODO - Verify that the tasklets return correct results
+        # DONE -  use tasklets to fetch both stock and broker at the same time
+        # DONE - Verify that the tasklets return correct results
         stock = yield self.fetch_stock(stock_id=stock_id)
         broker = yield self.fetch_broker(broker_id=broker_id)
+
+        debug: bool = current_app.config.get('DEBUG')
+        if debug is True:
+            print("{}{}".format(stock,broker))
 
         stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
                                                       sid=sid, stock=stock, broker=broker)
