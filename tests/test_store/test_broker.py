@@ -2,7 +2,7 @@ from data_service.store.stocks import Broker
 from data_service.utils.utils import create_id
 
 broker_instance: Broker = Broker()
-
+# TODO add mocks for ndb calls
 def test_broker_instance():
     assert isinstance(broker_instance, Broker), "broker instance could not be instantiated"
 
