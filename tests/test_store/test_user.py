@@ -1,5 +1,4 @@
-from werkzeug.security import generate_password_hash, check_password_hash
-
+from werkzeug.security import check_password_hash
 from data_service.store.mixins import AddressMixin
 from data_service.utils.utils import create_id, timestamp
 from data_service.store.users import UserModel
