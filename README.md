@@ -4,6 +4,10 @@ The purpose of the project is to make it easy to use datastore database on
 GCP Platform with several of its cloud platform offerings such as GCP by offering a single end point from which to 
 access data.
 
+**Development Time**
+
+[![wakatime](https://wakatime.com/badge/github/freelancing-solutions/GCP-Based-Database-as-a-Service.svg)](https://wakatime.com/badge/github/freelancing-solutions/GCP-Based-Database-as-a-Service)
+
  **How it Works?**
  --
      by creating API endpoints for databases hosted in Google Cloud Platform this service is able to 
