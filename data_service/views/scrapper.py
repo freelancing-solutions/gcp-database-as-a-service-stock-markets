@@ -16,7 +16,7 @@ class ScrapperView:
     @handle_view_errors
     def add_data(self, scrapper_data: dict) -> tuple:
         if isinstance(scrapper_data, dict):
-            scrapper_instance = ScrapperTempStore()
+            scrapper_instance: ScrapperTempStore = ScrapperTempStore()
             scrapper_instance.status = scrapper_data.get('status')
             scrapper_instance.data_id = create_id()
             scrapper_instance.data = scrapper_data.get('data')

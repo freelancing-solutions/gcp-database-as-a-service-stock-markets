@@ -261,6 +261,7 @@ class CatchStockErrors(StockViewContext):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
+    # TODO use ndb.tasklets to refactor stock input validators
     @staticmethod
     def symbol_exist(symbol: str) -> typing.Union[None, bool]:
         # noinspection DuplicatedCode
@@ -335,6 +336,7 @@ class CatchBrokerErrors(StockViewContext):
     def __int__(self):
         super(CatchBrokerErrors, self).__init__()
 
+    # TODO refactor with taslets to validate input faster
     @staticmethod
     def broker_id_exist(broker_id: str) -> typing.Union[None, bool]:
         try:
@@ -372,6 +374,7 @@ class CatchBrokerErrors(StockViewContext):
         except Aborted:
             return None
 
+    # TODO Refactor with ndb.Tasklets in order to get input validity check resolutions faster
     def can_add_broker(self, broker_id: str, broker_code: str) -> bool:
         broker_id_exist: bool = self.broker_id_exist(broker_id=broker_id)
         broker_code_exist: bool = self.broker_code_exist(broker_code=broker_code)
