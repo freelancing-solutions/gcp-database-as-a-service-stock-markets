@@ -32,6 +32,6 @@ def test_stock_instance():
 def test_broker_instance():
     assert stock_model_instance.broker is None, "Broker model instance initial value invalid"
     stock_model_instance.broker = broker_instance
-    assert isinstance(stock_model_instance.broker, Broker) , "Broker Model instance not being set correctly"
+    assert isinstance(stock_model_instance.broker, Broker), "Broker Model instance not being set correctly"
 
 

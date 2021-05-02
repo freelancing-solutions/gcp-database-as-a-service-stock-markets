@@ -1,5 +1,6 @@
 import os, random, string, time, datetime
 from datetime import datetime, date
+from datetime import time as time_class
 import typing
 
 char_set = string.ascii_lowercase + string.digits
@@ -74,3 +75,9 @@ def return_ttl(name) -> int:
     elif name == "medium":
         return cache_ttl_medium
     return cache_ttl_short
+
+def today() -> date:
+    return datetime.datetime.now().date()
+
+def time_now() -> time_class:
+    return datetime.datetime.now().time()

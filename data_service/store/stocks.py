@@ -200,7 +200,7 @@ class BuyVolumeModel(ndb.Model):
     stock_id: str = ndb.StringProperty(validator=set_stock_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
                                                    validator=set_date)
-    currency: str = ndb.StringProperty(default=lambda currency : current_app.config.get('CURRENCY'))
+    currency: str = ndb.StringProperty(default=lambda currency: current_app.config.get('CURRENCY'))
     buy_volume: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_value: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int_property)
