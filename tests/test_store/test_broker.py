@@ -40,7 +40,7 @@ def test_broker_name():
     broker_instance.broker_name = b_name
     assert broker_instance.broker_name == b_name.lower(), "broker instance broker name could not be set correctly"
 
-def test_two_brokers_equal():
+def test_broker_dunder_functions():
     first_broker: Broker = assign_broker(broker_instance)
     second_broker: Broker = assign_broker(broker_instance)
     assert first_broker == second_broker, "Equal does not pass"

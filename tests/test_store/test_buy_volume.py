@@ -98,3 +98,17 @@ def buy_trade_count():
         buy_volume_instance.buy_trade_count = "ABC"
     with raises(ValueError):
         buy_volume_instance.buy_trade_count = -10
+
+def set_buy_volume_mock_data(my_buy_volume_instance: BuyVolumeModel) -> BuyVolumeModel:
+    my_buy_volume_instance.buy_volume = 100
+    my_buy_volume_instance.buy_value = 100
+    my_buy_volume_instance.buy_trade_count = 12
+    my_buy_volume_instance.buy_market_val_percent = 15
+    my_buy_volume_instance.currency = "PHP"
+    my_buy_volume_instance.transaction_id = "dfiudshfisudf"
+    return my_buy_volume_instance
+
+def test_buy_volume_dunder_functions():
+    first_buy: BuyVolumeModel = set_buy_volume_mock_data(my_buy_volume_instance=buy_volume_instance)
+    second_buy: BuyVolumeModel = set_buy_volume_mock_data(my_buy_volume_instance=buy_volume_instance)
+    assert first_buy == second_buy, "BuyVoluMe __eq__ function not working correctly"

@@ -17,23 +17,22 @@ class Stock(ndb.Model):
             input: value: str
             output str
         """
-        value: str = value.strip()
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(self))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(self))
-        return value
+        return value.strip()
 
     def set_stock_name(self, value: str) -> str:
         """
             verify stock_name
         """
-        value: str = value.strip()
+
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(self))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(self))
-        return value.lower()
+        return value.strip().lower()
 
     stock_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
     stock_code: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
