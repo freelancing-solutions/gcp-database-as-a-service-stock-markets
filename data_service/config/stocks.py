@@ -10,9 +10,9 @@ stock_ticker: dict = {
     "stock_name": ""
 }
 
-default_stock_tickers: typing.List[stock_ticker] = []
+default_stock_tickers: typing.List[dict] = []
 # _code,_unicode-decimal,_unicode-hex,__text
-list_of_currencies: typing.List[typing.List[str]] = [
+list_of_currencies: typing.List[list] = [
     ["ALL", 'Albania Lek'],
     ["AFN", "Afghanistan Afghani"],
     ["ARS", "Argentina Peso"],

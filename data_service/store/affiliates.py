@@ -106,43 +106,43 @@ class ClassSetters:
 
     def set_id(self, value: str) -> str:
         if (value == "") or (value is None):
-            raise ValueError("{} cannot be Null".format(self.name))
+            raise ValueError("{} cannot be Null".format(self))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(self.name))
+            raise TypeError("{} can only be a string".format(self))
         return value
 
     def set_number(self, value: int) -> int:
         if (value == "") or (value is None):
-            raise ValueError("{} cannot be Null".format(self.name))
+            raise ValueError("{} cannot be Null".format(self))
         if not isinstance(value, int):
-            raise TypeError("{} can only be an integer".format(self.name))
+            raise TypeError("{} can only be an integer".format(self))
         return value
 
     def set_date(self, value: datetime) -> datetime:
         if not isinstance(value, datetime):
-            raise TypeError("{}, can only be a datetime".format(self.name))
+            raise TypeError("{}, can only be a datetime".format(self))
         return value
 
     def set_bool(self, value: bool) -> bool:
         if not isinstance(value, bool):
-            raise TypeError("{}, can only be a boolean".format(self.name))
+            raise TypeError("{}, can only be a boolean".format(self))
         return value
 
     def set_percent(self, value: int) -> int:
         if (value == "") or (value is None):
-            raise ValueError("{} cannot be Null".format(self.name))
+            raise ValueError("{} cannot be Null".format(self))
 
         if not isinstance(value, int):
-            raise TypeError("{}, can only be an integer".format(self.name))
+            raise TypeError("{}, can only be an integer".format(self))
 
         if 0 < value > 100:
-            raise ValueError("{}, should be a percent". format(self.name))
+            raise ValueError("{}, should be a percent". format(self))
 
         return value
 
     def set_amount(self, amount: AmountMixin) -> AmountMixin:
         if not isinstance(amount, AmountMixin):
-            raise TypeError('{} is invalid'.format(self.name))
+            raise TypeError('{} is invalid'.format(self))
         return amount
 
 class Affiliates(ndb.Model):
@@ -208,7 +208,7 @@ class EarningsData(ndb.Model):
     """
     def set_date(self, value) -> date:
         if not isinstance(value, date):
-            raise ValueError("{} is invalid".format(self.name))
+            raise ValueError("{} is invalid".format(self))
         return value
 
     affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)

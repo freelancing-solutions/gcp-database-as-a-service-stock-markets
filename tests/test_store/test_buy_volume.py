@@ -37,7 +37,11 @@ def test_currency():
         assert buy_volume_instance.currency == "USD", "Currency is not being set correctly"
 
 def test_buy_volume():
-    pass
+    assert buy_volume_instance.buy_volume == 0, "Buy Volume initial volume is invalid"
+    buy_volume_instance.buy_volume = 1000
+    assert buy_volume_instance.buy_volume == 1000, "Buy volume not being set correctly"
+
+    assert buy_volume_instance.buy_volume != -1000, "Buy volume not being set correctly"
 
 def test_buy_value():
     pass
