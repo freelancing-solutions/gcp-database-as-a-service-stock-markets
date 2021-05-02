@@ -173,14 +173,14 @@ class BuyVolumeModel(ndb.Model):
     """
         daily buy volumes
     """
-
+    # TODO find out why it seems i can set values of None even if i am checking against
     def set_stock_id(self, value: str) -> str:
-        value = value.strip()
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError('{} cannot be Null'.format(self))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(self))
-        return value
+
+        return value.strip()
 
     def set_date(self, value: datetime.date) -> datetime.date:
         if isinstance(value, datetime.date):
