@@ -1,0 +1,129 @@
+broker_id,broker_code,broker_name
+101,A_AND_A,"A & A Securities, Inc."
+237,AAA,"AAA Southeast Equities, Inc."
+102,ABACUS,Abacus Securities Corporation
+112,ABCAP,"AB Capital Securities, Inc."
+232,ALAKOR,Alakor Securities Corporation
+106,ALPHA,Alpha Securities Corporation
+110,ANGPING,"Angping & Associates Securities, Inc."
+111,ANSALDO,"Ansaldo, Godinez & Company, Inc."
+255,APEX,Apex Phils. Equities Corporation
+388,ARMSTRONG,"Armstrong Securities, Inc."
+116,ASIA_PAC,Asia Pacific Capital Equities & Securities Corporation
+118,ASIASEC,"Asiasec Equities, Inc."
+119,ASTRA,Astra Securities Corporation
+104,ATCASTRO,A.T. de Castro Securities Corporation
+220,ATR,"Maybank ATR-Kim Eng Securities, Inc. (MakeTrade)"
+167,AURORA,"Aurora Securities, Inc."
+109,BA,"BA Securities, Inc."
+188,BARCELON,"J.M. Barcelon & Company, Inc."
+279,BDO,"BDO Securities, Inc."
+122,BELSON,"Belson Securities, Inc."
+123,BENJAMIN,"Benjamin Co Ca & Company, Inc."
+175,BENNETT,"H.E. Bennett Securities, Inc."
+272,BERNAD,"Bernad Securities, Inc."
+124,BH_CHUA,B.H. Chua Securities Corporation
+126,BPI,BPI Securities Corporation (BPI Trade)
+128,CAMPOS,"Campos, Lanuza & Company, Inc."
+120,CBSC,China Bank Securities Corp
+130,CENTURY,Century Securities Corporation
+203,CITISEC,"Citisecurities, Inc."
+323,CLSA,"CLSA Phils., Inc."
+387,COHERCO,"Coherco Securities, Inc."
+133,COL,COL Financial
+233,COYIUTO,"R. Coyiuto Securities, Inc."
+537,CSUISSE,Credit Suisse Securities
+141,CUALOPING,Cualoping Securities Corporation
+204,DAMARKET,"Da Market Securities, Inc."
+143,DAVID_GO,David Go Securities Corporation
+142,DBP_DWA,"DBP-Daiwa Securities SMBC Phils., Inc."
+145,DVRSFIED,"Diversified Securities, Inc."
+147,E_CHUA,"E. Chua Chiaco Securities, Inc."
+283,EAGLE,"Eagle Equities, Inc."
+150,EASTERN,Eastern Securities Development Corp.
+149,EASTWEST,Eastwest Capital Corporation
+153,EQWORLD,"Equitiworld Securites, Inc."
+154,EVERGRN,"Evergreen Stock Brokerage & Securities, Inc."
+157,F_ORIENT,"First Orient Securities, Inc."
+162,F_YAP,"F. Yap Securities, Inc."
+243,FIDELITY,"Fidelity Securities, Inc."
+159,FINCAP,"First Integrated Capital Sec., Inc."
+267,FIRSTMETRO,First Metro Securities Brokerage Corporation
+252,FIRSTRES,The First Resources Management & Securities Corporation
+168,G_LINK,"Globalinks Securities & Stocks, Inc."
+285,G_TOWER,"Golden Tower Sec. & Holdings, Inc."
+288,GD_TAN,"G.D. Tan & Company, Inc."
+180,GIMENEZ,"I.B. Gimenez Securities, Inc."
+170,GOLDSTAR,"Goldstar Securities, Inc."
+172,GUILD,"Guild Securities, Inc."
+174,HDI,"HDI Securities, Inc."
+140,IGC,"IGC Securities, Inc."
+182,IMPERIAL,"Imperial de Guzman, Abalos & Co., Inc."
+183,INTRAINV,"Intra-Invest Securities, Inc."
+181,INVESTOR,"Investors Securities, Inc."
+125,JAKA,Jaka Securities Corporation
+185,JPMORGAN,"J.P. Morgan Securities Philippines, Inc."
+169,JSG,"JSG Securities, Inc."
+389,KINGS,"King's Power Securities, Inc."
+193,LARRGO,"Larrgo Securities Company, Inc."
+195,LITONJUA,"Litonjua Seucrities, Inc."
+197,LOPEZ,"Lopez, Locsin, Ledesma & Company, Inc."
+198,LUCKY,"Lucky Securities, Inc."
+199,LUYS,"Luy's Securities Company, Inc."
+121,MACQUAR,"Macquarie Securities (Philippines), Inc."
+200,MANDARIN,Mandarin Securities Corporation
+201,MARIAN,"Marian Securities, Inc."
+208,MDR,"MDR Securities, Inc."
+206,MERIDIAN,"Meridian Securities, Inc."
+205,MRCNTILE,Mercantile Securities Corporation
+210,MTPEAK,"Mount Peak Securities, Inc."
+211,NEW_WRLD,"New World Securities, Inc."
+131,NOMURA,BDO NOMURA SECURITIES INC.
+215,OPTIMUM,Optimum Securities Corporation
+218,PAN_ASIA,Pan Asia Securities Corporation
+219,PAPA,Papa Securities Corporation
+338,PEP,"Philippine Equity Partners, Inc."
+103,PHLSTOCK,Philstocks Financial Inc.
+223,PLATINUM,"Platinum Securities, Inc."
+224,PNB,"PNB Securities, Inc."
+225,PREMIUM,"Premium Securities, Inc."
+276,PROGRESS,Phil-Progress Securities Corporation
+230,QUALITY,Quality Investment & Securities Corp.
+236,R_NUBLA,"R. Nubla Securities, Inc."
+217,RCBC,"RCBC Securities, Inc."
+235,REGINA,Regina Capital Development Corp
+209,REGIS,"Regis Partners, Inc."
+238,RS_LIM,"R.S. Lim & Company, Inc."
+239,RTG,"RTG & Company, Inc."
+242,S_SPCLST,"Securities Specialists, Inc."
+229,SALISBUR,Salisbury BKT Securities Corporation
+113,SARNGGNI,"Sarangani Securities, Inc."
+115,SB-EQTY,"SB Equities, Inc."
+129,SINCERE,Sincere Securities Corporation
+240,SJ_ROXAS,"S.J. Roxas & Company, Inc"
+286,SOLAR,"Solar Securities, Inc."
+247,STANDARD,Standard Securities Corporation
+528,STARALL,Star Alliance Securities Corporation
+192,STRATEQ,Strategic Equities Corporation
+246,SUMMIT,"Summit Securities, Inc."
+368,SUN,"Sun Securities, Inc."
+249,SUPREME,"Supreme Stockbroker, Inc."
+488,TIMSON,"Timson Securities, Inc."
+251,TNSENGCO,"Tansengco & Company, Inc."
+253,TOWER,"Tower Securities, Inc."
+254,TRANSASIA,"Trans-Asia Securities, Inc."
+257,TRISTATE,"Tri-State Securities, Inc."
+136,TRITON,Triton Securities Corporation
+333,UBS,"UBS Securities Philippines, Inc."
+259,UCPB,"UCPB Securities, Inc."
+345,UNICAP,"Unicapital Securities, Inc."
+260,UOB-KAY,"UOB-Kay Hian Securities (Phils.), Inc."
+100,UPCC,UPCC Securities Corporation
+190,VALUEQST,Value Quest Securities Corp.
+540,VCS,VC Securities
+263,VENTURE,"Venture Securities, Inc."
+269,WEALTH,"Wealth Securities, Inc."
+270,WESTLINK,"Westlink Global Equities, Inc."
+273,WONG,Wong Securities Corporation
+275,YAO,"Yao & Zialcita, Inc."
+278,YU,"Yu & Company, Inc."
