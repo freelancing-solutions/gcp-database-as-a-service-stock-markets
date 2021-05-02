@@ -3,7 +3,7 @@ from data_service.store.mixins import AddressMixin
 from data_service.utils.utils import create_id, timestamp
 from data_service.store.users import UserModel
 user_model_instance: UserModel = UserModel()
-
+from pytest import raises
 uid: str = create_id()
 assert isinstance(uid, str), "create_id not returning an ID"
 
@@ -22,30 +22,62 @@ def test_user_uid():
     assert isinstance(user_model_instance.uid, str), "Invalid uid Type"
     assert user_model_instance.uid == uid, "Invalid data set for UID"
     assert isinstance(result, bool), "result of uid should be bool"
+    with raises(TypeError):
+        user_model_instance.set_uid(1000000)
+    with raises(ValueError):
+        user_model_instance.set_uid("")
+
 
 def test_user_names():
     result = user_model_instance.set_names(names="steve")
     assert isinstance(user_model_instance.names, str), "invalid names type"
     assert user_model_instance.names == "steve", "Invalid name is being set on names field"
     assert isinstance(result, bool), "result of set_names should be bool"
+    with raises(TypeError):
+        user_model_instance.set_names(100)
+    with raises(ValueError):
+        user_model_instance.set_names(str())
+    with raises(ValueError):
+        user_model_instance.set_names("")
+    with raises(TypeError):
+        user_model_instance.set_names({})
+
 
 def test_surname():
     result = user_model_instance.set_surname(surname="mantarakis")
     assert isinstance(user_model_instance.surname, str), "invalid surname type"
     assert user_model_instance.surname == "mantarakis", "invalid value for surname is being set"
     assert isinstance(result, bool), "invalid result for set_surname"
+    with raises(ValueError):
+        user_model_instance.set_surname("")
+    with raises(TypeError):
+        user_model_instance.set_surname({})
+    with raises(TypeError):
+        user_model_instance.set_surname(50)
 
 def test_cell():
     result = user_model_instance.set_cell(cell="0762777153")
     assert isinstance(user_model_instance.cell, str), "invalid cell type"
     assert user_model_instance.cell == "0762777153", "cell number is not being set correctly"
     assert isinstance(result, bool), "invalid result for set_cell"
+    with raises(ValueError):
+        user_model_instance.set_cell("")
+    with raises(TypeError):
+        user_model_instance.set_cell(float())
+    with raises(TypeError):
+        user_model_instance.set_cell(123)
 
 def test_email():
     result = user_model_instance.set_email(email="mobiusndou@gmail.com")
     assert isinstance(user_model_instance.email, str), "invalid email type"
     assert user_model_instance.email == "mobiusndou@gmail.com", "email is not being set correctly"
     assert isinstance(result, bool), "set_email result should be bool"
+    with raises(ValueError):
+        user_model_instance.set_email("")
+    with raises(TypeError):
+        user_model_instance.set_email(float())
+    with raises(TypeError):
+        user_model_instance.set_email(0)
 
 def test_password():
     password: str = "1234567890"

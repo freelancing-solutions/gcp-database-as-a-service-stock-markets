@@ -132,12 +132,12 @@ class StockModel(ndb.Model):
     """
 
     def set_id(self, value: str) -> str:
-        value: str = value.strip()
+
         if value is None or value == "":
             raise ValueError('{} cannot be Null'.format(self))
         if not isinstance(value, str):
             raise TypeError('{} may only be a string'.format(self))
-        return value
+        return value.strip()
 
     def set_stock(self, stock: Stock) -> Stock:
         if not isinstance(stock, Stock):

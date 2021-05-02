@@ -57,4 +57,16 @@ def test_stock_symbol():
     with raises(ValueError):
         stock_instance.symbol = ""
 
+def create_stock_mock(my_stock_instance: Stock) -> Stock:
+    my_stock_instance.stock_id = "45345345"
+    my_stock_instance.symbol = "SDF"
+    my_stock_instance.stock_name = "HGTFR"
+    my_stock_instance.stock_code = "X45T"
+    return my_stock_instance
+
+def test_stock_dunder_methods():
+    first_stock: Stock = create_stock_mock(stock_instance)
+    second_stock: Stock = create_stock_mock(stock_instance)
+    assert first_stock == second_stock, "__eq__ not implemented correctly"
+    assert str(first_stock) == str(second_stock), "__str__ not implemented correctly"
 
