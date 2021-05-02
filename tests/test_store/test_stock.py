@@ -56,3 +56,5 @@ def test_stock_symbol():
         stock_instance.symbol = str()
     with raises(ValueError):
         stock_instance.symbol = ""
+
+
