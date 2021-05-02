@@ -1,7 +1,10 @@
 import datetime
 
+from flask import current_app
+
 from data_service.store.stocks import BuyVolumeModel
 from data_service.utils.utils import create_id, today
+from .. import app
 
 buy_volume_instance: BuyVolumeModel = BuyVolumeModel()
 
@@ -26,7 +29,12 @@ def test_date_created():
     assert isinstance(buy_volume_instance.date_created, datetime.date), message
 
 def test_currency():
-    pass
+
+    with app.app_context():
+        def_currency: str = app.config.get("CURRENCY")
+        assert buy_volume_instance.currency == def_currency, "Buy Volume currency initial value invalid"
+        buy_volume_instance.currency = "USD"
+        assert buy_volume_instance.currency == "USD", "Currency is not being set correctly"
 
 def test_buy_volume():
     pass

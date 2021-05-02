@@ -3,13 +3,14 @@ from google.cloud import ndb
 import datetime
 from data_service.config import Config
 from data_service.utils.utils import create_id
-
+from data_service.config.stocks import currency_symbols
 
 class Stock(ndb.Model):
     """
         A Model for keeping stock code, stored separately on datastore
         but also a sub model of StockModel
     """
+
     def set_string(self, value: str) -> str:
         """
             takes in string input verifies and returns the same string
@@ -196,11 +197,15 @@ class BuyVolumeModel(ndb.Model):
             raise ValueError("{} can only be a positive integer".format(self.name))
         return value
 
+    def set_currency(self, value: str) -> str:
+        if value not in currency_symbols():
+            raise TypeError("{} not a valid currency".format(self.name))
+        return value
     transaction_id: str = ndb.StringProperty(indexed=True, required=True, default=create_id())
     stock_id: str = ndb.StringProperty(validator=set_stock_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
                                                    validator=set_date)
-    currency: str = ndb.StringProperty(default=lambda currency: current_app.config.get('CURRENCY'))
+    currency: str = ndb.StringProperty(default=Config.CURRENCY, validator=set_currency)
     buy_volume: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_value: int = ndb.IntegerProperty(default=0, validator=set_int_property)
     buy_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int_property)
@@ -229,6 +234,7 @@ class SellVolumeModel(ndb.Model):
     """
         daily sell volumes
     """
+
     def set_id(self, value: str) -> str:
         value = value.strip()
         if value is None or value == "":
@@ -251,12 +257,13 @@ class SellVolumeModel(ndb.Model):
         if not isinstance(transaction_id, str):
             raise TypeError("{} can only be a str".format(self.name))
         return transaction_id
+
     transaction_id: str = ndb.StringProperty(indexed=True, validator=set_transaction_id)
 
     stock_id: str = ndb.StringProperty(validator=set_id)
     # Auto now add can be over written
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
-    currency: str = ndb.StringProperty(default= lambda currency : current_app.config.get('CURRENCY'))
+    currency: str = ndb.StringProperty(default=lambda currency: current_app.config.get('CURRENCY'))
     sell_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int)
@@ -285,6 +292,7 @@ class NetVolumeModel(ndb.Model):
     """
         daily net volume
     """
+
     def set_id(self, value: str) -> str:
         value = value.strip()
         if value is None or value == "":

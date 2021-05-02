@@ -76,8 +76,9 @@ def return_ttl(name) -> int:
         return cache_ttl_medium
     return cache_ttl_short
 
+# TODO Refactor the entire codebase to use this function to obtain todays date
 def today() -> date:
-    return datetime.datetime.now().date()
+    return datetime.now().date()
 
 def time_now() -> time_class:
-    return datetime.datetime.now().time()
+    return datetime.now().time()
