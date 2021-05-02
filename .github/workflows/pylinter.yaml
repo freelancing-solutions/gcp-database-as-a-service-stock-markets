@@ -1,2 +1,10 @@
-- name: Python Linter
-  uses: sunnysid3up/python-linter@v0.1-beta.7
+ steps:
+ - uses: actions/checkout@v2  
+ - name: Python Linter
+   uses: sunnysid3up/python-linter@master
+   with:
+     source: "data_service"
+     mypy-options: "--ignore-missing-imports --show-error-codes"
+     pylint-options: "--rcfile=setup.cfg"
+     isort-options: "-w 100",
+     django: false
