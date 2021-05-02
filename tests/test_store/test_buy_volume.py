@@ -1,9 +1,6 @@
 import datetime
-
 from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
-from flask import current_app
-
 from data_service.store.stocks import BuyVolumeModel
 from data_service.utils.utils import create_id, today
 from .. import app
@@ -63,14 +60,41 @@ def test_buy_volume():
     assert buy_volume_instance.buy_volume != -1000, "Buy volume not being set correctly"
 
 def test_buy_value():
-    pass
+    assert buy_volume_instance.buy_value == 0, "Buy_volume buy value defaul invalid"
+    buy_volume_instance.buy_value = 1000
+    assert buy_volume_instance.buy_value == 1000, "Buy_volume buy_value is not being set correctly"
+    with raises(TypeError):
+        buy_volume_instance.buy_value = "12"
+    with raises(ValueError):
+        buy_volume_instance.buy_value = ""
+    with raises(ValueError):
+        buy_volume_instance.buy_value = -1000
 
 def test_buy_ave_price():
-    pass
+    assert buy_volume_instance.buy_ave_price == 0, "Buy_volume default not being set"
+    buy_volume_instance.buy_volume = 100
+    assert buy_volume_instance.buy_volume == 100, "Buy Volumen is not being set correctly"
+    with raises(TypeError):
+        buy_volume_instance.buy_volume = "ABC"
+    with raises(ValueError):
+        buy_volume_instance.buy_volume = -1
+
 
 def test_buy_market_val_percent():
-    pass
+    assert buy_volume_instance.buy_market_val_percent == 0, "Buy_volume default not being set correctly"
+    buy_volume_instance.buy_market_val_percent = 100
+    assert buy_volume_instance.buy_market_val_percent == 100, "Buy_volume buy market is not being set correctly"
+    with raises(TypeError):
+        buy_volume_instance.buy_market_val_percent = "ABC"
+    with raises(ValueError):
+        buy_volume_instance.buy_market_val_percent = -10
+
 
 def buy_trade_count():
-    pass
-
+    assert buy_volume_instance.buy_trade_count == 0, "Buy_volume default not being set correctly"
+    buy_volume_instance.buy_trade_count = 100
+    assert buy_volume_instance.buy_trade_count == 100, "Buy_volume trade account is not being set correctly"
+    with raises(TypeError):
+        buy_volume_instance.buy_trade_count = "ABC"
+    with raises(ValueError):
+        buy_volume_instance.buy_trade_count = -10
