@@ -17,7 +17,7 @@ Jinja2==2.11.3
 proto-plus==1.11.0
 protobuf==3.13.0
 PyJWT==1.7.1
-requests==2.24.0
+requests==2.25.1
 requests-toolbelt==0.9.1
 shortuuid==1.0.1
 uuid==1.30
