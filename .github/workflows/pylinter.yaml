@@ -8,7 +8,7 @@ jobs:
     steps:
      - uses: actions/checkout@v2
      - name: Python Linter
-       uses: sunnysid3up/python-linter@master
+       uses: fylein/python-pylint-github-action@v4
        with:
          source: "data_service"
          mypy-options: "--ignore-missing-imports --show-error-codes"
