@@ -23,41 +23,41 @@ class ClassSetters:
 
     def set_id(self, value: str) -> str:
         if value is None or value == "":
-            raise ValueError(" {} cannot be Null".format(self))
+            raise ValueError(" {} cannot be Null".format(str(self)))
 
         if not isinstance(value, str):
-            raise ValueError(" {} can only be a string".format(self))
+            raise ValueError(" {} can only be a string".format(str(self)))
 
         return value
 
     def set_funds(self, value: AmountMixin) -> AmountMixin:
         if not isinstance(value, AmountMixin):
-            raise ValueError(" {} Invalid Argument Type".format(self))
+            raise ValueError(" {} Invalid Argument Type".format(str(self)))
         return value
 
     def set_paypal(self, value: str) -> str:
         if value is None or value == "":
-            raise ValueError(" {} cannot be Null".format(self))
+            raise ValueError(" {} cannot be Null".format(str(self)))
 
         if not isinstance(value, str):
-            raise ValueError(" {} can only be a string".format(self))
+            raise ValueError(" {} can only be a string".format(str(self)))
 
         return value
 
     def set_transaction_types(self, value: str) -> str:
         if value not in self.transaction_types:
-            raise ValueError(" {} invalid transaction type".format(self))
+            raise ValueError(" {} invalid transaction type".format(str(self)))
         return value
 
     def set_datetime(self, value: datetime) -> datetime:
         if not isinstance(value, datetime):
-            raise ValueError("{} invalid argument".format(self))
+            raise ValueError("{} invalid argument".format(str(self)))
 
         return value
 
     def set_bool(self, value: bool) -> bool:
         if not isinstance(value, bool):
-            raise ValueError("{} invalid argument".format(self))
+            raise ValueError("{} invalid argument".format(str(self)))
         return value
 
 class WalletModel(ndb.Model):

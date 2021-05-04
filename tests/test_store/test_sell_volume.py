@@ -58,3 +58,14 @@ def test_sell_volume_currency():
         with raises(TypeError):
             sell_volume_instance.currency = 123
 
+
+def test_sell_volume_sell_volume():
+    sell_volume: int  = 500
+    assert sell_volume_instance.sell_volume == 0, "sell Volume default value set incorrectly"
+    assert isinstance(sell_volume_instance.sell_volume, int), "Sell volume instance should be integer"
+    sell_volume_instance.sell_volume = sell_volume
+    assert sell_volume_instance.sell_volume == sell_volume, "Sell Volume instance not being set correctly"
+    sell_volume_instance.sell_volume = 0
+    assert sell_volume_instance.sell_volume == 0, "Sell volument instance not being set correctly"
+    with raises(ValueError):
+        sell_volume_instance.sell_volume = -500

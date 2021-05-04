@@ -18,9 +18,9 @@ class Stock(ndb.Model):
             output str
         """
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return value.strip()
 
     def set_stock_name(self, value: str) -> str:
@@ -29,9 +29,9 @@ class Stock(ndb.Model):
         """
 
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return value.strip().lower()
 
     stock_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_string)
@@ -63,25 +63,25 @@ class Broker(ndb.Model):
     def set_id(self, broker_id: str) -> str:
 
         if broker_id is None or broker_id == "":
-            raise ValueError("{} can only accept a string".format(self))
+            raise ValueError("{} can only accept a string".format(str(self)))
         if not isinstance(broker_id, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return broker_id.strip()
 
     def set_broker_code(self, broker_code: str) -> str:
 
         if broker_code is None or broker_code == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(broker_code, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return broker_code.strip()
 
     def set_broker_name(self, broker_name: str) -> str:
         broker_name = broker_name.strip()
         if broker_name is None or broker_name == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(broker_name, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return broker_name.strip().lower()
 
     broker_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_id)
@@ -134,19 +134,19 @@ class StockModel(ndb.Model):
     def set_id(self, value: str) -> str:
 
         if value is None or value == "":
-            raise ValueError('{} cannot be Null'.format(self))
+            raise ValueError('{} cannot be Null'.format(str(self)))
         if not isinstance(value, str):
-            raise TypeError('{} may only be a string'.format(self))
+            raise TypeError('{} may only be a string'.format(str(self)))
         return value.strip()
 
     def set_stock(self, stock: Stock) -> Stock:
         if not isinstance(stock, Stock):
-            raise TypeError('{}, needs to be an instance of Stock'.format(self))
+            raise TypeError('{}, needs to be an instance of Stock'.format(str(self)))
         return stock
 
     def set_broker(self, broker: Broker) -> Broker:
         if not isinstance(broker, Broker):
-            raise TypeError("{}, Needs to be an instance of Broker".format(self))
+            raise TypeError("{}, Needs to be an instance of Broker".format(str(self)))
         return broker
 
     exchange_id: str = ndb.StringProperty(required=True, indexed=True, validator=set_id)
@@ -175,30 +175,30 @@ class BuyVolumeModel(ndb.Model):
     # TODO find out why it seems i can set values of None even if i am checking against
     def set_stock_id(self, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError('{} cannot be Null'.format(self))
+            raise ValueError('{} cannot be Null'.format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
 
         return value.strip()
 
     def set_date(self, value: datetime.date) -> datetime.date:
         if isinstance(value, datetime.date):
             return value
-        raise TypeError('{} can only be an object of datetime'.format(self))
+        raise TypeError('{} can only be an object of datetime'.format(str(self)))
 
     def set_int_property(self, value: int) -> int:
         if value is None or value == "":
-            raise ValueError("{} can not be Null".format(self))
+            raise ValueError("{} can not be Null".format(str(self)))
 
         if not isinstance(value, int):
-            raise TypeError("{} can only be an Integer".format(self))
+            raise TypeError("{} can only be an Integer".format(str(self)))
         if value < 0:
-            raise ValueError("{} can only be a positive integer".format(self))
+            raise ValueError("{} can only be a positive integer".format(str(self)))
         return value
 
     def set_currency(self, value: str) -> str:
         if value not in currency_symbols():
-            raise TypeError("{} not a valid currency".format(self))
+            raise TypeError("{} not a valid currency".format(str(self)))
         return value
     transaction_id: str = ndb.StringProperty(indexed=True, required=True, default=create_id())
     stock_id: str = ndb.StringProperty(validator=set_stock_id)
@@ -237,28 +237,30 @@ class SellVolumeModel(ndb.Model):
     def set_id(self, value: str) -> str:
 
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return value.strip()
 
     def set_int(self, value: int) -> int:
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, int):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be an integer".format(str(self)))
+        if value < 0:
+            raise ValueError("{} can only be a positive integer".format(str(self)))
         return value
 
     def set_transaction_id(self, transaction_id: str) -> str:
         if transaction_id is None or transaction_id == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(transaction_id, str):
-            raise TypeError("{} can only be a str".format(self))
+            raise TypeError("{} can only be a str".format(str(self)))
         return transaction_id.strip()
 
     def set_currency(self, value: str) -> str:
         if value not in currency_symbols():
-            raise TypeError("{} not a valid currency".format(self))
+            raise TypeError("{} not a valid currency".format(str(self)))
         return value
 
     transaction_id: str = ndb.StringProperty(indexed=True, validator=set_transaction_id)
@@ -299,16 +301,16 @@ class NetVolumeModel(ndb.Model):
     def set_id(self, value: str) -> str:
         value = value.strip()
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return value
 
     def set_int(self, value: int) -> int:
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, int):
-            raise TypeError("{} can only be a string".format(self))
+            raise TypeError("{} can only be a string".format(str(self)))
         return value
 
     stock_id: str = ndb.StringProperty(validator=set_id)

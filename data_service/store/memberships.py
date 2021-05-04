@@ -115,38 +115,38 @@ class CouponsValidator:
 class ClassSetters:
     def set_id(self, value: str) -> str:
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string ".format(self))
+            raise TypeError("{} can only be a string ".format(str(self)))
         if len(value) > 64:
             raise ValueError("Invalid format for ID")
         return value.strip()
 
     def set_status(self, value: str) -> str:
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         value = value.strip().lower()
         if value not in ['paid', 'upaid']:
-            raise TypeError("{} invalid status".format(self))
+            raise TypeError("{} invalid status".format(str(self)))
         return value
 
     def set_datetime(self, value: date) -> object:
         if not isinstance(value, date):
-            raise TypeError("{}, invalid datetime".format(self))
+            raise TypeError("{}, invalid datetime".format(str(self)))
         return value
 
     def set_string(self, value: str) -> str:
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string ".format(self))
+            raise TypeError("{} can only be a string ".format(str(self)))
         return value.strip()
 
     def set_schedule_term(self, value: str) -> str:
         if value is None or value == "":
-            raise ValueError("{} cannot be Null".format(self))
+            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string ".format(self))
+            raise TypeError("{} can only be a string ".format(str(self)))
         value = value.strip().lower()
         if value in ["monthly", "quarterly", "annually"]:
             return value
@@ -154,28 +154,28 @@ class ClassSetters:
 
     def set_schedule_day(self, value: int) -> int:
         if not isinstance(value, int):
-            raise TypeError('{} can only be an integer'.format(self))
+            raise TypeError('{} can only be an integer'.format(str(self)))
         if value not in [1, 2, 3, 4, 5]:
-            raise ValueError('{} can only be between 1 -> 5 of every month'.format(self))
+            raise ValueError('{} can only be between 1 -> 5 of every month'.format(str(self)))
         return value
 
     def set_number(self, value: int) -> int:
         if not isinstance(value, int):
-            raise TypeError('{} can only be an integer'.format(self))
+            raise TypeError('{} can only be an integer'.format(str(self)))
 
         if value < 0:
-            raise TypeError("{} no negative numbers".format(self))
+            raise TypeError("{} no negative numbers".format(str(self)))
 
         return value
 
     def set_bool(self, value: bool) -> bool:
         if not isinstance(value, bool):
-            raise TypeError("{}, should be boolean".format(self))
+            raise TypeError("{}, should be boolean".format(str(self)))
         return value
 
     def set_amount(self, value: AmountMixin) -> AmountMixin:
         if not isinstance(value, AmountMixin):
-            raise TypeError("{}, Amount Invalid".format(self))
+            raise TypeError("{}, Amount Invalid".format(str(self)))
         return value
 
 
