@@ -1,6 +1,9 @@
 from flask import current_app
 from data_service.config import Config
 from data_service.main import create_app
+from random import random, choice
+from string import digits
+
 
 if not current_app:
     app = create_app(config_class=Config)
@@ -10,3 +13,26 @@ else:
 
 app.testing = True
 
+def int_positive():
+    num = 0
+    for _ in range(3):
+        num += int(choice(digits))
+    return num
+
+def int_negative():
+    num = 0
+    for _ in range(3):
+        num -= int(choice(digits))
+    return num
+
+def float_positive():
+    num = 0
+    for _ in range(3):
+        num += int(choice(digits))
+    return float(num)
+
+def float_negative():
+    num = 0
+    for _ in range(3):
+        num -= int(choice(digits))
+    return float(num)

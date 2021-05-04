@@ -1,6 +1,9 @@
 from data_service.store.stocks import Broker
 from data_service.utils.utils import create_id
 from pytest import raises
+
+from tests import int_negative
+
 broker_instance: Broker = Broker()
 # TODO add mocks for ndb calls
 
@@ -30,7 +33,7 @@ def test_broker_code():
     broker_instance.broker_code = b_code
     assert broker_instance.broker_code == b_code, "broker instance broker_code could not be set correctly"
     with raises(TypeError):
-        broker_instance.broker_code = -9
+        broker_instance.broker_code = int_negative()
     with raises(ValueError):
         broker_instance.broker_code = ""
 
