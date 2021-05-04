@@ -308,12 +308,12 @@ class NetVolumeModel(ndb.Model):
     """
 
     def set_id(self, value: str) -> str:
-        value = value.strip()
+
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(str(self)))
-        return value
+        return value.strip()
 
     def set_int(self, value: int) -> int:
         if value is None or value == "":
@@ -322,10 +322,27 @@ class NetVolumeModel(ndb.Model):
             raise TypeError("{} can only be a string".format(str(self)))
         return value
 
+    def set_date(self, value: datetime.date) -> datetime.date:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(str(self)))
+        if not isinstance(value, datetime.date):
+            raise TypeError("{} can only be a date instance".format(str(self)))
+        return value
+
+    def set_currency(self, value: str) -> str:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(str(self)))
+        if not isinstance(value, str):
+            raise TypeError("{} can only be string".format(str(self)))
+
+        if not (value in currency_symbols()):
+            raise TypeError("{} not a currency symbol".format(str(self)))
+        return value
+
     stock_id: str = ndb.StringProperty(validator=set_id)
     transaction_id: str = ndb.StringProperty(validator=set_id)
-    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
-    currency: str = ndb.StringProperty(default=lambda currency: current_app.config.get('CURRENCY'))
+    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=set_date)
+    currency: str = ndb.StringProperty(default=Config.CURRENCY, validator=set_currency)
     net_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     net_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     total_volume: int = ndb.IntegerProperty(default=0, validator=set_int)

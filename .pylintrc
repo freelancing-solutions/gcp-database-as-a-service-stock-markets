@@ -308,7 +308,7 @@ no-docstring-rgx=^_
 
 # Minimum line length for functions/classes that require docstrings, shorter
 # ones are exempt.
-docstring-min-length=9
+docstring-min-length=45
 
 
 [ELIF]
@@ -330,7 +330,7 @@ ignored-argument-names=_.*
 max-locals=15
 
 # Maximum number of return / yield for function / method body
-max-returns=6
+max-returns=10
 
 # Maximum number of branch for function / method body
 max-branches=12

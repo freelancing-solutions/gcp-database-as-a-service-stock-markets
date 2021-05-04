@@ -8,6 +8,9 @@
       </configuration>
     </facet>
   </component>
+  <component name="Flask">
+    <option name="enabled" value="true" />
+  </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
