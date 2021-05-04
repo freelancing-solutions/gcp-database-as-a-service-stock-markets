@@ -256,12 +256,17 @@ class SellVolumeModel(ndb.Model):
             raise TypeError("{} can only be a str".format(self))
         return transaction_id.strip()
 
+    def set_currency(self, value: str) -> str:
+        if value not in currency_symbols():
+            raise TypeError("{} not a valid currency".format(self))
+        return value
+
     transaction_id: str = ndb.StringProperty(indexed=True, validator=set_transaction_id)
 
     stock_id: str = ndb.StringProperty(validator=set_id)
     # Auto now add can be over written
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET))
-    currency: str = ndb.StringProperty(default=lambda currency: current_app.config.get('CURRENCY'))
+    currency: str = ndb.StringProperty(default=Config.CURRENCY, validator=set_currency)
     sell_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int)

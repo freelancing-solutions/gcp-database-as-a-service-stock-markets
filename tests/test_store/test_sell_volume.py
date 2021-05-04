@@ -1,6 +1,10 @@
 import datetime
+from random import choice
+
 from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
+
+from data_service.config.stocks import currency_symbols
 from data_service.store.stocks import SellVolumeModel
 from data_service.utils.utils import create_id, today
 from .. import app
@@ -44,3 +48,13 @@ def test_sell_volume_date_created():
         sell_volume_instance.date_created = 123
     with raises(BadValueError):
         sell_volume_instance.date_created = {}
+
+def test_sell_volume_currency():
+    t_currency: str = choice(currency_symbols())
+    with app.app_context():
+        assert sell_volume_instance.currency == app.config.get("CURRENCY"), "Sell Volume currency initial value invalid"
+        sell_volume_instance.currency = t_currency
+        assert sell_volume_instance.currency == t_currency, "Sell Volume currency is not being set correctly"
+        with raises(TypeError):
+            sell_volume_instance.currency = 123
+
