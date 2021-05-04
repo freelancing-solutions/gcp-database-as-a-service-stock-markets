@@ -1,4 +1,4 @@
-name: Pytest
+name: Pytest Action
 on: ["push"]
 jobs:
   build:
@@ -8,4 +8,4 @@ jobs:
       - name: "Python Pytest"
         uses: "fylein/python-pytest-github-action@v1"
         with:
-          args: "pip3 install -r requirements.txt && py.test"
+          args: "pip3 install -r requirements.txt && pytest -h"
