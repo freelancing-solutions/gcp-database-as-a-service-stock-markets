@@ -251,6 +251,15 @@ class SellVolumeModel(ndb.Model):
             raise ValueError("{} can only be a positive integer".format(str(self)))
         return value
 
+    def set_percent(self, value: int) -> int:
+        if value is None or value == "":
+            raise ValueError("{} cannot be Null".format(str(self)))
+        if not isinstance(value, int):
+            raise TypeError("{} can only be an integer".format(str(self)))
+        if value < 0 or value > 100:
+            raise ValueError("{} should be a percentage".format(str(self)))
+        return value
+
     def set_transaction_id(self, transaction_id: str) -> str:
         if transaction_id is None or transaction_id == "":
             raise ValueError("{} cannot be Null".format(str(self)))
@@ -272,7 +281,7 @@ class SellVolumeModel(ndb.Model):
     sell_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_value: int = ndb.IntegerProperty(default=0, validator=set_int)
     sell_ave_price: int = ndb.IntegerProperty(default=0, validator=set_int)
-    sell_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_int)
+    sell_market_val_percent: int = ndb.IntegerProperty(default=0, validator=set_percent)
     sell_trade_count: int = ndb.IntegerProperty(default=0, validator=set_int)
 
     def __eq__(self, other) -> bool:

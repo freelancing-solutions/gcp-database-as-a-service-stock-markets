@@ -52,6 +52,7 @@ def test_stock_instance():
     stock_model_instance.stock = stock_instance
     assert isinstance(stock_model_instance.stock, Stock), "Stock model not setting stock correctly"
     with raises(TypeError):
+        # noinspection PyTypeChecker
         stock_model_instance.stock = "ABCD"
     with raises(TypeError):
         stock_model_instance.stock = str()

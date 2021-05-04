@@ -119,7 +119,7 @@ def set_buy_volume_mock_data(my_buy_volume_instance: BuyVolumeModel) -> BuyVolum
     my_buy_volume_instance.buy_trade_count = 12
     my_buy_volume_instance.buy_market_val_percent = 15
     my_buy_volume_instance.currency = "PHP"
-    my_buy_volume_instance.transaction_id = "dfiudshfisudf"
+    my_buy_volume_instance.transaction_id = create_id()
     return my_buy_volume_instance
 
 def test_buy_volume_dunder_functions():

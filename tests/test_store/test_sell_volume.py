@@ -1,14 +1,11 @@
 import datetime
-from random import choice
-
+from random import choice, randint
 from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
-
 from data_service.config.stocks import currency_symbols
 from data_service.store.stocks import SellVolumeModel
 from data_service.utils.utils import create_id, today
 from .. import app, int_positive, int_negative
-
 sell_volume_instance: SellVolumeModel = SellVolumeModel()
 
 def test_sell_sell_volume_instance():
@@ -106,7 +103,8 @@ def test_sell_volume_sell_value():
     with raises(ValueError):
         sell_volume_instance.sell_value = int_negative()
     with raises(TypeError):
-        sell_volume_instance.sell_value = "abcd"
+        # noinspection PyTypeChecker
+        sell_volume_instance.sell_value = "abed"
     with raises(TypeError):
         sell_volume_instance.sell_value = "0"
 
@@ -125,6 +123,51 @@ def test_sell_volume_sell_ave_price():
     sell_volume_instance.sell_ave_price = ave_price
     assert sell_volume_instance.sell_ave_price == ave_price, "sell volume sell value is not being set correctly"
     sell_volume_instance.sell_ave_price = 0
+    assert sell_volume_instance.sell_ave_price == 0, "sell volume sell ave price is not being set correctly"
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        sell_volume_instance.sell_volume = "abed"
+    with raises(ValueError):
+        sell_volume_instance.sell_volume = int_negative()
+    with raises(TypeError):
+        sell_volume_instance.sell_volume = "0"
 
 
+def test_sell_volume_sell_market_val_percent():
+    """
+        test sell market value percent
+    """
+    # selecting an arbitrary percentage value
+    sell_percent: int = randint(0, 101)
+    assert (sell_volume_instance.sell_market_val_percent, int), "sell volume percent instance is not valid"
+    assert sell_volume_instance.sell_market_val_percent == 0, "Sell volume percent default not valid"
+    sell_volume_instance.sell_market_val_percent = sell_percent
+    assert sell_volume_instance.sell_market_val_percent == sell_percent, "sell Volume sell market percent is not " \
+                                                                         "set correctly"
+    sell_volume_instance.sell_market_val_percent = 0
+    assert sell_volume_instance.sell_market_val_percent == 0,  "sell Volume sell market percent is not set correctly"
+    with raises(TypeError):
+        sell_volume_instance.sell_market_val_percent = "abed"
+    with raises(ValueError):
+        sell_volume_instance.sell_market_val_percent = sell_percent + 100
+    with raises(ValueError):
+        sell_volume_instance.sell_market_val_percent = sell_percent - 100
 
+
+def test_sell_volume_trade_account():
+    """
+
+    """
+    temp_trade_account: int = int_positive()
+    assert isinstance(sell_volume_instance.sell_trade_count, int), "sell volume instance initialized incorrectly"
+    assert sell_volume_instance.sell_trade_count == 0, "sell volume instance initialized incorrectly"
+    sell_volume_instance.sell_trade_count = temp_trade_account
+    assert sell_volume_instance.sell_trade_count == temp_trade_account, "sell volume trade account not set correctly"
+    sell_volume_instance.sell_trade_count = 0
+    assert sell_volume_instance.sell_trade_count == 0, "sell volume trade account not set correctly"
+    with raises(TypeError):
+        sell_volume_instance.sell_volume = "abed"
+    with raises(TypeError):
+        sell_volume_instance.sell_volume = "0"
+    with raises(ValueError):
+        sell_volume_instance.sell_volume = int_negative()

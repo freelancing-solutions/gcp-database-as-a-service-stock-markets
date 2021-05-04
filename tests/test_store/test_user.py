@@ -24,6 +24,7 @@ def test_user_uid():
     assert user_model_instance.uid == uid, "Invalid data set for UID"
     assert isinstance(result, bool), "result of uid should be bool"
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_uid(1000000)
     with raises(ValueError):
         user_model_instance.set_uid("")
@@ -35,12 +36,14 @@ def test_user_names():
     assert user_model_instance.names == "steve", "Invalid name is being set on names field"
     assert isinstance(result, bool), "result of set_names should be bool"
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_names(100)
     with raises(ValueError):
         user_model_instance.set_names(str())
     with raises(ValueError):
         user_model_instance.set_names("")
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_names({})
 
 
@@ -52,8 +55,10 @@ def test_surname():
     with raises(ValueError):
         user_model_instance.set_surname("")
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_surname({})
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_surname(50)
 
 def test_cell():
@@ -64,8 +69,10 @@ def test_cell():
     with raises(ValueError):
         user_model_instance.set_cell("")
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_cell(float())
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_cell(123)
 
 def test_email():
@@ -76,8 +83,10 @@ def test_email():
     with raises(ValueError):
         user_model_instance.set_email("")
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_email(float())
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_model_instance.set_email(0)
 
 def test_password():
