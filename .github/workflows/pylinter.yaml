@@ -10,8 +10,4 @@ jobs:
      - name: Python Linter
        uses: fylein/python-pylint-github-action@v4
        with:
-         source: "data_service"
-         mypy-options: "--ignore-missing-imports --show-error-codes"
-         pylint-options: "--rcfile=.pylintrc"
-         isort-options: "-w 100",
-         django: false
+        args: pip3 install -r requirements.txt && pylint --rcfile=.pylintrc data_service
