@@ -1,0 +1,10 @@
+name: Pytest
+on: ["push"]
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: Python Pytest
+      uses: fylein/python-pytest-github-action@v1
+      with:
+        args: pip3 install -r requirements.txt && py.test
