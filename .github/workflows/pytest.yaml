@@ -63,7 +63,7 @@ jobs:
       uses: nashmaniac/create-issue-action@v1.1
       with:
         title: Pytest coverage single falls below minimum ${{ env.COVERAGE_SINGLE }}
-        token: ${{secrets.GH_TOKEN}}
+        token: ${{secrets.PYTEST_GITHUB_TOKEN}}
         assignees: ${{github.actor}}
         labels: worflow-failed
         body: ${{ steps.pytest.outputs.output-table }}
@@ -79,7 +79,7 @@ jobs:
       uses: nashmaniac/create-issue-action@v1.1
       with:
         title: Pytest coverage total falls below minimum ${{ env.COVERAGE_TOTAL }}
-        token: ${{secrets.GH_TOKEN}}
+        token: ${{secrets.PYTEST_GITHUB_TOKEN}}
         assignees: ${{github.actor}}
         labels: worflow-failed
         body: ${{ steps.pytest.outputs.output-table }}
