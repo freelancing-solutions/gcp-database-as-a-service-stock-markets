@@ -60,12 +60,36 @@ def test_sell_volume_currency():
 
 
 def test_sell_volume_sell_volume():
-    sell_volume: int  = 500
-    assert sell_volume_instance.sell_volume == 0, "sell Volume default value set incorrectly"
+    sell_volume: int = 500
     assert isinstance(sell_volume_instance.sell_volume, int), "Sell volume instance should be integer"
+    assert sell_volume_instance.sell_volume == 0, "sell Volume default value set incorrectly"
     sell_volume_instance.sell_volume = sell_volume
     assert sell_volume_instance.sell_volume == sell_volume, "Sell Volume instance not being set correctly"
     sell_volume_instance.sell_volume = 0
     assert sell_volume_instance.sell_volume == 0, "Sell volument instance not being set correctly"
     with raises(ValueError):
         sell_volume_instance.sell_volume = -500
+    with raises(TypeError):
+        sell_volume_instance.sell_value = "0"
+    with raises(TypeError):
+        sell_volume_instance.sell_volume = "abcd"
+
+def test_sell_volume_sell_value():
+    temp_sell_value: int = 100
+    assert isinstance(sell_volume_instance.sell_value, int), "Sell Volume sell value can only be an integer"
+    assert sell_volume_instance.sell_value == 0, "Sell Volume sell value default invalid"
+    sell_volume_instance.sell_value = temp_sell_value
+    assert sell_volume_instance.sell_value == temp_sell_value, "Sell Volume sell value not being set correctly"
+    sell_volume_instance.sell_value = 0
+    assert sell_volume_instance.sell_value == 0, "Sell volume sell value not being set correctly"
+    with raises(ValueError):
+        sell_volume_instance.sell_value = -1
+    with raises(TypeError):
+        sell_volume_instance.sell_value = "abcd"
+    with raises(TypeError):
+        sell_volume_instance.sell_value = "0"
+
+def test_sell_volume_sell_ave_price():
+    ave_price: int = 25
+    assert sell_volume_instance.sell_ave_price == 0, "sell volume sell value default invalid"
+
