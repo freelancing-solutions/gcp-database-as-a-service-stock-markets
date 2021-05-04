@@ -235,12 +235,12 @@ class SellVolumeModel(ndb.Model):
     """
 
     def set_id(self, value: str) -> str:
-        value = value.strip()
+
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(self))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(self))
-        return value
+        return value.strip()
 
     def set_int(self, value: int) -> int:
         if value is None or value == "":
@@ -250,12 +250,11 @@ class SellVolumeModel(ndb.Model):
         return value
 
     def set_transaction_id(self, transaction_id: str) -> str:
-        transaction_id = transaction_id.strip()
         if transaction_id is None or transaction_id == "":
             raise ValueError("{} cannot be Null".format(self))
         if not isinstance(transaction_id, str):
             raise TypeError("{} can only be a str".format(self))
-        return transaction_id
+        return transaction_id.strip()
 
     transaction_id: str = ndb.StringProperty(indexed=True, validator=set_transaction_id)
 

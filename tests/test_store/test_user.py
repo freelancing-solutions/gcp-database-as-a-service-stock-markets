@@ -12,6 +12,7 @@ def test_user_model():
         test if user model can instantiate correctly
     """
     assert isinstance(user_model_instance, UserModel), "user model not correctly instatiating"
+    # TODO add more tests here to confirm user_model_instance
 
 def test_user_uid():
     """
