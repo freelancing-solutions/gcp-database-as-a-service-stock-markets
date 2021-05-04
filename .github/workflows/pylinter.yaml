@@ -12,6 +12,6 @@ jobs:
        with:
          source: "data_service"
          mypy-options: "--ignore-missing-imports --show-error-codes"
-         pylint-options: "--rcfile=.pylintrc"
+         pylint-options: "--srcfile=.pylintrc"
          isort-options: "-w 100",
          django: false
