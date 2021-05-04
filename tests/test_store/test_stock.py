@@ -70,3 +70,4 @@ def test_stock_dunder_methods():
     assert first_stock == second_stock, "__eq__ not implemented correctly"
     assert str(first_stock) == str(second_stock), "__str__ not implemented correctly"
 
+

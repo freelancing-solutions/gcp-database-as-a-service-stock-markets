@@ -171,3 +171,19 @@ def test_sell_volume_trade_account():
         sell_volume_instance.sell_volume = "0"
     with raises(ValueError):
         sell_volume_instance.sell_volume = int_negative()
+
+def set_sell_volume_mock(sell_volume: SellVolumeModel) ->  SellVolumeModel:
+    sell_volume.transaction_id = "abcde"
+    sell_volume.currency = choice(currency_symbols())
+    sell_volume.stock_id = "abdfgt"
+    sell_volume.date_created = today()
+    sell_volume.sell_volume = 100
+    sell_volume.sell_value = 100
+    sell_volume.sell_ave_price = 100
+    return sell_volume
+
+
+def test_sell_volume_test_dunder_methods():
+    first_sell_volume: SellVolumeModel = set_sell_volume_mock(sell_volume=sell_volume_instance)
+    second_sell_volume: SellVolumeModel = set_sell_volume_mock(sell_volume=sell_volume_instance)
+    assert first_sell_volume == second_sell_volume, "__eq__ method not function correctly"
