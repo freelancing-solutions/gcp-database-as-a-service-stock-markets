@@ -53,8 +53,8 @@ jobs:
       id: pytest
       uses: alexanderdamiani/pytester-cov@v1.0.1
       with:
-        pytest-root-dir: 'data_service/*'
-        cov-omit-list: 'tests/*, initial_data/*, gen/*, .github/'
+        pytest-root-dir: 'tests/'
+        cov-omit-list: 'tests/, initial_data/, gen/, .github/'
         cov-threshold-single: ${{ env.COVERAGE_TOTAL }}
         cov-threshold-total: ${{ env.COVERAGE_SINGLE }}
 
