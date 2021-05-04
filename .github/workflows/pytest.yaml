@@ -24,7 +24,7 @@
 #   * peter-evans/commit-comment@v1: adds message to commit
 # **************************************************************************************************************** #
 
-# ------NOTE need to steadily increase Test Coverage as i add more test cases 
+# ------NOTE need to steadily increase Test Coverage as i add more test cases
 name: pytester-cov workflow
 
 on: [push, pull_request]
