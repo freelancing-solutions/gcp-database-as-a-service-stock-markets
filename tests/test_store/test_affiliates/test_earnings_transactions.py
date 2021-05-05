@@ -36,8 +36,19 @@ def test_total_earned():
     assert total_earned.currency == symbol, "Total Earned Currency Symbol not being set correctly"
     earnings_transactions_instance.total_earned = total_earned
     assert earnings_transactions_instance.total_earned == total_earned, "Total earned is not be set properly"
+    with raises(TypeError):
+        earnings_transactions_instance.total_earned = 0
+
+def test_last_transaction_time():
+    last_transaction_time: datetime = datetime.now()
+    assert earnings_transactions_instance.last_transaction_time is None, "Last transaction time is not correctly set"
+    earnings_transactions_instance.last_transaction_time = last_transaction_time
+    assert earnings_transactions_instance.last_transaction_time == last_transaction_time
+    with raises(TypeError):
+        earnings_transactions_instance.last_transaction_time = 0
+
+    with raises(TypeError):
+        earnings_transactions_instance.last_transaction_time= ""
 
 
-def test_transaction_date():
-    pass
 

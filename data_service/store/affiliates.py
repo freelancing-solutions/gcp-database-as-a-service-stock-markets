@@ -248,7 +248,7 @@ class AffiliateEarningsTransactions(ndb.Model):
     affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
-    last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
+    last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True, validator=ClassSetters.set_date)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
