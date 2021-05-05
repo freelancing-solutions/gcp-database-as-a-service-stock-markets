@@ -270,7 +270,7 @@ class AffiliateTransactionItems(ndb.Model):
     """
         keeps track of singular transaction items
     """
-    transaction_id: str = ndb.StringProperty()
+    transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_date)
 
