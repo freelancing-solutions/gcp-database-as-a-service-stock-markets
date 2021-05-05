@@ -112,10 +112,11 @@ class ClassSetters:
         return value
 
     def set_number(self, value: int) -> int:
-        if (value == "") or (value is None):
-            raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, int):
             raise TypeError("{} can only be an integer".format(str(self)))
+        if value < 0:
+            raise ValueError('{} can only be postivie integer'.format(str(self)))
+
         return value
 
     def set_date(self, value: datetime) -> datetime:
@@ -149,10 +150,15 @@ class Affiliates(ndb.Model):
     """
         class used to track affiliates registered
     """
+    def set_date_time(self, value: datetime) -> datetime:
+        if not isinstance(value, datetime):
+            raise TypeError("{} can only be a datetime object".format(str(self)))
+        return value
+
     affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    last_updated: datetime = ndb.DateTimeProperty(auto_now=True)
-    datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True)
+    last_updated: datetime = ndb.DateTimeProperty(auto_now=True, validator=set_date_time)
+    datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=set_date_time)
     total_recruits: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_number)
     is_active: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
     is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)

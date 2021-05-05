@@ -82,3 +82,6 @@ def today() -> date:
 
 def time_now() -> time_class:
     return datetime.now().time()
+
+def datetime_now() -> datetime:
+    return datetime.now()

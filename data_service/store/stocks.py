@@ -320,6 +320,8 @@ class NetVolumeModel(ndb.Model):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, int):
             raise TypeError("{} can only be a string".format(str(self)))
+        if value < 0:
+            raise ValueError("{} cannot be Negative".format(str(self)))
         return value
 
     def set_date(self, value: datetime.date) -> datetime.date:

@@ -3,7 +3,7 @@ from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 from data_service.store.stocks import BuyVolumeModel
 from data_service.utils.utils import create_id, today
-from .. import app, int_positive, int_negative
+from tests import app, int_positive, int_negative
 
 buy_volume_instance: BuyVolumeModel = BuyVolumeModel()
 

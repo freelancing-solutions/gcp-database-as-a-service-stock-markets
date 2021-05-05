@@ -5,7 +5,7 @@ from pytest import raises
 from data_service.config.stocks import currency_symbols
 from data_service.store.stocks import SellVolumeModel
 from data_service.utils.utils import create_id, today
-from .. import app, int_positive, int_negative
+from tests import app, int_positive, int_negative
 sell_volume_instance: SellVolumeModel = SellVolumeModel()
 
 def test_sell_sell_volume_instance():
