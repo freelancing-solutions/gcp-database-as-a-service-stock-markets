@@ -125,8 +125,10 @@ class ClassSetters:
     def set_status(self, value: str) -> str:
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(str(self)))
+        if not isinstance(value, str):
+            raise TypeError("{} invalid status".format(str(self)))
         value = value.strip().lower()
-        if value not in ['paid', 'upaid']:
+        if value not in ['paid', 'unpaid']:
             raise TypeError("{} invalid status".format(str(self)))
         return value
 
@@ -185,7 +187,7 @@ class Memberships(ndb.Model):
     """
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
     plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    status: str = ndb.StringProperty(validator=ClassSetters.set_status)  # Paid/ Unpaid
+    status: str = ndb.StringProperty(default="unpaid", validator=ClassSetters.set_status)  # Paid/ Unpaid
     date_created: date = ndb.DateTimeProperty(auto_now_add=True,
                                               validator=ClassSetters.set_datetime)
     plan_start_date: date = ndb.DateProperty(validator=ClassSetters.set_datetime)  # the date this plan will
