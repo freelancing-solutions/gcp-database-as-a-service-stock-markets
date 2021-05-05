@@ -5,9 +5,9 @@ from pytest import raises
 
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import create_id, datetime_now
+from data_service.utils.utils import create_id
 from data_service.store.affiliates import AffiliateTransactionItems
-from tests import int_positive, int_negative
+from tests import int_positive
 
 transaction_item_instance: AffiliateTransactionItems() = AffiliateTransactionItems()
 

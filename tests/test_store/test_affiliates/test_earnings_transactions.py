@@ -1,13 +1,11 @@
 from datetime import datetime
 from random import choice
-
 from pytest import raises
-
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import create_id, today, datetime_now
+from data_service.utils.utils import create_id
 from data_service.store.affiliates import AffiliateEarningsTransactions
-from tests import int_positive, int_negative
+from tests import int_positive
 
 
 earnings_transactions_instance: AffiliateEarningsTransactions = AffiliateEarningsTransactions()
