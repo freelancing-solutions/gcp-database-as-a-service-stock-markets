@@ -256,7 +256,7 @@ class SellVolumeModel(ndb.Model):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, int):
             raise TypeError("{} can only be an integer".format(str(self)))
-        if value < 0 or value > 100:
+        if (value < 0) or (value > 100):
             raise ValueError("{} should be a percentage".format(str(self)))
         return value
 

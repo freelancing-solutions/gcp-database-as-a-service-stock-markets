@@ -137,8 +137,10 @@ def test_sell_volume_sell_market_val_percent():
     """
         test sell market value percent
     """
+
     # selecting an arbitrary percentage value
-    sell_percent: int = randint(0, 101)
+    # This test will sometimes fail
+    sell_percent: int = randint(1, 100)
     assert (sell_volume_instance.sell_market_val_percent, int), "sell volume percent instance is not valid"
     assert sell_volume_instance.sell_market_val_percent == 0, "Sell volume percent default not valid"
     sell_volume_instance.sell_market_val_percent = sell_percent
@@ -149,9 +151,11 @@ def test_sell_volume_sell_market_val_percent():
     with raises(TypeError):
         sell_volume_instance.sell_market_val_percent = "abed"
     with raises(ValueError):
-        sell_volume_instance.sell_market_val_percent = sell_percent + 100
+        # insuring the test succeed by substracting 150
+        sell_volume_instance.sell_market_val_percent = sell_percent + 150
     with raises(ValueError):
-        sell_volume_instance.sell_market_val_percent = sell_percent - 100
+        # insuring the test succeed by substracting 150
+        sell_volume_instance.sell_market_val_percent = sell_percent - 150
 
 
 def test_sell_volume_trade_account():
