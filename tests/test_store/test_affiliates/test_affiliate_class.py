@@ -1,8 +1,6 @@
-from datetime import date as date_class
 from datetime import datetime
-from random import choice, randint
 from pytest import raises
-from data_service.utils.utils import create_id, today, datetime_now
+from data_service.utils.utils import create_id, datetime_now
 from data_service.store.affiliates import Affiliates
 from tests import int_positive, int_negative
 
