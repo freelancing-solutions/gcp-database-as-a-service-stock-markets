@@ -69,7 +69,6 @@ def test_plan_id():
     with raises(ValueError):
         recruitment_instance.plan_id = ""
 
-
 def test_is_active():
     is_active: bool = False
     assert recruitment_instance.is_active, "recruits is_active default not set correctly"
@@ -89,4 +88,3 @@ def test_is_deleted():
         recruitment_instance.is_deleted = 0
     with raises(TypeError):
         recruitment_instance.is_deleted = ""
-

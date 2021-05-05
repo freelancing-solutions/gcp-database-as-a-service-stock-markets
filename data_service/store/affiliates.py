@@ -104,7 +104,7 @@ class ClassSetters:
     def __init__(self):
         super(ClassSetters, self).__init__()
 
-    def                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          set_id(self, value: str) -> str:
+    def set_id(self, value: str) -> str:
         if (value == "") or (value is None):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
@@ -245,7 +245,7 @@ class AffiliateEarningsTransactions(ndb.Model):
     """
         keeps track of amounts paid from earningsData
     """
-    affiliate_id: str = ndb.StringProperty()
+    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
