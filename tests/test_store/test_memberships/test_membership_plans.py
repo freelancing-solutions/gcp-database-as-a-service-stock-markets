@@ -83,14 +83,30 @@ def test_term_payment_amount():
     amount_instance: AmountMixin = AmountMixin(amount=payment_amount, currency=currency)
     assert membership_plan_instance.term_payment_amount is None, "membership_plan term_payment amount not set correctly"
     membership_plan_instance.term_payment_amount = amount_instance
-    assert membership_plan_instance.term_payment_amount == amount_instance, "membership_plan term_payment amount " \
-                                                                           "not set correctly"
+    assert membership_plan_instance.term_payment_amount == amount_instance, "membership_plan term_payment amount not " \
+                                                                            "set correctly"
     assert membership_plan_instance.term_payment_amount == amount_instance , "membership_plan term_amount not " \
                                                                              "set correctly"
     with raises(TypeError):
         membership_plan_instance.term_payment_amount = 0
     with raises(TypeError):
         membership_plan_instance.term_payment_amount = "o"
+
+def test_registration_amount():
+    payment_amount: int = int_positive()
+    currency: str = choice(currency_symbols())
+    amount_instance: AmountMixin = AmountMixin(amount=payment_amount, currency=currency)
+    assert membership_plan_instance.registration_amount is None, "membership_plan registration not set correctly"
+    membership_plan_instance.registration_amount = amount_instance
+    assert membership_plan_instance.registration_amount == amount_instance, "membership_plan registration amount set " \
+                                                                            "correctly"
+    with raises(TypeError):
+        membership_plan_instance.registration_amount = 0
+
+    with raises(TypeError):
+        membership_plan_instance.registration_amount = "0"
+
+
 
 
 
