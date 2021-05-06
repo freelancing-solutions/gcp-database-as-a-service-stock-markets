@@ -1,5 +1,11 @@
 from datetime import datetime
+from random import choice
+
+from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
+
+from data_service.config.stocks import currency_symbols
+from data_service.store.mixins import AmountMixin
 from data_service.utils.utils import create_id, datetime_now
 from tests import int_positive, int_negative
 from data_service.store.memberships import MembershipPlans
@@ -53,3 +59,39 @@ def set_schedule_day():
     assert membership_plan_instance.schedule_day == schedule_day, "membership_plan schedule_day is not set correctly"
     with raises(TypeError):
         membership_plan_instance.schedule_day = "0"
+
+def set_schedule_term():
+    schedule_term: str = "yearly"
+    assert membership_plan_instance.schedule_term == "monthly", "membership_plan schedule term default is not " \
+                                                                "set correctly"
+    membership_plan_instance.schedule_term = schedule_term
+    assert membership_plan_instance.schedule_term == schedule_term, "membership_plan schedule_term is not set correctly"
+    schedule_term  = "quarterly"
+    membership_plan_instance.schedule_term = schedule_term
+    assert membership_plan_instance.schedule_term == schedule_term, "membership_plan schedule term is not set correctly"
+    schedule_term  = "monthly"
+    membership_plan_instance.schedule_term = schedule_term
+    assert membership_plan_instance.schedule_term == schedule_term, "membership_plan schedule term is not set correctly"
+    with raises(ValueError):
+        membership_plan_instance.schedule_term = ""
+    with raises(TypeError):
+        membership_plan_instance.schedule_term = 0
+
+def test_term_payment_amount():
+    payment_amount: int = int_positive()
+    currency: str = choice(currency_symbols())
+    amount_instance: AmountMixin = AmountMixin(amount=payment_amount, currency=currency)
+    assert membership_plan_instance.term_payment_amount is None, "membership_plan term_payment amount not set correctly"
+    membership_plan_instance.term_payment_amount = amount_instance
+    assert membership_plan_instance.term_payment_amount == amount_instance, "membership_plan term_payment amount " \
+                                                                           "not set correctly"
+    assert membership_plan_instance.term_payment_amount == amount_instance , "membership_plan term_amount not " \
+                                                                             "set correctly"
+    with raises(TypeError):
+        membership_plan_instance.term_payment_amount = 0
+    with raises(TypeError):
+        membership_plan_instance.term_payment_amount = "o"
+
+
+
+
