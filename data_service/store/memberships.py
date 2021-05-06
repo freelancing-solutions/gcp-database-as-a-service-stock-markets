@@ -251,10 +251,19 @@ class Coupons(ndb.Model):
         the admin app should setup the coupon codes.
         endpoints should be provided via view and api
     """
-    code: str = ndb.StringProperty()
-    discount: int = ndb.IntegerProperty()
-    is_valid: bool = ndb.BooleanProperty()
-    date_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
+    def set_code(self, value: str) -> str:
+        if not isinstance(value, str):
+            raise TypeError("{} can only be a string".format(str(self)))
+
+        return value
+
+    def set_discount(self, value):
+        pass
+
+    code: str = ndb.StringProperty(validator=set_code)
+    discount: int = ndb.StructuredProperty(AmountMixin)
+    is_valid: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
+    date_created: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
     expiration_time: int = ndb.IntegerProperty(default=lambda expire_date: (timestamp() + get_days(days=30)))
 
 
