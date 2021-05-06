@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import date as date_class
 from random import choice
 
 from google.cloud.ndb.exceptions import BadValueError
@@ -6,7 +7,7 @@ from pytest import raises
 
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import create_id, datetime_now
+from data_service.utils.utils import create_id, datetime_now, today
 from tests import int_positive, int_negative
 from data_service.store.memberships import MembershipPlans
 
@@ -117,6 +118,14 @@ def test_is_active():
         membership_plan_instance.is_active = "True"
 
 
-
+def test_date_created():
+    date_created: date_class = today()
+    assert membership_plan_instance.date_created is None, "membership_plan date not set correctly"
+    membership_plan_instance.date_created = date_created
+    assert membership_plan_instance.date_created == date_created, "membership_pla date not set correctly"
+    with raises(TypeError):
+        membership_plan_instance.date_created = "o"
+    with raises(TypeError):
+        membership_plan_instance.date_created = "2021/07/07"
 
 
