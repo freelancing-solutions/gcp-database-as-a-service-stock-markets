@@ -36,5 +36,20 @@ def test_description():
     with raises(ValueError):
         membership_plan_instance.description = ""
 
+def set_total_members():
+    total_members: int = 0
+    assert membership_plan_instance.total_members == 0, "membership_plan total_members is not being set correctly"
+    membership_plan_instance.total_members = total_members
+    assert membership_plan_instance.total_members == total_members, "membership_plan total_members is not being set"
+    with raises(TypeError):
+        membership_plan_instance.total_members = "0"
+    with raises(ValueError):
+        membership_plan_instance.total_members = int_negative()
 
-
+def set_schedule_day():
+    schedule_day: int = 0
+    assert membership_plan_instance.schedule_day is None, "membership_plan schedule_day default is not set correctly"
+    membership_plan_instance.schedule_day = schedule_day
+    assert membership_plan_instance.schedule_day == schedule_day, "membership_plan schedule_day is not set correctly"
+    with raises(TypeError):
+        membership_plan_instance.schedule_day = "0"

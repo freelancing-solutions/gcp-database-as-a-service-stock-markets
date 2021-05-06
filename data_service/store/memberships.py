@@ -220,7 +220,7 @@ class MembershipPlans(ndb.Model):
     plan_name: str = ndb.StringProperty(validator=ClassSetters.set_string)
     description: str = ndb.StringProperty(validator=ClassSetters.set_string)
     total_members: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
-    schedule_day: int = ndb.IntegerProperty(validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or
+    schedule_day: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or
     # week, or three months
     schedule_term: str = ndb.StringProperty(validator=ClassSetters.set_schedule_term)  # Monthly, Quarterly, Annually
     term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
