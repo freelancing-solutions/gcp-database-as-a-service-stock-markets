@@ -25,3 +25,16 @@ def test_plan_name():
         membership_plan_instance.plan_name = 0
     with raises(ValueError):
         membership_plan_instance.plan_name = ""
+
+def test_description():
+    description: str = "bronze plan"
+    assert membership_plan_instance.description is None, "membership_plan description is not being set correctly"
+    membership_plan_instance.description = description
+    assert membership_plan_instance.description == description, "membership_plan is not being set correctly"
+    with raises(TypeError):
+        membership_plan_instance.description = 0
+    with raises(ValueError):
+        membership_plan_instance.description = ""
+
+
+
