@@ -106,6 +106,15 @@ def test_registration_amount():
     with raises(TypeError):
         membership_plan_instance.registration_amount = "0"
 
+def test_is_active():
+    is_active: bool = False
+    assert not membership_plan_instance.is_active, "membership_pla is active not set correctly"
+    membership_plan_instance.is_active = is_active
+    assert membership_plan_instance.is_active == is_active, "membership_plan is_active not set correctly"
+    with raises(TypeError):
+        membership_plan_instance.is_active = 0
+    with raises(TypeError):
+        membership_plan_instance.is_active = "True"
 
 
 
