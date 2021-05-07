@@ -7,7 +7,7 @@ from data_service.store.mixins import AmountMixin
 from data_service.utils.utils import create_id, timestamp
 from tests import int_positive
 from data_service.store.users import UserModel
-
+from werkzeug.security import check_password_hash
 user_instance: UserModel = UserModel()
 
 def test_uid():
@@ -67,11 +67,46 @@ def test_password():
     password: str = "asidaosiduaosiduoaisd"
     assert user_instance.password is None, "user instance password default is not set properly"
     user_instance.set_password(password=password)
-    assert user_instance.password == password, "user instance password not being set properly"
+    assert check_password_hash(user_instance.password, password), "user instance password not being set properly"
     with raises(ValueError):
         user_instance.set_password(password="")
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_instance.set_password(password=0)
 
 def test_is_active():
-    pass
+    is_active: bool = False
+    assert user_instance.is_active, "user instance is_active default not properly set"
+    user_instance.set_is_active(is_active=is_active)
+    assert user_instance.is_active == is_active, "user instance is_active default not properly set"
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_is_active(is_active="")
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_is_active(is_active=0)
+
+
+def test_time_registered():
+    time_registered: int = timestamp()
+    assert user_instance.time_registered, "user instance time_registered default not properly set"
+    user_instance.set_time_registered(time_registered=time_registered)
+    assert user_instance.time_registered == time_registered, "user instance time_registered default not set properly"
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_time_registered(time_registered="")
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_time_registered(time_registered="99")
+
+
+def test_is_admin():
+    is_admin: bool = True
+    assert not user_instance.is_admin, "user instance is_admin default not properly set"
+    user_instance.set_admin(is_admin=is_admin)
+    assert user_instance.is_admin == is_admin, "user instance is_admin default not set properly"
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_admin(is_admin=0)
+    with raises(TypeError):
+        user_instance.set_admin(is_admin="0")
