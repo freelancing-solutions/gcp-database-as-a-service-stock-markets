@@ -93,23 +93,51 @@ def test_delete_affiliate(mocker):
         message: str = "affiliate delete operation response status was not set correctly"
         assert isinstance(affiliate_dict['status'], bool) and affiliate_dict['status'], message
 
+# noinspection PyShadowingNames
+def test_mark_active(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
 
-def test_mark_active():
-    pass
+    with test_app().app_context():
+        pass
 
-def test_get_affiliate():
-    pass
+# noinspection PyShadowingNames
+def test_get_affiliate(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
 
-def test_get_all_affiliate():
-    pass
+    with test_app().app_context():
+        pass
 
-def get_active_affiliates():
-    pass
+# noinspection PyShadowingNames
+def test_get_all_affiliate(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
 
-def get_inactive_affiliates():
-    pass
+    with test_app().app_context():
+        pass
 
-def get_deleted_affiliates():
-    pass
+# noinspection PyShadowingNames
+def get_active_affiliates(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
 
+    with test_app().app_context():
+        pass
+
+# noinspection PyShadowingNames
+def get_inactive_affiliates(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
+
+    with test_app().app_context():
+        pass
+
+# noinspection PyShadowingNames
+def get_deleted_affiliates(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
+
+    with test_app().app_context():
+        pass
 
