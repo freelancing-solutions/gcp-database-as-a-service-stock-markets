@@ -92,6 +92,7 @@ def test_delete_affiliate(mocker):
         assert affiliate_dict.get('message') is not None, "delete_affiliate response message must be set"
         message: str = "affiliate delete operation response status was not set correctly"
         assert isinstance(affiliate_dict['status'], bool) and affiliate_dict['status'], message
+    mocker.stopall()
 
 # noinspection PyShadowingNames
 def test_mark_active(mocker):
@@ -99,7 +100,18 @@ def test_mark_active(mocker):
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
 
     with test_app().app_context():
-        pass
+        affiliates_view_instance = AffiliatesView()
+        response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active=False)
+        assert status == 200, "Unable to mark affiliate as in-active"
+        response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active=True)
+        assert status == 200, "Unable to mark affiliate as active"
+        # noinspection PyTypeChecker
+        response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active="True")
+        assert status == 500, "passing invalid values is not triggering errors"
+        affiliate_data_mock['affiliate_id'] = None
+        response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active="True")
+        assert status == 500, "passing invalid values is not triggering errors"
+    mocker.stopall()
 
 # noinspection PyShadowingNames
 def test_get_affiliate(mocker):
@@ -107,7 +119,10 @@ def test_get_affiliate(mocker):
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
 
     with test_app().app_context():
-        pass
+        affiliates_view_instance = AffiliatesView()
+        response, status = affiliates_view_instance.get_affiliate(affiliate_data=affiliate_data_mock)
+        assert status == 200, 'unable to locate affiliate'
+    mocker.stopall()
 
 # noinspection PyShadowingNames
 def test_get_all_affiliate(mocker):
@@ -116,6 +131,7 @@ def test_get_all_affiliate(mocker):
 
     with test_app().app_context():
         pass
+    mocker.stopall()
 
 # noinspection PyShadowingNames
 def get_active_affiliates(mocker):
@@ -124,6 +140,7 @@ def get_active_affiliates(mocker):
 
     with test_app().app_context():
         pass
+    mocker.stopall()
 
 # noinspection PyShadowingNames
 def get_inactive_affiliates(mocker):
@@ -132,7 +149,8 @@ def get_inactive_affiliates(mocker):
 
     with test_app().app_context():
         pass
-
+    mocker.stopall()
+    
 # noinspection PyShadowingNames
 def get_deleted_affiliates(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
@@ -140,4 +158,4 @@ def get_deleted_affiliates(mocker):
 
     with test_app().app_context():
         pass
-
+    mocker.stopall()
