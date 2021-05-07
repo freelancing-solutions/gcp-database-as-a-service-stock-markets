@@ -5,7 +5,7 @@ from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import create_id, datetime_now, today
+from data_service.utils.utils import create_id, datetime_now, today, timestamp
 from tests import int_positive, int_negative
 from data_service.store.memberships import Coupons
 
@@ -43,8 +43,23 @@ def test_is_valid():
 
 
 def test_date_created():
-    pass
+    date_created: datetime = datetime.now()
+    assert coupon_instance.date_created is None, "coupon date_created not initialized properly"
+    coupon_instance.date_created = date_created
+    assert coupon_instance.date_created == date_created, "coupon date_created not set correctly"
+    with raises(TypeError):
+        coupon_instance.date_created = 0
+    with raises(TypeError):
+        coupon_instance.date_created = "0"
 
 def test_expiration_date():
-    pass
+    expiration_time: int = timestamp()
+    assert coupon_instance.expiration_time == 0, "coupon expiration_time not initialized properly"
+    coupon_instance.expiration_time = expiration_time
+    assert coupon_instance.expiration_time == expiration_time, "coupon expiration_time not set correctly"
+    with raises(TypeError):
+        coupon_instance.expiration_time = ""
+    with raises(TypeError):
+        coupon_instance.expiration_time = "0"
+
 

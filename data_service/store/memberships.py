@@ -258,13 +258,20 @@ class Coupons(ndb.Model):
         return value
 
     def set_discount(self, value):
-        pass
+        if not isinstance(value, int):
+            raise TypeError("{} can only be an integer".format(str(self)))
+        return value
+
+    def set_expiration_time(self, value: int) -> int:
+        if not isinstance(value, int):
+            raise TypeError("{} can only be an integer".format(str(self)))
+        return value
 
     code: str = ndb.StringProperty(validator=set_code)
     discount: int = ndb.StructuredProperty(AmountMixin)
     is_valid: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
     date_created: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
-    expiration_time: int = ndb.IntegerProperty(default=lambda expire_date: (timestamp() + get_days(days=30)))
+    expiration_time: int = ndb.IntegerProperty(default=0, validator=set_expiration_time)
 
 
 class AccessRights(ndb.Model):
