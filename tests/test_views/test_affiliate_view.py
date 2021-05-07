@@ -1,10 +1,11 @@
-import json
 from datetime import datetime
 from data_service.views.affiliates import AffiliatesView
 from data_service.store.affiliates import Affiliates
 from data_service.utils.utils import create_id
 from .. import test_app
+# noinspection PyUnresolvedReferences
 from pytest import raises
+# noinspection PyUnresolvedReferences
 from pytest_mock import mocker
 
 class AffiliateQueryMock:
@@ -15,6 +16,9 @@ class AffiliateQueryMock:
 
     def fetch(self) -> list:
         return [self.affiliate_instance]
+
+    def get(self) -> Affiliates:
+        return self.affiliate_instance
 
 
 affiliate_data_mock: dict = {
@@ -62,8 +66,21 @@ def test_register_affiliate(mocker):
 
 
 # noinspection PyShadowingNames
-def test_increment_total_recruits(mocker):
-    pass
+def test_increment_decrement_total_recruits(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
+
+    with test_app().app_context():
+        affiliates_view_instance = AffiliatesView()
+        response, status = affiliates_view_instance.increment_total_recruits(affiliate_data=affiliate_data_mock)
+        affiliate_dict: dict = response.get_json()
+        assert affiliate_dict['payload']['total_recruits'] == 1, 'failed to increment number of affiliates'
+        assert affiliate_dict['status'], "failing to set the return boolean status"
+        assert affiliate_dict.get('message') is not None, "failed to set message"
+
+
+
+
 
 def test_delete_affiliate():
     pass
