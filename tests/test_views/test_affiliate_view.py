@@ -37,16 +37,32 @@ def test_register_affiliate(mocker):
     with test_app().app_context():
         affiliates_view_instance = AffiliatesView()
         response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
-        print("status: {}".format(status))
         response_dict: dict = response.get_json()
         assert status == 200, response_dict['message']
-        affiliate_data_mock['uid'] = ""
-        # print(affiliate_data_mock)
-        response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
-        print("status: {}".format(status))
-        assert status != 200, "registering affiliate without uid"
+        assert response_dict['status'], "response status not set correctly"
+        assert response_dict.get('payload') is not None, "affiliates payload is not being set correctly"
+        assert response_dict.get('message') is not None, "affiliate message is not being set correctly"
 
-def test_increment_total_recruits():
+        # print(affiliate_data_mock)
+        # Results here means the registration attempt will fail because uid is empty
+        affiliate_data_mock['uid'] = ""
+        response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
+        response_dict: dict = response.get_json()
+        assert status != 200, response_dict['message']
+        assert not response_dict['status'], "response status not set correctly"
+        assert response_dict.get('message') is not None, "affiliate message is not being set correctly"
+
+        mocker.patch('data_service.store.affiliates.AffiliatesValidators.user_already_registered', return_value=True)
+        affiliate_data_mock['uid'] = create_id()
+        response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
+        response_dict: dict = response.get_json()
+        assert status != 200, response_dict['message']
+        assert not response_dict['status'], "response status not set correctly"
+        assert response_dict.get('message') is not None, "affiliate message is not being set correctly"
+
+
+# noinspection PyShadowingNames
+def test_increment_total_recruits(mocker):
     pass
 
 def test_delete_affiliate():

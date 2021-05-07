@@ -20,6 +20,7 @@ class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
         already_registered: bool = self.user_already_registered(uid=uid)
         if not isinstance(already_registered, bool):
             raise ValueError("invalid user id")
+        print("User Already Registered: {}".format(already_registered))
         return not already_registered
 
 
