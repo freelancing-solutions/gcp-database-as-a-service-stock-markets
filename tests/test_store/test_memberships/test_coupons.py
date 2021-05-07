@@ -1,12 +1,11 @@
 from datetime import datetime
-from datetime import date as date_class
 from random import choice
 from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import create_id, datetime_now, today, timestamp
-from tests import int_positive, int_negative
+from data_service.utils.utils import create_id, timestamp
+from tests import int_positive
 from data_service.store.memberships import Coupons
 
 coupon_instance: Coupons = Coupons()
