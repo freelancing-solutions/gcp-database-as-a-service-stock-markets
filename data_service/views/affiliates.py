@@ -64,16 +64,16 @@ class AffiliatesView(Validator):
         affiliate_id: typing.Union[str, None] = affiliate_data.get('affiliate_id')
         if affiliate_id is None or affiliate_id == "":
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
-        affilite_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
-        if isinstance(affilite_instance, Affiliates):
-            affilite_instance.total_recruits += 1
-            key = affilite_instance.put(retries=self._max_retries, timeout=self._max_timeout)
+        affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
+        if isinstance(affiliate_instance, Affiliates):
+            affiliate_instance.total_recruits += 1
+            key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Something went wrong while updating affiliate"
                 raise DataServiceError(message)
             return jsonify({'status': True,
                             'message': 'successfully incremented total recruits',
-                            'payload': affilite_instance.to_dict()}), 200
+                            'payload': affiliate_instance.to_dict()}), 200
         else:
             return jsonify({'status': False, 'message': 'Failed to locate affiliate'}), 500
 

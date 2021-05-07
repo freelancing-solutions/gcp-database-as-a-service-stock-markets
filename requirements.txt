@@ -27,3 +27,4 @@ python-decouple
 pandas~=1.2.3
 pytest~=6.2.2
 pytest_mock
+pytest_cov
