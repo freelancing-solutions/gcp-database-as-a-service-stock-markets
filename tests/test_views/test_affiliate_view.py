@@ -122,27 +122,30 @@ def test_get_affiliate(mocker):
         affiliates_view_instance = AffiliatesView()
         response, status = affiliates_view_instance.get_affiliate(affiliate_data=affiliate_data_mock)
         assert status == 200, 'unable to locate affiliate'
+        # TODO expand the test cases
     mocker.stopall()
 
-# noinspection PyShadowingNames
+
+# noinspection PyShadowingNames,DuplicatedCode
 def test_get_all_affiliate(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
-
+    # TODo complete the test cases
     with test_app().app_context():
         pass
     mocker.stopall()
 
-# noinspection PyShadowingNames
+# noinspection PyShadowingNames,DuplicatedCode
 def get_active_affiliates(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
+    # TODO Add more test cases
 
     with test_app().app_context():
         pass
     mocker.stopall()
 
-# noinspection PyShadowingNames
+# noinspection PyShadowingNames,DuplicatedCode
 def get_inactive_affiliates(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
@@ -150,8 +153,8 @@ def get_inactive_affiliates(mocker):
     with test_app().app_context():
         pass
     mocker.stopall()
-    
-# noinspection PyShadowingNames
+
+# noinspection PyShadowingNames,DuplicatedCode
 def get_deleted_affiliates(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
