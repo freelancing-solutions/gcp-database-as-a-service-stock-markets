@@ -3,7 +3,7 @@ from random import choice
 from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 from data_service.config.stocks import currency_symbols
-from data_service.store.mixins import AmountMixin
+from data_service.store.mixins import AmountMixin, AddressMixin
 from data_service.utils.utils import create_id, timestamp
 from tests import int_positive
 from data_service.store.users import UserModel
@@ -109,4 +109,27 @@ def test_is_admin():
         # noinspection PyTypeChecker
         user_instance.set_admin(is_admin=0)
     with raises(TypeError):
+        # noinspection PyTypeChecker
         user_instance.set_admin(is_admin="0")
+
+def test_is_support():
+    is_support: bool = False
+    assert not user_instance.is_support, "user instance is_support default not properly set"
+    user_instance.set_support(is_support=is_support)
+    assert user_instance.is_support == is_support, "user instance is_suport default not set properly"
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_support(is_support=0)
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_support(is_support="0")
+
+def test_address():
+    address: AddressMixin = AddressMixin(line_1="joe slovo street", city="Johannesburg", zip_code="1000",
+                                         province="gauteng")
+    assert user_instance.address is None, "user instance address default not properly set"
+    user_instance.set_address(address=address)
+    assert user_instance.address == address, "user instance address not properly set"
+    with raises(TypeError):
+        # noinspection PyTypeChecker
+        user_instance.set_address(address="joe slove street johanesburg")
