@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from data_service.views.affiliates import AffiliatesView
 from data_service.store.affiliates import Affiliates
@@ -25,17 +26,25 @@ affiliate_data_mock: dict = {
     "is_deleted": False
 }
 
+
+# noinspection PyShadowingNames
 def test_register_affiliate(mocker):
-    app = test_app()
 
-    affiliare_query_mock = AffiliateQueryMock()
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
-    mocker.patch('google.cloud.ndb.Model.query', return_value=affiliare_query_mock)
+    mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
+    mocker.patch('data_service.store.affiliates.AffiliatesValidators.user_already_registered', return_value=False)
 
-    with app.app_context():
+    with test_app().app_context():
         affiliates_view_instance = AffiliatesView()
-        status, message = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
-        assert status, "not registering affiliate correctly"
+        response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
+        print("status: {}".format(status))
+        response_dict: dict = response.get_json()
+        assert status == 200, response_dict['message']
+        affiliate_data_mock['uid'] = ""
+        # print(affiliate_data_mock)
+        response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
+        print("status: {}".format(status))
+        assert status != 200, "registering affiliate without uid"
 
 def test_increment_total_recruits():
     pass
