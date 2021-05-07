@@ -4,7 +4,7 @@ from data_service.main import create_app
 from data_service.config import Config
 from google.cloud import ndb
 import os
-credential_path = "C:\\gcp_credentials\\mobius.json"
+credential_path = "C:\\gcp_credentials\\pinoydesk.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 def use_context(func):

@@ -1,9 +1,19 @@
 from datetime import datetime
 from data_service.views.affiliates import AffiliatesView
+from data_service.store.affiliates import Affiliates
 from data_service.utils.utils import create_id
 from .. import test_app
-from data_service.config import Config
 from pytest import raises
+from pytest_mock import mocker
+
+class AffiliateQueryMock:
+    affiliate_instance = Affiliates()
+
+    def __init__(self):
+        pass
+
+    def fetch(self) -> list:
+        return [self.affiliate_instance]
 
 
 affiliate_data_mock: dict = {
@@ -14,11 +24,18 @@ affiliate_data_mock: dict = {
     "is_active": True,
     "is_deleted": False
 }
-def test_register_affiliate():
+
+def test_register_affiliate(mocker):
     app = test_app()
+
+    affiliare_query_mock = AffiliateQueryMock()
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=affiliare_query_mock)
+
     with app.app_context():
         affiliates_view_instance = AffiliatesView()
-        response = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
+        status, message = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
+        assert status, "not registering affiliate correctly"
 
 def test_increment_total_recruits():
     pass

@@ -9,8 +9,10 @@ from tests import test_app, int_positive, int_negative
 
 net_volume_instance: NetVolumeModel = NetVolumeModel()
 
+
 def test_net_volume_instance():
     assert isinstance(net_volume_instance, NetVolumeModel), "net volume instance is instantiated incorrectly"
+
 
 def test_net_volume_transaction_id():
     temp_t_id: str = create_id()
@@ -35,6 +37,7 @@ def test_net_volume_stock_id():
     with raises(ValueError):
         net_volume_instance.stock_id = str()
 
+
 def test_net_volume_date_created():
     date_created: datetime.date = today()
     assert net_volume_instance.date_created is None, "net volume date_created not initialized"
@@ -48,9 +51,10 @@ def test_net_volume_date_created():
 
 def test_net_volume_currency():
     currency: str = choice(currency_symbols())
-    app =test_app()
+    app = test_app()
     with app.app_context():
-        assert net_volume_instance.currency is app.config.get('CURRENCY'), "net volume currency has not initialized correctly"
+        assert net_volume_instance.currency is app.config.get(
+            'CURRENCY'), "net volume currency has not initialized correctly"
         net_volume_instance.currency = currency
         assert net_volume_instance.currency == currency, "net volume currency is not being set correctly"
         with raises(TypeError):
@@ -80,7 +84,7 @@ def test_net_volume_total_volume():
     net_volume_instance.total_volume = total_volume
     assert net_volume_instance.total_volume == total_volume, "net volume is not being set correctly"
     net_volume_instance.total_volume = 0
-    assert net_volume_instance.total_volume ==  0, "net volume not setting values correctly"
+    assert net_volume_instance.total_volume == 0, "net volume not setting values correctly"
     with raises(ValueError):
         net_volume_instance.total_volume = int_negative()
     with raises(TypeError):

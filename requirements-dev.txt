@@ -24,3 +24,6 @@ uuid==1.30
 Werkzeug==1.0.1
 gunicorn==20.1.0
 python-decouple
+pytest
+pytest_cov
+pytest_mock

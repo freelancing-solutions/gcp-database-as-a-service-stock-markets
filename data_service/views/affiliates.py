@@ -10,12 +10,12 @@ from data_service.utils.utils import create_id, return_ttl, end_of_month
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
+
 # TODO Create Test Cases for Affiliates View and Documentations
 # Dont Edit Just Watch can you see this
 
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
 
-    @staticmethod
     def can_register_affiliate(self, uid: str) -> bool:
         already_registered: bool = self.user_already_registered(uid=uid)
         if not isinstance(already_registered, bool):
@@ -27,6 +27,7 @@ class AffiliatesView(Validator):
     """
         Register new affiliates using this class
     """
+
     def __init__(self):
         super(AffiliatesView, self).__init__()
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
@@ -43,7 +44,7 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'user id cannot be Null'}), 500
         if self.can_register_affiliate(uid=uid) is True:
             affiliate_instance: Affiliates = Affiliates(affiliate_id=create_id(), uid=uid)
-            key = affiliate_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "There was an error creating Affiliate"
                 raise DataServiceError(message)
@@ -213,6 +214,7 @@ class RecruitsView(Validator):
     """
         Used by affiliates to register newly recruited members
     """
+
     def __init__(self):
         super(RecruitsView, self).__init__()
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
@@ -230,7 +232,7 @@ class RecruitsView(Validator):
 
         # TODO - check if i can add recruit
         recruit_instance: Recruits = Recruits(affiliate_id=create_id(), referrer_uid=referrer_uid)
-        key = recruit_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+        key = recruit_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "An Error occurred while adding new recruit"
             return jsonify({'status': False, 'message': message}), 500
@@ -250,7 +252,7 @@ class RecruitsView(Validator):
             recruits_instance = recruits_list[0]
             recruits_instance.is_deleted = True
             recruits_instance.is_active = False
-            key = recruits_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = recruits_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Error occurred while deleting recruit"
                 return jsonify({'status': False, 'message': message}), 500
@@ -273,7 +275,7 @@ class RecruitsView(Validator):
         if isinstance(recruits_list, list) and len(recruits_list) > 0:
             recruits_instance: Recruits = recruits_list[0]
             recruits_instance.is_active = is_active
-            key = recruits_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = recruits_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Error occurred while changing recruit active status"
                 return jsonify({'status': False, 'message': message}), 500
@@ -376,7 +378,7 @@ class EarningsView(Validator):
         """
         pass
 
-    def mark_on_hold(self, earnings_data: dict, on_hold: bool) -> bool :
+    def mark_on_hold(self, earnings_data: dict, on_hold: bool) -> bool:
         """
             mark earnings as on hold or not on hold
             earnings which are on-hold may not be paid until problem is resolved
@@ -389,8 +391,3 @@ class EarningsView(Validator):
             wallet earnings can be sent to paypal or through EFT
         """
         pass
-
-
-
-
-

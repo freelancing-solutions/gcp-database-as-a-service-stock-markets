@@ -1,7 +1,7 @@
 from flask import current_app
 from data_service.config import Config
 from data_service.main import create_app
-from random import random, choice
+from random import choice
 from string import digits
 
 def test_app():
