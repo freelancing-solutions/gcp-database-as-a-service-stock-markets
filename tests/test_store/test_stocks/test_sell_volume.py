@@ -5,7 +5,7 @@ from pytest import raises
 from data_service.config.stocks import currency_symbols
 from data_service.store.stocks import SellVolumeModel
 from data_service.utils.utils import create_id, today
-from tests import app, int_positive, int_negative
+from tests import test_app, int_positive, int_negative
 sell_volume_instance: SellVolumeModel = SellVolumeModel()
 
 def test_sell_sell_volume_instance():
@@ -51,6 +51,7 @@ def test_sell_volume_currency():
         test if i can store any valid currency
     """
     t_currency: str = choice(currency_symbols())
+    app = test_app()
     with app.app_context():
         assert sell_volume_instance.currency == app.config.get("CURRENCY"), "Sell Volume currency initial value invalid"
         sell_volume_instance.currency = t_currency

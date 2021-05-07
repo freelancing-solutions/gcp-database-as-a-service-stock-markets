@@ -4,14 +4,16 @@ from data_service.main import create_app
 from random import random, choice
 from string import digits
 
+def test_app():
 
-if not current_app:
-    app = create_app(config_class=Config)
-    app.app_context().push()
-else:
-    app = current_app
+    if not current_app:
+        app = create_app(config_class=Config)
+        app.app_context().push()
+    else:
+        app = current_app
 
-app.testing = True
+    app.testing = True
+    return app
 
 def int_positive():
     num = 0

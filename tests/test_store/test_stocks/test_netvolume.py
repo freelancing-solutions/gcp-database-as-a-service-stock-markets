@@ -5,7 +5,7 @@ from data_service.config.stocks import currency_symbols
 from pytest import raises
 from data_service.store.stocks import NetVolumeModel
 from data_service.utils.utils import create_id, today
-from tests import app, int_positive, int_negative
+from tests import test_app, int_positive, int_negative
 
 net_volume_instance: NetVolumeModel = NetVolumeModel()
 
@@ -48,6 +48,7 @@ def test_net_volume_date_created():
 
 def test_net_volume_currency():
     currency: str = choice(currency_symbols())
+    app =test_app()
     with app.app_context():
         assert net_volume_instance.currency is app.config.get('CURRENCY'), "net volume currency has not initialized correctly"
         net_volume_instance.currency = currency

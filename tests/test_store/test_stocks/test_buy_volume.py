@@ -3,7 +3,7 @@ from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 from data_service.store.stocks import BuyVolumeModel
 from data_service.utils.utils import create_id, today
-from tests import app, int_positive, int_negative
+from tests import test_app, int_positive, int_negative
 
 buy_volume_instance: BuyVolumeModel = BuyVolumeModel()
 
@@ -41,7 +41,7 @@ def test_date_created():
 
 
 def test_currency():
-
+    app = test_app()
     with app.app_context():
         def_currency: str = app.config.get("CURRENCY")
         assert buy_volume_instance.currency == def_currency, "Buy Volume currency initial value invalid"
