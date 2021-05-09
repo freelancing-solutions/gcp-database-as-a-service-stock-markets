@@ -42,6 +42,7 @@ class AffiliatesValidators:
         except Aborted:
             return None
 
+
 class RecruitsValidators:
     def __init__(self):
         super(RecruitsValidators, self).__init__()
@@ -79,6 +80,7 @@ class RecruitsValidators:
         except Aborted:
             return None
 
+
 class EarningsValidators:
     def __init__(self):
         super(EarningsValidators, self).__init__()
@@ -99,6 +101,7 @@ class EarningsValidators:
             return None
         except Aborted:
             return None
+
 
 class ClassSetters:
     def __init__(self):
@@ -137,7 +140,7 @@ class ClassSetters:
             raise TypeError("{}, can only be an integer".format(str(self)))
 
         if 0 < value > 100:
-            raise ValueError("{}, should be a percent". format(str(self)))
+            raise ValueError("{}, should be a percent".format(str(self)))
 
         return value
 
@@ -146,10 +149,12 @@ class ClassSetters:
             raise TypeError('{} is invalid'.format(str(self)))
         return amount
 
+
 class Affiliates(ndb.Model):
     """
         class used to track affiliates registered
     """
+
     def set_date_time(self, value: datetime) -> datetime:
         if not isinstance(value, datetime):
             raise TypeError("{} can only be a datetime object".format(str(self)))
@@ -179,6 +184,7 @@ class Affiliates(ndb.Model):
     def __repr__(self) -> str:
         return "<Affiliates: {}{}".format(self.affiliate_id, self.uid)
 
+
 class Recruits(ndb.Model):
     """
         class used to track recruited affiliates
@@ -207,11 +213,13 @@ class Recruits(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+
 class EarningsData(ndb.Model):
     """
         class used to track periodical earnings per affiliate
         #
     """
+
     def set_date(self, value) -> date:
         if not isinstance(value, date):
             raise ValueError("{} is invalid".format(str(self)))

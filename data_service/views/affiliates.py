@@ -211,6 +211,7 @@ class AffiliatesView(Validator):
                         'payload': payload}), 200
 
 
+# noinspection DuplicatedCode
 class RecruitsView(Validator):
     """
         Used by affiliates to register newly recruited members
@@ -231,7 +232,6 @@ class RecruitsView(Validator):
         if referrer_uid is None or referrer_uid == "":
             return jsonify({'status': False, 'message': 'referrer uid is required'}), 200
 
-        # TODO - check if i can add recruit
         recruit_instance: Recruits = Recruits(affiliate_id=create_id(), referrer_uid=referrer_uid)
         key = recruit_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
@@ -257,7 +257,8 @@ class RecruitsView(Validator):
             if key is None:
                 message: str = "An Error occurred while deleting recruit"
                 return jsonify({'status': False, 'message': message}), 500
-            return jsonify({'status': True, 'message': 'Successfully deleted recruit'}), 200
+            return jsonify({'status': True, 'message': 'Successfully deleted recruit',
+                            'payload': recruits_instance.to_dict()}), 200
         else:
             message: str = "Recruit does not exist"
             return jsonify({'status': False, 'message': message}), 500
@@ -280,7 +281,8 @@ class RecruitsView(Validator):
             if key is None:
                 message: str = "An Error occurred while changing recruit active status"
                 return jsonify({'status': False, 'message': message}), 500
-            return jsonify({'status': True, 'message': 'Successfully deleted recruit'}), 200
+            return jsonify({'status': True, 'message': 'Successfully deleted recruit',
+                            'payload': recruits_instance.to_dict()}), 200
         else:
             message: str = "Recruit does not exist"
             return jsonify({'status': False, 'message': message}), 500
