@@ -87,5 +87,35 @@ def test_mark_active(mocker):
         response_data: dict = response.get_json()
         assert response_data.get('payload') is not None, "mark_active payload not being set properly"
         assert response_data.get('message') is not None, "mark_active message not being set properly"
+    mocker.stopall()
 
+
+# noinspection PyShadowingNames
+def test_get_recruit(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=RecruitsQueryMock())
+
+    with test_app().app_context():
+        recruits_view_instance: RecruitsView = RecruitsView()
+        response, status = recruits_view_instance.get_recruit(recruit_data=recruit_data_mock)
+        assert status == 200, "Unable to fetch recruit"
+        response_data: dict = response.get_json()
+        assert response_data.get('payload') is not None, "get_recruit payload data not being set correctly"
+        assert response_data.get('message') is not None, "get_recruit message data not being set correctly"
+    mocker.stopall()
+
+
+# noinspection PyShadowingNames
+def test_recruits_by_active_status(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=RecruitsQueryMock())
+
+    with test_app().app_context():
+        recruits_view_instance: RecruitsView = RecruitsView()
+        response, status = recruits_view_instance.get_recruit(recruit_data=recruit_data_mock)
+        assert status == 200, "Unable to fetch recruit"
+        response_data: dict = response.get_json()
+        assert response_data.get('payload') is not None, "get_recruit payload is not set"
+        assert response_data.get('message') is not None, "get_recruit message is not set"
+    mocker.stopall()
 
