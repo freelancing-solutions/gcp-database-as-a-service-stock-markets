@@ -2,8 +2,8 @@
 appengine-generated/
 app.yaml
 .env
-venv/
-gen/
+/venv/
+/gen/
 .pytest_cache/
 *.pyc
 open-api.json
