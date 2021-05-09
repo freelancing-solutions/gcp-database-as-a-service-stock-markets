@@ -331,10 +331,10 @@ class RecruitsView(Validator):
     @use_context
     @handle_view_errors
     def get_recruits_by_affiliate(self, affiliate_data: dict) -> tuple:
-        referrer_uid: str = affiliate_data.get('referrer_uid')
-        if referrer_uid is None or referrer_uid == "":
-            return jsonify({'status': False, 'message': 'referrer_uid is required'}), 500
-        recruits_list: typing.List[Recruits] = Recruits.query(Recruits.referrer_uid == referrer_uid).fetch()
+        affiliate_id: str = affiliate_data.get('affiliate_id')
+        if affiliate_id is None or affiliate_id == "":
+            return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
+        recruits_list: typing.List[Recruits] = Recruits.query(Recruits.affiliate_id == affiliate_id).fetch()
         payload = [recruit.to_dict() for recruit in recruits_list]
 
         message: str = "{} recruits successfully fetched recruits by active status".format(str(len(recruits_list)))
@@ -343,7 +343,7 @@ class RecruitsView(Validator):
     @cache_affiliates.cached(timeout=return_ttl(name='short'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def get_recruits_by_active_and_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
+    def get_recruits_by_active_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
         referrer_uid: str = affiliate_data.get('referrer_uid')
         if referrer_uid is None or referrer_uid == "":
             return jsonify({'status': False, 'message': 'referrer_uid is required'}), 500

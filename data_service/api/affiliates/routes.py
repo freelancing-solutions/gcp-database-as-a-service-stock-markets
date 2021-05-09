@@ -66,9 +66,9 @@ def recruits(path: str) -> tuple:
     elif path == "get-by-affiliate":
         return recruits_view_instance.get_recruits_by_affiliate(affiliate_data=recruit_data)
     elif path == "get-by-active-affiliate":
-        return recruits_view_instance.get_recruits_by_active_and_affiliate(affiliate_data=recruit_data, is_active=True)
+        return recruits_view_instance.get_recruits_by_active_affiliate(affiliate_data=recruit_data, is_active=True)
     elif path == "get-by-not-active-affiliate":
-        return recruits_view_instance.get_recruits_by_active_and_affiliate(affiliate_data=recruit_data, is_active=False)
+        return recruits_view_instance.get_recruits_by_active_affiliate(affiliate_data=recruit_data, is_active=False)
     else:
         pass
 

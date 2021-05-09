@@ -119,3 +119,48 @@ def test_recruits_by_active_status(mocker):
         assert response_data.get('message') is not None, "get_recruit message is not set"
     mocker.stopall()
 
+
+# noinspection PyShadowingNames
+def test_recruits_by_deleted_status(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=RecruitsQueryMock())
+
+    with test_app().app_context():
+        recruits_view_instance: RecruitsView = RecruitsView()
+        response, status = recruits_view_instance.get_recruits_by_deleted_status(is_deleted=False)
+        assert status == 200, "Unable to get recruits by deleted status"
+        response_data: dict = response.get_json()
+        assert response_data.get('payload') is not None, "payload for get_recruit_by_deleted_status not set"
+        assert response_data.get('message') is not None, "message gor get_recruit_by_deleted status not set"
+    mocker.stopall()
+
+
+# noinspection PyShadowingNames
+def test_recruits_by_affiliate(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=RecruitsQueryMock())
+    from .test_affiliate_view import affiliate_data_mock
+    affiliate_data_mock['affiliate_id'] = create_id()
+    with test_app().app_context():
+        recruits_view_instance: RecruitsView = RecruitsView()
+        response, status = recruits_view_instance.get_recruits_by_affiliate(affiliate_data=affiliate_data_mock)
+        assert status == 200, "Unable to get recruits by affiliate"
+        response_data: dict = response.get_json()
+        assert response_data.get('payload') is not None, response_data['message']
+        assert response_data.get('message') is not None, "message for get_recruits_by_affiliate not set"
+
+    mocker.stopall()
+
+
+def test_recruits_by_active_and_affiliate(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=RecruitsQueryMock())
+    from .test_affiliate_view import affiliate_data_mock
+    affiliate_data_mock['affiliate_id'] = create_id()
+    with test_app().app_context():
+        recruits_view_instance: RecruitsView = RecruitsView()
+        response, status = recruits_view_instance.get_recruits_by_active_affiliate(affiliate_data=affiliate_data_mock,
+                                                                                   is_active=True)
+        assert status == 200, "Unable to get affiliates by active status"
+        response_data: dict = response.get_json()
+        assert response_data.get('payload') is not None, response_data['message']
