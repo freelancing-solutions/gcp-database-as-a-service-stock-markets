@@ -152,6 +152,7 @@ def test_recruits_by_affiliate(mocker):
     mocker.stopall()
 
 
+# noinspection PyShadowingNames
 def test_recruits_by_active_and_affiliate(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=RecruitsQueryMock())
@@ -164,3 +165,4 @@ def test_recruits_by_active_and_affiliate(mocker):
         assert status == 200, "Unable to get affiliates by active status"
         response_data: dict = response.get_json()
         assert response_data.get('payload') is not None, response_data['message']
+    mocker.stopall()
