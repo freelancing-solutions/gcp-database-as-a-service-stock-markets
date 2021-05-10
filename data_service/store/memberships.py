@@ -11,7 +11,6 @@ from data_service.utils.utils import timestamp, get_days
 class MembershipValidators:
 
     @staticmethod
-    @ndb.tasklet
     def start_date_valid(start_date: date) -> bool:
         """
             check if date is from today and falls within normal parameters
@@ -25,7 +24,6 @@ class MembershipValidators:
 class PlanValidators:
 
     @staticmethod
-    @ndb.tasklet
     def plan_exist(plan_id: str) -> typing.Union[None, bool]:
         """
             return True or False
@@ -73,6 +71,7 @@ class PlanValidators:
             return None
         return False
 
+
 class CouponsValidator:
     def __init__(self):
         pass
@@ -111,6 +110,7 @@ class CouponsValidator:
         if 0 < discount_valid > 100:
             return False
         return True
+
 
 class ClassSetters:
     def set_id(self, value: str) -> str:
@@ -191,6 +191,7 @@ class Memberships(ndb.Model):
     date_created: date = ndb.DateTimeProperty(auto_now_add=True,
                                               validator=ClassSetters.set_datetime)
     plan_start_date: date = ndb.DateProperty(validator=ClassSetters.set_datetime)  # the date this plan will
+
     # become active
 
     def __eq__(self, other) -> bool:
@@ -220,9 +221,11 @@ class MembershipPlans(ndb.Model):
     plan_name: str = ndb.StringProperty(validator=ClassSetters.set_string)
     description: str = ndb.StringProperty(validator=ClassSetters.set_string)
     total_members: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
-    schedule_day: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or
+    schedule_day: int = ndb.IntegerProperty(default=0,
+                                            validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or
     # week, or three months
-    schedule_term: str = ndb.StringProperty(default="monthly", validator=ClassSetters.set_schedule_term)  # Monthly, Quarterly, Annually
+    schedule_term: str = ndb.StringProperty(default="monthly",
+                                            validator=ClassSetters.set_schedule_term)  # Monthly, Quarterly, Annually
     term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     registration_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     is_active: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
@@ -251,6 +254,7 @@ class Coupons(ndb.Model):
         the admin app should setup the coupon codes.
         endpoints should be provided via view and api
     """
+
     def set_code(self, value: str) -> str:
         if not isinstance(value, str):
             raise TypeError("{} can only be a string".format(str(self)))
@@ -286,6 +290,7 @@ class AccessRights(ndb.Model):
     access_rights_list: typing.List[str] = ndb.StringProperty(repeated=True)  # a list containing the rights of users
 
     # TODO - finish this
+
 
 class MembershipDailyStats(ndb.Model):
     """

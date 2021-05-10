@@ -27,12 +27,12 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
 
     @ndb.tasklet
     def can_add_member(self, uid: str, plan_id: str, start_date: date) -> any:
-        user_valid: typing.Union[None, bool] = yield self.is_user_valid(uid=uid)
-        plan_exist: typing.Union[None, bool] = yield self.plan_exist(plan_id=plan_id)
-        date_valid: typing.Union[None, bool] = yield self.start_date_valid(start_date=start_date)
+        user_valid: typing.Union[None, bool] = self.is_user_valid(uid=uid)
+        plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
+        date_valid: typing.Union[None, bool] = self.start_date_valid(start_date=start_date)
 
         if isinstance(user_valid, bool) and isinstance(plan_exist, bool) and isinstance(date_valid, bool):
-            return user_valid and plan_exist and date_valid
+            return user_valid and not plan_exist and date_valid
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 

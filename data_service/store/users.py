@@ -13,18 +13,17 @@ class UserValidators:
     # Which ever module calls this validators it will provide its own context
 
     @staticmethod
-    @ndb.tasklet
     def is_user_valid(uid: str) -> typing.Union[None, bool]:
         if not isinstance(uid, str):
             return False
         try:
-            users_instance_list: typing.List[UserModel] = UserModel.query().filter(
-                UserModel.uid == uid).get_async(keys_only=True)
+            user_instance: typing.List[UserModel] = UserModel.query(
+                UserModel.uid == uid).get_async().get_result()
         except ConnectionRefusedError:
             return None
         except RetryError:
             return None
-        if isinstance(users_instance_list, list) and len(users_instance_list) > 0:
+        if isinstance(user_instance, UserModel):
             return True
         return False
 

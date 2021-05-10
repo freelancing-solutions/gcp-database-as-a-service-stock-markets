@@ -344,13 +344,13 @@ class RecruitsView(Validator):
     @use_context
     @handle_view_errors
     def get_recruits_by_active_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
-        referrer_uid: str = affiliate_data.get('referrer_uid')
-        if referrer_uid is None or referrer_uid == "":
-            return jsonify({'status': False, 'message': 'referrer_uid is required'}), 500
+        affiliate_id: str = affiliate_data.get('affiliate_id')
+        if affiliate_id is None or affiliate_id == "":
+            return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
 
-        if isinstance(is_active, bool):
+        if not isinstance(is_active, bool):
             return jsonify({'status': False, 'message': 'is_active status can only be a boolean'}), 500
-        recruits_list: typing.List[Recruits] = Recruits.query(Recruits.referrer_uid == referrer_uid,
+        recruits_list: typing.List[Recruits] = Recruits.query(Recruits.affiliate_id == affiliate_id,
                                                               Recruits.is_active == is_active).fetch()
         payload = [recruit.to_dict() for recruit in recruits_list]
 

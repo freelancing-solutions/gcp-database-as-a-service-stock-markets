@@ -15,7 +15,9 @@ def create_id(size: int = 64, chars: str = char_set) -> str: return ''.join(rand
 
 def timestamp() -> int: return int(float(time.time()) * 1000)
 
-def get_days(days: int) -> int: return int(24*days*60*60*1000)
+
+def get_days(days: int) -> int: return int(24 * days * 60 * 60 * 1000)
+
 
 def timestamp_difference(stamp1, stamp2) -> int: return int(stamp1 - stamp2)
 
@@ -63,6 +65,7 @@ def end_of_month() -> bool:
         return True
     return False
 
+
 def return_ttl(name) -> int:
     cache_ttl_short: int = 60 * 60 * 3  # 3 hours
     cache_ttl_medium: int = 60 * 60 * 6  # 6 hours
@@ -76,12 +79,15 @@ def return_ttl(name) -> int:
         return cache_ttl_medium
     return cache_ttl_short
 
+
 # TODO Refactor the entire codebase to use this function to obtain todays date
 def today() -> date:
     return datetime.now().date()
 
+
 def time_now() -> time_class:
     return datetime.now().time()
+
 
 def datetime_now() -> datetime:
     return datetime.now()

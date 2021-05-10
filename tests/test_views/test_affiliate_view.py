@@ -2,6 +2,8 @@ import typing
 from datetime import datetime
 from random import randint
 
+from google.cloud import ndb
+
 from data_service.views.affiliates import AffiliatesView
 from data_service.store.affiliates import Affiliates
 from data_service.utils.utils import create_id
@@ -32,6 +34,10 @@ class AffiliateQueryMock:
         return [self.affiliate_instance for _ in range(self.results_range)]
 
     def get(self) -> Affiliates:
+        return self.affiliate_instance
+
+    @ndb.tasklet
+    def get_async(self):
         return self.affiliate_instance
 
 

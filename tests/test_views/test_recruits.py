@@ -2,6 +2,8 @@ import typing
 from datetime import datetime
 from random import randint
 
+from google.cloud import ndb
+
 from data_service.views.affiliates import RecruitsView
 from data_service.store.affiliates import Recruits
 from data_service.utils.utils import create_id
@@ -23,6 +25,10 @@ class RecruitsQueryMock:
         return [self.recruits_instance for _ in range(self.results_range)]
 
     def get(self) -> Recruits:
+        return self.recruits_instance
+
+    @ndb.tasklet
+    def get_async(self):
         return self.recruits_instance
 
 
@@ -162,8 +168,8 @@ def test_recruits_by_active_and_affiliate(mocker):
         recruits_view_instance: RecruitsView = RecruitsView()
         response, status = recruits_view_instance.get_recruits_by_active_affiliate(affiliate_data=affiliate_data_mock,
                                                                                    is_active=True)
-        assert status == 200, "Unable to get affiliates by active status"
         response_data: dict = response.get_json()
+        assert status == 200, response_data['message']
         assert response_data.get('payload') is not None, response_data['message']
     mocker.stopall()
 
