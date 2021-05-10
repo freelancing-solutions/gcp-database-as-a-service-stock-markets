@@ -166,3 +166,4 @@ def test_recruits_by_active_and_affiliate(mocker):
         response_data: dict = response.get_json()
         assert response_data.get('payload') is not None, response_data['message']
     mocker.stopall()
+
