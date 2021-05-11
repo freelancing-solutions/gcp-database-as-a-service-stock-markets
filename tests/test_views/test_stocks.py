@@ -1,9 +1,7 @@
 import typing
 from datetime import datetime
 from random import randint
-
 from google.cloud import ndb
-
 from data_service.views.stocks import StockView
 from data_service.store.stocks import Stock
 from data_service.utils.utils import create_id
@@ -32,21 +30,21 @@ class StockQueryMock:
 def test_create_stock_data(mocker):
     pass
 
+
 # noinspection PyShadowingNames
 def test_create_broker_data(mocker):
     pass
 
-# noinspection PyShadowingNames
-def test_create_stock_model(mocker):
-    pass
 
 # noinspection PyShadowingNames
 def test_create_stock_model(mocker):
     pass
+
 
 # noinspection PyShadowingNames
 def test_create_buy_model(mocker):
     pass
+
 
 # noinspection PyShadowingNames
 def test_create_sell_model(mocker):
