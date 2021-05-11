@@ -191,14 +191,21 @@ def test_is_member_off(mocker):
 def test_payment_amount(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
-
+    #TODO something is wrong with app_context and this test is failing
     with test_app().app_context():
         membership_view_instance: MembershipsView = MembershipsView()
         uid: str = membership_mock_data['uid']
         response, status = membership_view_instance.payment_amount(uid=uid)
         assert status == 200, "Unable to fetch payment amount"
+    mocker.stopall()
 
 
 # noinspection PyShadowingNames
 def test_set_payment_status(mocker):
-    pass
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
+
+    with test_app().app_context():
+        pass
+    mocker.stopall()
+
