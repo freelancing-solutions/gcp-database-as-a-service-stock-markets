@@ -47,8 +47,8 @@ def test_create_membership(mocker):
     mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
 
     # noinspection PyShadowingNames
-    def validator_mocker(mocker):
-        yield True
+    def validator_mocker():
+        return True
 
     with test_app().app_context():
         membership_view_instance: MembershipsView = MembershipsView()
@@ -63,10 +63,10 @@ def test_create_membership(mocker):
         response_data: dict = response.get_json()
         assert status == 500, response_data['message']
 
-        mocker.patch('data_service.store.users.UserValidators.is_user_valid', return_value=validator_mocker)
-        mocker.patch('data_service.store.memberships.PlanValidators.plan_exist', return_value=not validator_mocker)
-        mocker.patch('data_service.store.memberships.MembershipValidators.start_date_valid',
-                     return_value=validator_mocker)
+        mocker.patch('data_service.store.users.UserValidators.is_user_valid', return_value=True)
+        mocker.patch('data_service.store.memberships.PlanValidators.plan_exist', return_value=False)
+        mocker.patch('data_service.store.memberships.MembershipValidators.start_date_valid', return_value=True)
+        # mocker.patch('data_service.views.memberships.Validators.can_add_member', return_value=True)
 
         response, status = membership_view_instance.add_membership(uid=uid, plan_id=plan_id,
                                                                    plan_start_date=plan_start_date)

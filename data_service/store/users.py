@@ -17,8 +17,7 @@ class UserValidators:
         if not isinstance(uid, str):
             return False
         try:
-            user_instance: typing.List[UserModel] = UserModel.query(
-                UserModel.uid == uid).get()
+            user_instance: typing.List[UserModel] = UserModel.query(UserModel.uid == uid).get()
         except ConnectionRefusedError:
             return None
         except RetryError:
