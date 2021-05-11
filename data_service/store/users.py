@@ -18,7 +18,7 @@ class UserValidators:
             return False
         try:
             user_instance: typing.List[UserModel] = UserModel.query(
-                UserModel.uid == uid).get_async().get_result()
+                UserModel.uid == uid).get()
         except ConnectionRefusedError:
             return None
         except RetryError:

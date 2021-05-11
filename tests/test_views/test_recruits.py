@@ -31,7 +31,6 @@ class RecruitsQueryMock:
     def get_async(self):
         return self.recruits_instance
 
-
 recruit_data_mock: dict = {
     'affiliate_id': create_id(),
     'referrer_uid': create_id(),

@@ -1,9 +1,7 @@
 import typing
 from datetime import datetime
 from random import randint
-
 from google.cloud import ndb
-
 from data_service.views.affiliates import AffiliatesView
 from data_service.store.affiliates import Affiliates
 from data_service.utils.utils import create_id
@@ -122,6 +120,7 @@ def test_mark_active(mocker):
         response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active="True")
         assert status == 500, "passing invalid values is not triggering errors"
         affiliate_data_mock['affiliate_id'] = None
+        # noinspection PyTypeChecker
         response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active="True")
         assert status == 500, "passing invalid values is not triggering errors"
     mocker.stopall()

@@ -36,7 +36,7 @@ class PlanValidators:
             return False
         try:
             plan_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).get_async().get_result()
+                MembershipPlans.plan_id == plan_id).get()
         except ConnectionRefusedError:
             return None
         except RetryError:
@@ -48,7 +48,6 @@ class PlanValidators:
         return False
 
     @staticmethod
-    @ndb.tasklet
     def plan_name_exist(plan_name: str) -> typing.Union[None, bool]:
         """
             returns True or False if plan exist or dont exist
@@ -61,7 +60,7 @@ class PlanValidators:
             return False
         try:
             plan_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_name == plan_name).get_async().get_result()
+                MembershipPlans.plan_name == plan_name).get()
             if isinstance(plan_instance, MembershipPlans):
                 return True
 
@@ -77,14 +76,13 @@ class CouponsValidator:
         pass
 
     @staticmethod
-    @ndb.tasklet
     def coupon_exist(code: str) -> typing.Union[None, bool]:
         if not isinstance(code, str):
             return False
         if code == "":
             return False
         try:
-            coupons_instance: Coupons = Coupons.query(Coupons.code == code).get_async().get_result()
+            coupons_instance: Coupons = Coupons.query(Coupons.code == code).get()
             if isinstance(coupons_instance, Coupons):
                 return True
             return False
@@ -94,7 +92,6 @@ class CouponsValidator:
             return None
 
     @staticmethod
-    @ndb.tasklet
     def expiration_valid(expiration_time: int) -> bool:
         if not isinstance(expiration_time, int):
             return False
@@ -103,7 +100,6 @@ class CouponsValidator:
         return True
 
     @staticmethod
-    @ndb.tasklet
     def discount_valid(discount_valid: int) -> bool:
         if not isinstance(discount_valid, int):
             return False

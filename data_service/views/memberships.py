@@ -25,7 +25,6 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
-    @ndb.tasklet
     def can_add_member(self, uid: str, plan_id: str, start_date: date) -> any:
         user_valid: typing.Union[None, bool] = self.is_user_valid(uid=uid)
         plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
@@ -36,39 +35,35 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    @ndb.tasklet
     def can_add_plan(self, plan_name: str) -> any:
-        name_exist: typing.Union[None, bool] = yield self.plan_name_exist(plan_name)
+        name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name)
         if isinstance(name_exist, bool):
             return name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    @ndb.tasklet
     def can_update_plan(self, plan_id: str, plan_name: str) -> any:
-        plan_exist: typing.Union[None, bool] = yield self.plan_exist(plan_id=plan_id)
-        plan_name_exist: typing.Union[None, bool] = yield self.plan_name_exist(plan_name=plan_name)
+        plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
+        plan_name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name=plan_name)
         if isinstance(plan_exist, bool) and isinstance(plan_name_exist, bool):
             return plan_exist and plan_name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    @ndb.tasklet
     def can_add_coupon(self, code: str, expiration_time: int, discount: int) -> any:
-        coupon_exist: typing.Union[None, bool] = yield self.coupon_exist(code=code)
-        expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
-        discount_valid: typing.Union[None, bool] = yield self.discount_valid(discount=discount)
+        coupon_exist: typing.Union[None, bool] = self.coupon_exist(code=code)
+        expiration_valid: typing.Union[None, bool] = self.expiration_valid(expiration_time=expiration_time)
+        discount_valid: typing.Union[None, bool] = self.discount_valid(discount_valid=discount)
 
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return (not coupon_exist) and expiration_valid and discount_valid
         message: str = "Unable to verify input data"
         raise DataServiceError(message)
 
-    @ndb.tasklet
     def can_update_coupon(self, code: str, expiration_time: int, discount: int) -> any:
-        coupon_exist: typing.Union[None, bool] = yield self.coupon_exist(code=code)
-        expiration_valid: typing.Union[None, bool] = yield self.expiration_valid(expiration_time=expiration_time)
-        discount_valid: typing.Union[None, bool] = yield self.discount_valid(discount=discount)
+        coupon_exist: typing.Union[None, bool] = self.coupon_exist(code=code)
+        expiration_valid: typing.Union[None, bool] = self.expiration_valid(expiration_time=expiration_time)
+        discount_valid: typing.Union[None, bool] = self.discount_valid(discount_valid=discount)
 
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return coupon_exist and expiration_valid and discount_valid
@@ -85,7 +80,7 @@ class MembershipsView(Validators):
     @use_context
     @handle_view_errors
     def _create_or_update_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
-        if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date).result() is True:
+        if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date) is True:
             # can use get to simplify this and make transactions faster
             membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
             if isinstance(membership_instance, Memberships):
@@ -98,7 +93,7 @@ class MembershipsView(Validators):
 
             membership_instance.uid = uid
             membership_instance.plan_start_date = plan_start_date
-            key = membership_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
                 raise DataServiceError(message)
@@ -121,7 +116,7 @@ class MembershipsView(Validators):
 
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         membership_instance.status = status
-        key = membership_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+        key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "Unable to save membership instance to database, please try again"
             raise DataServiceError(message)
@@ -136,12 +131,12 @@ class MembershipsView(Validators):
         if membership_instance.plan_id == origin_plan_id:
             if self.plan_exist(plan_id=dest_plan_id):
                 membership_instance.plan_id = dest_plan_id
-                key = membership_instance.put( retries=self._max_retries,
+                key = membership_instance.put(retries=self._max_retries,
                                               timeout=self._max_timeout)
             else:
                 # This maybe be because the original plan is deleted but its a rare case
                 membership_instance.plan_id = dest_plan_id
-                key = membership_instance.put( retries=self._max_retries,
+                key = membership_instance.put(retries=self._max_retries,
                                               timeout=self._max_timeout)
 
             if key is None:
@@ -196,7 +191,7 @@ class MembershipsView(Validators):
         else:
             plan_details: MembershipPlans = MembershipPlansView.get_plan(plan_id=plan_id)
             if plan_details is None:
-                message: str = "Unable to find members of plan {}".format(plan_details.plan_name)
+                message: str = "Unable to find members of plan {}"
                 return jsonify({'status': False, 'message': message}), 500
             return jsonify({'status': True, 'message': 'plan details found', 'payload': plan_details.to_dict()}), 200
 
@@ -247,7 +242,7 @@ class MembershipsView(Validators):
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         if isinstance(membership_instance, Memberships):
             membership_instance.status = status
-            key = membership_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to set payment status'
                 return jsonify({'status': False, 'message': message}), 500
@@ -311,7 +306,7 @@ class MembershipPlansView(Validators):
 
         is_active = True
 
-        if self.can_add_plan(plan_name=plan_name).result() is True:
+        if self.can_add_plan(plan_name=plan_name) is True:
             total_members: int = 0
             # Creating Amount Mixins to represent real currency
             curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
@@ -326,7 +321,7 @@ class MembershipPlansView(Validators):
                                                              registration_amount=curr_registration_amount,
                                                              is_active=is_active,
                                                              date_created=datetime.now().date())
-            key = plan_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = plan_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
                 return jsonify({'status': False, 'message': message}), 500
@@ -340,7 +335,7 @@ class MembershipPlansView(Validators):
     @handle_view_errors
     def update_plan(self, plan_id: str, plan_name: str, description: str, schedule_day: int, schedule_term: str,
                     term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
-        if self.can_update_plan(plan_id=plan_id, plan_name=plan_name).result() is True:
+        if self.can_update_plan(plan_id=plan_id, plan_name=plan_name) is True:
             membership_plans_instance: MembershipPlans = MembershipPlans.query(
                 MembershipPlans.plan_id == plan_id).get()
             if isinstance(membership_plans_instance, MembershipPlans):
@@ -354,7 +349,7 @@ class MembershipPlansView(Validators):
                 membership_plans_instance.term_payment_amount = curr_term_payment
                 membership_plans_instance.registration_amount = curr_registration_amount
                 membership_plans_instance.is_active = is_active
-                key = membership_plans_instance.put( retries=self._max_retries,
+                key = membership_plans_instance.put(retries=self._max_retries,
                                                     timeout=self._max_timeout)
                 if key is None:
                     message: str = 'for some reason we are unable to create a new plan'
@@ -377,7 +372,7 @@ class MembershipPlansView(Validators):
         membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
         if isinstance(membership_plans_instance, MembershipPlans):
             membership_plans_instance.is_active = is_active
-            key = membership_plans_instance.put( retries=self._max_retries,
+            key = membership_plans_instance.put(retries=self._max_retries,
                                                 timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
@@ -437,6 +432,7 @@ class MembershipPlansView(Validators):
         return jsonify({'status': True, 'payload': membership_plan_list,
                         'message': 'successfully fetched all memberships'}), 200
 
+
 class AccessRightsView:
     def __init__(self):
         pass
@@ -489,9 +485,9 @@ class CouponsView(Validators):
     @use_context
     @handle_view_errors
     def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
-        if self.can_add_coupon(code=code, expiration_time=expiration_time).result():
+        if self.can_add_coupon(code=code, expiration_time=expiration_time):
             coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
-            key = coupons_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = coupons_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "an error occured while creating coupon"
                 return jsonify({'status': False, 'message': message}), 500
@@ -505,11 +501,11 @@ class CouponsView(Validators):
     @use_context
     @handle_view_errors
     def update_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
-        if self.can_update_coupon(code=code, expiration_time=expiration_time).result():
+        if self.can_update_coupon(code=code, expiration_time=expiration_time) is True:
             coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
             coupon_instance.discount = discount
             coupon_instance.expiration_time = expiration_time
-            key = coupon_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = coupon_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Error updating coupon"
                 return jsonify({'status': False, 'message': message}), 500
@@ -531,7 +527,7 @@ class CouponsView(Validators):
         coupon_instace: Coupons = Coupons.query(Coupons.code == code).get()
         if isinstance(coupon_instace, Coupons):
             coupon_instace.is_valid = False
-            key = coupon_instace.put( retries=self._max_retries, timeout=self._max_timeout)
+            key = coupon_instace.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to cancel coupon"
                 return jsonify({'status': False, 'message': message}), 500
