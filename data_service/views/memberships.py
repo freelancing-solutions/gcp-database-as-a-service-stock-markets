@@ -122,14 +122,14 @@ class MembershipsView(Validators):
             raise DataServiceError(message)
 
         message: str = "Successfully update membership status"
-        return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message})
+        return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message}), 200
 
     @use_context
     @handle_view_errors
     def change_membership(self, uid: str, origin_plan_id: str, dest_plan_id: str) -> tuple:
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         if membership_instance.plan_id == origin_plan_id:
-            if self.plan_exist(plan_id=dest_plan_id):
+            if self.plan_exist(plan_id=dest_plan_id) is True:
                 membership_instance.plan_id = dest_plan_id
                 key = membership_instance.put(retries=self._max_retries,
                                               timeout=self._max_timeout)
@@ -138,7 +138,7 @@ class MembershipsView(Validators):
                 membership_instance.plan_id = dest_plan_id
                 key = membership_instance.put(retries=self._max_retries,
                                               timeout=self._max_timeout)
-
+                print("key is : {}".format(key))
             if key is None:
                 message: str = "Unable to Change Membership, please try again later"
                 raise DataServiceError(message)
