@@ -31,6 +31,7 @@ class MembershipsQueryMock:
     def get_async(self):
         return self.membership_instance
 
+
 class MembershipPlansQueryMock:
     membership_plan_instance: MembershipPlans = MembershipPlans()
     results_range: int = randint(0, 100)
