@@ -222,5 +222,13 @@ def test_set_payment_status(mocker):
     mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
 
     with test_app().app_context():
-        pass
+        membership_view_instance: MembershipsView = MembershipsView()
+        uid: str = membership_mock_data['uid']
+        status: str = "paid"
+        response, status = membership_view_instance.set_payment_status(uid=uid, status=status)
+        assert status == 200, "Unable to set payment status"
+        status: str = "unpaid"
+        response, status = membership_view_instance.set_payment_status(uid=uid, status=status)
+        assert status == 200, "Unable to set payment status"
+
     mocker.stopall()
