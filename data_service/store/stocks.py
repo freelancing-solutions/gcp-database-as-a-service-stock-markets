@@ -5,6 +5,7 @@ from data_service.config import Config
 from data_service.utils.utils import create_id
 from data_service.config.stocks import currency_symbols
 
+
 class Stock(ndb.Model):
     """
         A Model for keeping stock code, stored separately on datastore
@@ -172,6 +173,7 @@ class BuyVolumeModel(ndb.Model):
     """
         daily buy volumes
     """
+
     # TODO find out why it seems i can set values of None even if i am checking against
     def set_stock_id(self, value: str) -> str:
         if (value is None) or (value == ""):
@@ -200,6 +202,7 @@ class BuyVolumeModel(ndb.Model):
         if value not in currency_symbols():
             raise TypeError("{} not a valid currency".format(str(self)))
         return value
+
     transaction_id: str = ndb.StringProperty(indexed=True, required=True, default=create_id())
     stock_id: str = ndb.StringProperty(validator=set_stock_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
@@ -343,7 +346,8 @@ class NetVolumeModel(ndb.Model):
 
     stock_id: str = ndb.StringProperty(validator=set_id)
     transaction_id: str = ndb.StringProperty(validator=set_id)
-    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=set_date)
+    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
+                                                   validator=set_date)
     currency: str = ndb.StringProperty(default=Config.CURRENCY, validator=set_currency)
     net_volume: int = ndb.IntegerProperty(default=0, validator=set_int)
     net_value: int = ndb.IntegerProperty(default=0, validator=set_int)
