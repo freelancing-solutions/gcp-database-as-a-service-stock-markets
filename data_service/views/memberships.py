@@ -401,11 +401,10 @@ class MembershipPlansView(Validators):
         """
         if isinstance(plan_id, str):
             try:
-                membership_plans_list: typing.List[MembershipPlans] = MembershipPlans.query(
-                    MembershipPlans.plan_id == plan_id).fetch()
-                if isinstance(membership_plans_list, list) and len(membership_plans_list) > 0:
-                    membership_instance: MembershipPlans = membership_plans_list[0]
-                    return membership_instance
+                membership_plan_instance: MembershipPlans = MembershipPlans.query(
+                    MembershipPlans.plan_id == plan_id).get()
+                if isinstance(membership_plan_instance, MembershipPlans):
+                    return membership_plan_instance
                 else:
                     return None
             except ConnectionRefusedError:
@@ -414,7 +413,6 @@ class MembershipPlansView(Validators):
                 return None
             except Aborted:
                 return None
-
         return None
 
     @cache_memberships.cached(timeout=return_ttl(name='long'))

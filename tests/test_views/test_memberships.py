@@ -5,7 +5,7 @@ from random import randint
 from google.cloud import ndb
 
 from data_service.views.memberships import MembershipsView
-from data_service.store.memberships import Memberships
+from data_service.store.memberships import Memberships, MembershipPlans
 from data_service.utils.utils import create_id
 from .. import test_app
 # noinspection PyUnresolvedReferences
@@ -30,6 +30,19 @@ class MembershipsQueryMock:
     @ndb.tasklet
     def get_async(self):
         return self.membership_instance
+
+class MembershipPlansQueryMock:
+    membership_plan_instance: MembershipPlans = MembershipPlans()
+    results_range: int = randint(0, 100)
+
+    def __init__(self):
+        pass
+
+    def fetch(self) -> typing.List[MembershipPlans]:
+        return [self.membership_plan_instance for _ in range(self.results_range)]
+
+    def get(self) -> MembershipPlans:
+        return self.membership_plan_instance
 
 
 membership_mock_data: dict = {
@@ -191,12 +204,15 @@ def test_is_member_off(mocker):
 def test_payment_amount(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
-    #TODO something is wrong with app_context and this test is failing
     with test_app().app_context():
         membership_view_instance: MembershipsView = MembershipsView()
         uid: str = membership_mock_data['uid']
+        mocker.patch('data_service.views.memberships.MembershipPlansView.get_plan',
+                     return_value=MembershipPlansQueryMock().get())
+
         response, status = membership_view_instance.payment_amount(uid=uid)
-        assert status == 200, "Unable to fetch payment amount"
+        response_data: dict = response.get_json()
+        assert status == 200, response_data['message']
     mocker.stopall()
 
 
@@ -208,4 +224,3 @@ def test_set_payment_status(mocker):
     with test_app().app_context():
         pass
     mocker.stopall()
-
