@@ -127,15 +127,21 @@ def test_change_membership(mocker):
 
     mocker.stopall()
 
+
 # noinspection PyShadowingNames
 def test_send_welcome_email(mocker):
     mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
     mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
 
     with test_app().app_context():
-        pass
+        membership_view_instance: MembershipsView = MembershipsView()
+        uid: str = membership_mock_data['uid']
+        plan_id: str = membership_mock_data['plan_id']
+        response, status = membership_view_instance.send_welcome_email(uid=uid, plan_id=plan_id)
+        assert status == 200, "unable to send welcome email"
 
     mocker.stopall()
+
 
 # noinspection PyShadowingNames
 def test_plan_members_payment_status(mocker):
@@ -143,9 +149,16 @@ def test_plan_members_payment_status(mocker):
     mocker.patch('google.cloud.ndb.Model.query', return_value=MembershipsQueryMock())
 
     with test_app().app_context():
-        pass
+        membership_view_instance: MembershipsView = MembershipsView()
+        uid: str = membership_mock_data['uid']
+        plan_id: str = membership_mock_data['plan_id']
+        status: str = membership_mock_data['status']
+        response, status = membership_view_instance.return_plan_members_by_payment_status(plan_id=plan_id, status=status)
+        assert status == 200, "unable to fetch plan members by status"
+
 
     mocker.stopall()
+
 
 # noinspection PyShadowingNames
 def test_return_plan_members(mocker):
