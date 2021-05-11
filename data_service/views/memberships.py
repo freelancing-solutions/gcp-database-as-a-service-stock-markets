@@ -180,7 +180,7 @@ class MembershipsView(Validators):
     @use_context
     @handle_view_errors
     def return_plan_members(self, plan_id) -> tuple:
-        """
+        """079 266 2590
             return all members of a plan
         """
         membership_list: typing.List[Memberships] = Memberships.query(Memberships.plan_id == plan_id).fetch()
@@ -395,7 +395,6 @@ class MembershipPlansView(Validators):
         return jsonify({'status': False, 'payload': payload,
                         'message': 'successfully retrieved monthly plans'}), 200
 
-    @use_context
     def get_plan(self, plan_id: str) -> typing.Union[None, MembershipPlans]:
         """
             this utility will be used by other views to obtain information about membershipPlans
