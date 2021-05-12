@@ -1,9 +1,7 @@
 import typing
 from datetime import datetime
 from random import randint
-
 from google.cloud import ndb
-
 from data_service.views.affiliates import RecruitsView
 from data_service.store.affiliates import Recruits
 from data_service.utils.utils import create_id
@@ -30,6 +28,7 @@ class RecruitsQueryMock:
     @ndb.tasklet
     def get_async(self):
         return self.recruits_instance
+
 
 recruit_data_mock: dict = {
     'affiliate_id': create_id(),

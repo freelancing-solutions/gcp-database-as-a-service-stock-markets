@@ -263,8 +263,6 @@ class StockViewContext:
 class CatchStockErrors(StockViewContext):
     def __int__(self):
         super(CatchStockErrors, self).__int__()
-        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
-        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     @staticmethod
     def symbol_exist(symbol: str) -> typing.Union[None, bool]:
@@ -328,7 +326,7 @@ class CatchStockErrors(StockViewContext):
         stock_code_exist: bool = self.stock_code_exist(stock_code=stock_code)
         symbol_exist: bool = self.symbol_exist(symbol=symbol)
         if isinstance(stock_id_exist, bool) and isinstance(stock_code_exist, bool) and isinstance(symbol_exist, bool):
-            return stock_id_exist and stock_code_exist and symbol_exist
+            return not (stock_id_exist or stock_code_exist or symbol_exist)
 
         message: str = "Unable to verify input data, Due to database error please try again later"
         raise DataServiceError(message)
@@ -390,6 +388,8 @@ class CatchBrokerErrors(StockViewContext):
 class StockView(CatchStockErrors, CatchBrokerErrors):
     def __init__(self):
         super(StockView, self).__init__()
+        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
+        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
         with current_app.app_context():
             self.timezone = timezone(Config.UTC_OFFSET)
 
