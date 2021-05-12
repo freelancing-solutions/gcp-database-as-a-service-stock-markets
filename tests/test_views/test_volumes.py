@@ -28,7 +28,6 @@ class BuyVolumeQueryMock:
 
 
 buy_volume_mock_data: dict = {
-    'transaction_id': create_id(),
     'stock_id': create_id(),
     'date_created': datetime.now().date(),
     'currency': choice(currency_symbols()),

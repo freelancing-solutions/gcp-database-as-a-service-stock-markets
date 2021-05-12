@@ -131,7 +131,7 @@ class StockDataWrappers:
                             buy_market_val_percent=buy_market_val_percent, buy_trade_count=buy_trade_count,
                             transaction_id=transaction_id, *args)
 
-            return func(stock_id=stock_id, date_class=date_created, buy_volume=buy_volume,
+            return func(stock_id=stock_id, date_created=date_created, buy_volume=buy_volume,
                         buy_value=buy_value, buy_ave_price=buy_ave_price,
                         buy_market_val_percent=buy_market_val_percent, buy_trade_count=buy_trade_count, *args)
 
