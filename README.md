@@ -6,7 +6,7 @@ access data.
 
 **Development Time**
 
-[![wakatime](https://wakatime.com/badge/github/freelancing-solutions/GCP-Based-Database-as-a-Service.svg)](https://wakatime.com/badge/github/freelancing-solutions/GCP-Based-Database-as-a-Service)
+[![wakatime](https://wakatime.com/badge/github/freelancing-solutions/gcp-database-as-a-service-stock-markets.svg)](https://wakatime.com/badge/github/freelancing-solutions/gcp-database-as-a-service-stock-markets)
 
  **How it Works?**
  --
