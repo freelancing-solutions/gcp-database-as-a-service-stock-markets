@@ -150,9 +150,9 @@ class StockDataWrappers:
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
 
-            if "date_class" in sell_data and sell_data["date_class"] != "":
+            if "date_created" in sell_data and sell_data["date_created"] != "":
                 try:
-                    date_created: date_class = date_string_to_date(sell_data.get('date_class'))
+                    date_created: date_class = date_string_to_date(sell_data.get('date_created'))
                 except ValueError:
                     date_created: date_class = datetime.date(datetime.now())
             else:
