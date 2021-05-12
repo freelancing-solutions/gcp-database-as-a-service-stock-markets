@@ -55,3 +55,16 @@ def test_create_broker(mocker):
         assert status == 500, "Creating duplicate brokers"
 
     mocker.stopall()
+
+
+# noinspection PyShadowingNames
+def test_update_broker_data(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=BrokerQueryMock())
+    
+    with test_app().app_context():
+        stock_view_instance: StockView = StockView()
+        response, status = stock_view_instance.update_broker_data(broker_data=broker_data_mock)
+        assert status == 200, "Unable to update broker data"
+
+

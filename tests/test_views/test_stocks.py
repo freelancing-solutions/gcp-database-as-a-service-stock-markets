@@ -66,3 +66,17 @@ def test_create_stock_data(mocker):
         assert status == 500, "Creating stock duplicates by symbol"
 
     mocker.stopall()
+
+
+# noinspection PyShadowingNames
+def test_update_stock_data(mocker):
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=StockQueryMock())
+
+    with test_app().app_context():
+        stock_view_instance: StockView = StockView()
+        response, status = stock_view_instance.update_stock_data(stock_data=stock_data_mock)
+        assert status == 200, "unable to update stock data"
+
+    mocker.stopall()
+
