@@ -26,20 +26,54 @@ class StockQueryMock:
         return self.stock_instance
 
 
+stock_data_mock: dict = {
+    "stock_id": create_id(),
+    "stock_code": "TSLA",
+    "stock_name": "TESLA",
+    "symbol": "TSLA"
+}
+broker_data_mock: dict = {
+    "broker_id": create_id(),
+    "broker_code": "ASD",
+    "broker_name": "ASD"
+}
+
+
 # noinspection PyShadowingNames
 def test_create_stock_data(mocker):
-    pass
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=StockQueryMock())
+
+    with test_app().app_context():
+        stock_view_instance: StockView = StockView()
+        response, status = stock_view_instance.create_stock_data(stock_data=stock_data_mock)
+        assert status == 200, "Unable to create stock data"
+
+    mocker.stopall()
 
 
 # noinspection PyShadowingNames
 def test_create_broker_data(mocker):
-    pass
+    mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    mocker.patch('google.cloud.ndb.Model.query', return_value=StockQueryMock())
+
+    with test_app().app_context():
+        stock_view_instance: StockView = StockView()
+        response, status = stock_view_instance.create_broker_data(broker_data=broker_data_mock)
+        assert status == 200, "Unable to create broker data"
+
+    mocker.stopall()
 
 
 # noinspection PyShadowingNames
 def test_create_stock_model(mocker):
+    # mocker.patch('google.cloud.ndb.Model.put', return_value=create_id())
+    # mocker.patch('google.cloud.ndb.Model.query', return_value=StockQueryMock())
+    #
+    # with test_app().app_context():
+    #     stock_view_instance: StockView = StockView()
+    #     response, status = stock_view_instance.create_stock_model()
     pass
-
 
 # noinspection PyShadowingNames
 def test_create_buy_model(mocker):
@@ -49,6 +83,3 @@ def test_create_buy_model(mocker):
 # noinspection PyShadowingNames
 def test_create_sell_model(mocker):
     pass
-
-
-
