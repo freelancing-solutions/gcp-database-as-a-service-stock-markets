@@ -375,12 +375,11 @@ class CatchBrokerErrors(StockViewContext):
         except Aborted:
             return None
 
-    # Done Refactor with ndb.Tasklets in order to get input validity check resolutions faster
     def can_add_broker(self, broker_id: str, broker_code: str) -> bool:
         broker_id_exist: bool = self.broker_id_exist(broker_id=broker_id)
         broker_code_exist: bool = self.broker_code_exist(broker_code=broker_code)
         if isinstance(broker_id_exist, bool) and isinstance(broker_code_exist, bool):
-            return broker_id_exist and broker_code_exist
+            return not (broker_id_exist or broker_code_exist)
         message: str = "Unable to verify broker data due to database errors please try again later"
         raise DataServiceError(message)
 

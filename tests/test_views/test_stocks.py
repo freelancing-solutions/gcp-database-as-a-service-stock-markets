@@ -32,11 +32,6 @@ stock_data_mock: dict = {
     "stock_name": "TESLA",
     "symbol": "TSLA"
 }
-broker_data_mock: dict = {
-    "broker_id": create_id(),
-    "broker_code": "ASD",
-    "broker_name": "ASD"
-}
 
 
 # noinspection PyShadowingNames
@@ -50,7 +45,24 @@ def test_create_stock_data(mocker):
         mocker.patch('data_service.views.stocks.StockView.stock_code_exist', return_value=False)
         mocker.patch('data_service.views.stocks.StockView.symbol_exist', return_value=False)
         response, status = stock_view_instance.create_stock_data(stock_data=stock_data_mock)
-        response_data: dict = response.get_json()
-        assert status == 200, response_data['message']
+        assert status == 200, "unable to create stock data"
+
+        mocker.patch('data_service.views.stocks.StockView.stock_id_exist', return_value=True)
+        mocker.patch('data_service.views.stocks.StockView.stock_code_exist', return_value=False)
+        mocker.patch('data_service.views.stocks.StockView.symbol_exist', return_value=False)
+        response, status = stock_view_instance.create_stock_data(stock_data=stock_data_mock)
+        assert status == 500, "Creating stock duplicates by stock_id"
+
+        mocker.patch('data_service.views.stocks.StockView.stock_id_exist', return_value=False)
+        mocker.patch('data_service.views.stocks.StockView.stock_code_exist', return_value=True)
+        mocker.patch('data_service.views.stocks.StockView.symbol_exist', return_value=False)
+        response, status = stock_view_instance.create_stock_data(stock_data=stock_data_mock)
+        assert status == 500, "Creating stock duplicates by stock_code"
+
+        mocker.patch('data_service.views.stocks.StockView.stock_id_exist', return_value=False)
+        mocker.patch('data_service.views.stocks.StockView.stock_code_exist', return_value=False)
+        mocker.patch('data_service.views.stocks.StockView.symbol_exist', return_value=True)
+        response, status = stock_view_instance.create_stock_data(stock_data=stock_data_mock)
+        assert status == 500, "Creating stock duplicates by symbol"
 
     mocker.stopall()
