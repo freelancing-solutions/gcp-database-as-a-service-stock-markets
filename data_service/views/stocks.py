@@ -89,14 +89,14 @@ class StockDataWrappers:
                 stock_id: str = buy_data.get('stock_id') or None
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
-            if "date_class" in buy_data and buy_data['date_class'] != "":
+            if "date_created" in buy_data and buy_data['date_created'] != "":
                 # TODO- insure that FORMAT is DD_MM-YYYY
                 try:
-                    date_created: date_class = date_string_to_date(buy_data.get('date_class'))
+                    date_created: date_class = date_string_to_date(buy_data.get('date_created'))
                 except ValueError:
                     date_created: date_class = datetime.now().date()
             else:
-                return jsonify({'status': False, 'message': "date_class is required"}), 500
+                return jsonify({'status': False, 'message': "date_created is required"}), 500
 
             if "buy_volume" in buy_data and buy_data['buy_volume'] != "":
                 buy_volume: int = int(buy_data.get('buy_volume'))
