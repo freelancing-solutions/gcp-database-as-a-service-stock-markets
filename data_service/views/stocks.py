@@ -209,11 +209,11 @@ class StockDataWrappers:
                 stock_id: str = net_volume_data.get("stock_id") or None
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
-            if "date_class" in net_volume_data and net_volume_data['date_class'] != "":
+            if "date_created" in net_volume_data and net_volume_data['date_created'] != "":
                 # assumed format DD/MM/YYYY
-                date_created: date_class = date_string_to_date(net_volume_data['date_class'])
+                date_created: date_class = date_string_to_date(net_volume_data['date_created'])
             else:
-                return jsonify({'status': False, 'message': "date_class is required"}), 500
+                return jsonify({'status': False, 'message': "date_created is required"}), 500
 
             if "transaction_id" in net_volume_data and net_volume_data["transaction_id"] != "":
                 transaction_id: str = net_volume_data.get("transaction_id") or None
