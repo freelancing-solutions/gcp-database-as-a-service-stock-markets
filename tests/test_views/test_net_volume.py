@@ -50,5 +50,3 @@ def test_net_volume(mocker):
         response_data: dict = response.get_json()
         assert status == 200, response_data['message']
 
-
-
