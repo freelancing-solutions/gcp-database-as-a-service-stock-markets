@@ -15,6 +15,7 @@
 .gitignore
 .github
 *.pyc
+/venv
 # Python pycache:
 __pycache__/
 # Ignored by the build system
