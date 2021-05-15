@@ -18,7 +18,10 @@ def stocks(path: str) -> tuple:
         assert isinstance(json_data, dict)
     except AssertionError:
         message: str = "cannot read json data"
+        print(message)
         raise InputError(message)
+
+    print("json data: {}".format(json_data))
 
     if path == "stock":
         return stock_view_instance.create_stock_data(stock_data=json_data)

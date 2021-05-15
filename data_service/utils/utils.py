@@ -33,9 +33,9 @@ def date_string_to_date(date_str: str) -> date:
         else:
             raise ValueError('Date format invalid')
         try:
-            year: int = int(date_list[2])
+            year: int = int(date_list[0])
             month: int = int(date_list[1])
-            day: int = int(date_list[0])
+            day: int = int(date_list[2])
         except KeyError:
             raise ValueError("Date Format invalid")
 
