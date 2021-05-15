@@ -69,8 +69,6 @@ def test_net_volume_net_volume():
     assert net_volume_instance.net_volume == net_volume, "net volume not setting values up correctly"
     net_volume_instance.net_volume = 0
     assert net_volume_instance.net_volume == 0, "net volume not setting values correctly"
-    with raises(ValueError):
-        net_volume_instance.net_volume = int_negative()
     with raises(TypeError):
         net_volume_instance.net_volume = "abed"
     with raises(TypeError):
@@ -85,8 +83,6 @@ def test_net_volume_total_volume():
     assert net_volume_instance.total_volume == total_volume, "net volume is not being set correctly"
     net_volume_instance.total_volume = 0
     assert net_volume_instance.total_volume == 0, "net volume not setting values correctly"
-    with raises(ValueError):
-        net_volume_instance.total_volume = int_negative()
     with raises(TypeError):
         net_volume_instance.total_volume = "abed"
     with raises(TypeError):
