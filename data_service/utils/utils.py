@@ -6,9 +6,7 @@ import typing
 char_set = string.ascii_lowercase + string.digits
 
 
-def is_development() -> bool:
-    return True if os.environ['SERVER_SOFTWARE'].lower().startswith('development') else False
-
+def is_development() -> bool: return False if os.environ.get("IS_PRODUCTION") else True
 
 def create_id(size: int = 64, chars: str = char_set) -> str: return ''.join(random.choice(chars) for x in range(size))
 
