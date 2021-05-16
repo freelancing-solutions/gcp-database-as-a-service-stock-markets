@@ -7,6 +7,7 @@ from data_service.views.stocks import StockView
 pubsub_bp = Blueprint('pubsub', __name__)
 
 
+# noinspection DuplicatedCode
 @pubsub_bp.route('/pubsub/<path:path>', methods=["POST", "GET"])
 def pubsub(path):
     """
