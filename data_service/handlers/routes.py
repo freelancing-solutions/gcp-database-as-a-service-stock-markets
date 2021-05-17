@@ -6,13 +6,13 @@ default_handlers_bp = Blueprint('handlers', __name__)
 
 
 @default_handlers_bp.route('/_ah/warmup')
-def warmup():
+def warmup() -> tuple:
     """
         Use Context will create a database connection
         APP-Engine Warm UP Handler
         # TODO - Finalize the WarmUp Handler
     """
-    pass
+    return "OK", 200
 
 
 # noinspection PyUnusedLocal
