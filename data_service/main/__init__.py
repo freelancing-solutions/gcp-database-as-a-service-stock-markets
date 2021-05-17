@@ -31,7 +31,7 @@ def create_app(config_class=Config):
     from data_service.handlers.routes import default_handlers_bp
     from data_service.api.pubsub.routes import pubsub_bp
     from data_service.api.scrapper.routes import scrapper_bp
-    from data_service.tasks_input_handlers.routers import task_bp
+    from data_service.tasks.routers import task_bp
     from data_service.frontpage.routes import home_bp
 
     app.register_blueprint(users_bp)

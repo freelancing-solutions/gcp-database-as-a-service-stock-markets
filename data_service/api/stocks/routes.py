@@ -1,11 +1,10 @@
 from datetime import date as date_class
 from flask import Blueprint, request, jsonify
-
 from data_service.api.api_authenticator import handle_auth
 from data_service.config.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
 from data_service.views.stocks import StockView
-
+from data_service.tasks.tasks import create_task
 stocks_bp = Blueprint('stocks_bp', __name__)
 
 
@@ -21,9 +20,9 @@ def stocks(path: str) -> tuple:
         raise InputError(message)
 
     if path == "stock":
-        return stock_view_instance.create_stock_data(stock_data=json_data)
+        return create_task(uri='/task/stock/create-stock', payload=json_data, in_seconds=5)
     elif path == "broker":
-        return stock_view_instance.create_broker_data(broker_data=json_data)
+        return create_task(uri='/task/stock/create-broker', payload=json_data, in_seconds=5)
     elif path == "stock-model":
         
         if "exchange_id" in json_data and json_data["exchange_id"] != "":
