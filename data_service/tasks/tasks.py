@@ -1,4 +1,5 @@
 from google.cloud import tasks_v2
+from google.protobuf.timestamp_pb2 import Timestamp
 import datetime
 import json
 
@@ -33,7 +34,8 @@ def create_task(uri, payload, in_seconds):
 
     if in_seconds is not None:
         # Convert "seconds from now" into an rfc3339 datetime string.
-        timestamp = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
+        schedule_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=in_seconds)
+        timestamp = Timestamp().FromDatetime(schedule_time)
 
         # Add the timestamp to the tasks.
         task['schedule_time'] = timestamp
@@ -43,8 +45,6 @@ def create_task(uri, payload, in_seconds):
     try:
         # noinspection PyTypeChecker
         response = client.create_task(parent=parent, task=task)
-        print("task created: ")
     except Exception as e:
-        print("error creating task:  {}".format(str(e)))
         return None
     return response
