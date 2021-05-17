@@ -6,10 +6,12 @@ from data_service.utils.utils import date_string_to_date
 from data_service.views.stocks import StockView
 from data_service.tasks.tasks import create_task
 from functools import lru_cache
+
 stocks_bp = Blueprint('stocks_bp', __name__)
 
 task_time: int = 2
 task_count: int = 1
+
 
 @stocks_bp.route('/api/v1/stocks/create/<path:path>', methods=['POST'])
 @handle_auth
@@ -132,11 +134,11 @@ def stock_item(path: str) -> tuple:
     if path == "stock":
         stock_id: str = json_data.get('stock_id')
         stock_code: str = json_data.get('stock_code')
-        symbol: str = json_data.get('symbol') 
+        symbol: str = json_data.get('symbol')
         return stock_view_instance.get_stock_data(stock_id=stock_id, stock_code=stock_code, symbol=symbol)
     elif path == "broker":
         broker_id: str = json_data.get('broker_id')
-        broker_code: str = json_data.get('broker_code') 
+        broker_code: str = json_data.get('broker_code')
         return stock_view_instance.get_broker_data(broker_id=broker_id, broker_code=broker_code)
     elif path == "stock-model":
         transaction_id: str = json_data.get('transaction_id')
@@ -145,20 +147,20 @@ def stock_item(path: str) -> tuple:
         transaction_id: str = json_data.get('transaction_id')
         # Date format :  DD-MM-YYYY
         date_created: date_class = date_string_to_date(json_data.get('date'))
-        stock_id: str = json_data.get('stock_id') 
+        stock_id: str = json_data.get('stock_id')
         return stock_view_instance.get_buy_volume(transaction_id=transaction_id, date_created=date_created,
                                                   stock_id=stock_id)
     elif path == "sell-volume":
         transaction_id: str = json_data.get('transaction_id')
         # Date format :  DD-MM-YYYY
         date_created: date_class = date_string_to_date(json_data.get('date'))
-        stock_id: str = json_data['stock_id'] 
+        stock_id: str = json_data['stock_id']
         return stock_view_instance.get_sell_volume(transaction_id=transaction_id, date_created=date_created,
                                                    stock_id=stock_id)
     elif path == "net-volume":
         transaction_id: str = json_data.get('transaction_id')
         date_created: date_class = date_string_to_date(json_data.get('date'))
-        stock_id: str = json_data.get('stock_id') 
+        stock_id: str = json_data.get('stock_id')
         return stock_view_instance.get_net_volume(transaction_id=transaction_id, date_created=date_created,
                                                   stock_id=stock_id)
     else:
@@ -192,16 +194,3 @@ def day_volumes(path: str) -> tuple:
         return stock_view_instance.get_day_net_volumes(date_created=date_created)
     else:
         pass
-
-
-
-
-
-
-
-
-
-
-        
-
-
