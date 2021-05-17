@@ -39,9 +39,12 @@ def create_task(uri, payload, in_seconds):
         task['schedule_time'] = timestamp
 
     # Use the client to build and send the task.
-    # noinspection PyTypeChecker
+    # noinspection PyTypeChecker,PyBroadException
     try:
+        # noinspection PyTypeChecker
         response = client.create_task(parent=parent, task=task)
-    except Exception:
+        print("task created: ")
+    except Exception as e:
+        print("error creating task:  {}".format(str(e)))
         return None
     return response

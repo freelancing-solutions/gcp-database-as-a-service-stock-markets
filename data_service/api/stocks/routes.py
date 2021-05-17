@@ -5,11 +5,15 @@ from data_service.config.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
 from data_service.views.stocks import StockView
 from data_service.tasks.tasks import create_task
+from functools import lru_cache
 stocks_bp = Blueprint('stocks_bp', __name__)
 
+task_time: int = 2
+task_count: int = 1
 
 @stocks_bp.route('/api/v1/stocks/create/<path:path>', methods=['POST'])
 @handle_auth
+@lru_cache(maxsize=1024)
 def stocks(path: str) -> tuple:
     stock_view_instance: StockView = StockView()
     try:
@@ -20,7 +24,7 @@ def stocks(path: str) -> tuple:
         raise InputError(message)
 
     if path == "stock":
-        task = create_task(uri='/task/stock/create-stock', payload=json_data, in_seconds=5)
+        task = create_task(uri='/task/stock/create-stock', payload=json_data, in_seconds=task_time)
         if task is None:
             return jsonify({'status': False,
                             'message': 'Unable to create task',
@@ -29,8 +33,7 @@ def stocks(path: str) -> tuple:
                         'message': 'Successfully added a stock task'}), 200
 
     elif path == "broker":
-
-        task = create_task(uri='/task/stock/create-broker', payload=json_data, in_seconds=5)
+        task = create_task(uri='/task/stock/create-broker', payload=json_data, in_seconds=task_time)
         if task is None:
             return jsonify({'status': False,
                             'message': 'Unable to create task',
@@ -39,35 +42,43 @@ def stocks(path: str) -> tuple:
                         'message': 'Successfully added a broker task'}), 200
 
     elif path == "stock-model":
-        
-        if "exchange_id" in json_data and json_data["exchange_id"] != "":
-            exchange_id = json_data.get("exchange_id") 
-        else:
-            return jsonify({"status": False, "message": "exchange id is required"}), 500
-        if "sid" in json_data and json_data["sid"] != "":
-            sid: str = json_data.get("sid") 
-        else:
-            return jsonify({"status": False, "message": "sid is required"}), 500
-
-        if "stock_id" in json_data and json_data["stock_id"] != "":
-            stock_id: str = json_data.get("stock_id") 
-        else:
-            return jsonify({"status": False, "message": "stock is required"}), 500
-        if "broker_id" in json_data and json_data["broker_id"] != "":
-            broker_id: str = json_data.get("broker_id") 
-        else:
-            return jsonify({"status": False, "message": "stock is required"}), 500
-
-        return stock_view_instance.create_stock_model(exchange_id=exchange_id, sid=sid, stock_id=stock_id,
-                                                      broker_id=broker_id)
+        task = create_task(uri='/task/stock/create-stock-model', payload=json_data, in_seconds=task_time)
+        if task is None:
+            return jsonify({'status': False,
+                            'message': 'Unable to create task',
+                            }), 500
+        return jsonify({'status': True,
+                        'message': 'Successfully added a broker task'}), 200
 
     elif path == "buy-volume":
         # Date and transaction id are created here
-        return stock_view_instance.create_buy_model(buy_data=json_data)
+        # return stock_view_instance.create_buy_model(buy_data=json_data)
+        task = create_task(uri='/task/stock/create-buy-volume', payload=json_data, in_seconds=task_time)
+        if task is None:
+            return jsonify({'status': False,
+                            'message': 'Unable to create task',
+                            }), 500
+        return jsonify({'status': True,
+                        'message': 'Successfully added a broker task'}), 200
+
     elif path == "sell-volume":
-        return stock_view_instance.create_sell_volume(sell_data=json_data)
+        task = create_task(uri='/task/stock/create-sell-volume', payload=json_data, in_seconds=task_time)
+        if task is None:
+            return jsonify({'status': False,
+                            'message': 'Unable to create task',
+                            }), 500
+        return jsonify({'status': True,
+                        'message': 'Successfully added a broker task'}), 200
+
     elif path == "net-volume":
-        return stock_view_instance.create_net_volume(net_volume_data=json_data)
+        task = create_task(uri='/task/stock/create-net-volume', payload=json_data, in_seconds=task_time)
+        if task is None:
+            return jsonify({'status': False,
+                            'message': 'Unable to create task',
+                            }), 500
+        return jsonify({'status': True,
+                        'message': 'Successfully added a broker task'}), 200
+
     else:
         # if error the error handlers will handle it
         pass

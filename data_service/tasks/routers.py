@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 
 from data_service.views.stocks import StockView
 
@@ -24,5 +24,37 @@ def stock_task_handler(path: str) -> tuple:
     elif path == "create-broker":
         broker_data: dict = json.loads(request.get_data(as_text=True))
         return stock_view_instance.create_broker_data(broker_data=broker_data)
+    elif path == "create-stock-model":
+        json_data: dict = json.loads(request.get_data(as_text=True))
+        if "exchange_id" in json_data and json_data["exchange_id"] != "":
+            exchange_id = json_data.get("exchange_id")
+        else:
+            return jsonify({"status": False, "message": "exchange id is required"}), 500
+        if "sid" in json_data and json_data["sid"] != "":
+            sid: str = json_data.get("sid")
+        else:
+            return jsonify({"status": False, "message": "sid is required"}), 500
 
+        if "stock_id" in json_data and json_data["stock_id"] != "":
+            stock_id: str = json_data.get("stock_id")
+        else:
+            return jsonify({"status": False, "message": "stock is required"}), 500
+        if "broker_id" in json_data and json_data["broker_id"] != "":
+            broker_id: str = json_data.get("broker_id")
+        else:
+            return jsonify({"status": False, "message": "stock is required"}), 500
 
+        return stock_view_instance.create_stock_model(exchange_id=exchange_id, sid=sid, stock_id=stock_id,
+                                                      broker_id=broker_id)
+
+    elif path == "create-buy-volume":
+        buy_data: dict = json.loads(request.get_data(as_text=True))
+        return stock_view_instance.create_buy_model(buy_data=buy_data)
+
+    elif path == "create-sell-volume":
+        sell_data: dict = json.loads(request.get_data(as_text=True))
+        return stock_view_instance.create_sell_volume(sell_data=sell_data)
+
+    elif path == "create-net-volume":
+        net_data: dict = json.loads(request.get_data(as_text=True))
+        return stock_view_instance.create_net_volume(net_volume_data=net_data)
