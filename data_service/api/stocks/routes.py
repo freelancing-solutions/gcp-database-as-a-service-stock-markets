@@ -20,9 +20,24 @@ def stocks(path: str) -> tuple:
         raise InputError(message)
 
     if path == "stock":
-        return create_task(uri='/task/stock/create-stock', payload=json_data, in_seconds=5)
+        task = create_task(uri='/task/stock/create-stock', payload=json_data, in_seconds=5)
+        if task is None:
+            return jsonify({'status': False,
+                            'message': 'Unable to create task',
+                            }), 500
+        return jsonify({'status': True,
+                        'message': 'Successfully added a stock task'}), 200
+
     elif path == "broker":
-        return create_task(uri='/task/stock/create-broker', payload=json_data, in_seconds=5)
+
+        task = create_task(uri='/task/stock/create-broker', payload=json_data, in_seconds=5)
+        if task is None:
+            return jsonify({'status': False,
+                            'message': 'Unable to create task',
+                            }), 500
+        return jsonify({'status': True,
+                        'message': 'Successfully added a broker task'}), 200
+
     elif path == "stock-model":
         
         if "exchange_id" in json_data and json_data["exchange_id"] != "":

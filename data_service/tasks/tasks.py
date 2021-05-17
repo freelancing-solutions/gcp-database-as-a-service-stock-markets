@@ -40,7 +40,8 @@ def create_task(uri, payload, in_seconds):
 
     # Use the client to build and send the task.
     # noinspection PyTypeChecker
-    response = client.create_task(parent=parent, task=task)
-
-    print('Created task {}'.format(response.name))
+    try:
+        response = client.create_task(parent=parent, task=task)
+    except Exception:
+        return None
     return response
