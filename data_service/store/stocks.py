@@ -78,7 +78,6 @@ class Broker(ndb.Model):
         return broker_code.strip()
 
     def set_broker_name(self, broker_name: str) -> str:
-        broker_name = broker_name.strip()
         if broker_name is None or broker_name == "":
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(broker_name, str):
