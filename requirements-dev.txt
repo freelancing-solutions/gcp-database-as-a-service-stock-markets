@@ -15,7 +15,7 @@ grpc-google-iam-v1==0.12.3
 grpcio==1.37.1
 Jinja2==2.11.3
 proto-plus==1.18.0
-protobuf==3.13.0
+protobuf==3.17.0
 PyJWT==2.1.0
 requests==2.25.1
 requests-toolbelt==0.9.1
