@@ -5,6 +5,9 @@ from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
 
 
 def handle_view_errors(func):
+    """
+        handle errors related to views
+    """
     functools.wraps(func)
 
     def wrapper(*args, **kwargs):
@@ -36,6 +39,9 @@ def handle_view_errors(func):
 
 
 def handle_store_errors(func):
+    """
+        handle errors related to GCP datastore
+    """
     functools.wraps(func)
 
     def wrapper(*args, **kwargs):
