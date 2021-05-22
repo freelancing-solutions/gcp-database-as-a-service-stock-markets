@@ -588,12 +588,12 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @handle_view_errors
     def update_stock_model(self, stock_model: dict) -> tuple:
         if 'transaction_id' in stock_model and stock_model['transaction_id'] != "":
-            transaction_id: str = stock_model['transaction_id']
+            transaction_id: typing.Union[str, None] = stock_model.get('transaction_id')
         else:
             return jsonify({'status': False, 'message': 'transaction_id is required'}), 500
 
         if 'exchange_id' in stock_model and stock_model['exchange_id'] != "":
-            exchange_id: str = stock_model['exchange_id']
+            exchange_id: typing.Union[str, None] = stock_model.get('exchange_id')
         else:
             return jsonify({'status': False, 'message': 'exchange_id is required'}), 500
 
@@ -606,11 +606,11 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             broker: Broker = stock_model['broker']
         else:
             return jsonify({'status': False, 'message': 'Broker is required'}), 500
-        stock_model_list: typing.List[StockModel] = StockModel.query(
-            StockModel.transaction_id == transaction_id).fetch()
+        # TODO fix bug Stock and Broker would Dicts not Instances of Stock and Broker
+        stock_model_instance: StockModel = StockModel.query(StockModel.transaction_id == transaction_id).get()
 
-        if isinstance(stock_model_list, list) and len(stock_model_list) > 0:
-            stock_model = stock_model_list[0]
+        if isinstance(stock_model_instance, StockModel):
+            stock_model = stock_model_instance
             stock_model.transaction_id = transaction_id
             stock_model.exchange_id = exchange_id
             stock_model.stock = stock
