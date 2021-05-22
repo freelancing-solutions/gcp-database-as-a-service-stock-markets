@@ -265,9 +265,11 @@ class CatchStockErrors(StockViewContext):
         super(CatchStockErrors, self).__int__()
 
     @staticmethod
-    def symbol_exist(symbol: str) -> typing.Union[None, bool]:
+    def symbol_exist(symbol: typing.Union[str, None]) -> typing.Union[None, bool]:
         # noinspection DuplicatedCode
         try:
+            if not(symbol, str):
+                return None
             stock_instance: Stock = Stock.query(Stock.symbol == symbol).get()
         except BadRequestError:
             return None
@@ -285,8 +287,10 @@ class CatchStockErrors(StockViewContext):
         return False
 
     @staticmethod
-    def stock_code_exist(stock_code: str) -> typing.Union[None, bool]:
+    def stock_code_exist(stock_code: typing.Union[str, None]) -> typing.Union[None, bool]:
         try:
+            if not isinstance(stock_code, str):
+                return None
             stock_list: stock_list_type = Stock.query(Stock.stock_code == stock_code).get()
         except BadRequestError:
             return None
@@ -304,8 +308,10 @@ class CatchStockErrors(StockViewContext):
         return False
 
     @staticmethod
-    def stock_id_exist(stock_id: str) -> typing.Union[None, bool]:
+    def stock_id_exist(stock_id: typing.Union[str, None]) -> typing.Union[None, bool]:
         try:
+            if not isinstance(stock_id, str):
+                return None
             stock_list: stock_list_type = Stock.query(Stock.stock_id == stock_id).get()
         except BadRequestError:
             return None
@@ -321,7 +327,8 @@ class CatchStockErrors(StockViewContext):
             return True
         return False
 
-    def can_add_stock(self, stock_code: str, symbol: str, stock_id: str = None) -> bool:
+    def can_add_stock(self, stock_code: typing.Union[str, None] = None, symbol: typing.Union[str, None] = None,
+                      stock_id: typing.Union[str, None] = None) -> bool:
         stock_id_exist: bool = self.stock_id_exist(stock_id=stock_id)
         stock_code_exist: bool = self.stock_code_exist(stock_code=stock_code)
         symbol_exist: bool = self.symbol_exist(symbol=symbol)
@@ -339,8 +346,10 @@ class CatchBrokerErrors(StockViewContext):
         super(CatchBrokerErrors, self).__init__()
 
     @staticmethod
-    def broker_id_exist(broker_id: str) -> typing.Union[None, bool]:
+    def broker_id_exist(broker_id: typing.Union[str, None]) -> typing.Union[None, bool]:
         try:
+            if not isinstance(broker_id, str):
+                return None
             broker_instance: Broker = Broker.query(Broker.broker_id == broker_id).get()
             if isinstance(broker_instance, Broker):
                 return True
@@ -358,8 +367,10 @@ class CatchBrokerErrors(StockViewContext):
 
     # noinspection DuplicatedCode
     @staticmethod
-    def broker_code_exist(broker_code: str) -> typing.Union[None, bool]:
+    def broker_code_exist(broker_code: typing.Union[str, None]) -> typing.Union[None, bool]:
         try:
+            if not isinstance(broker_code, str):
+                return None
             broker_instance: Broker = Broker.query(Broker.broker_code == broker_code).get()
             if isinstance(broker_instance, Broker):
                 return True
@@ -375,7 +386,7 @@ class CatchBrokerErrors(StockViewContext):
         except Aborted:
             return None
 
-    def can_add_broker(self, broker_id: str, broker_code: str) -> bool:
+    def can_add_broker(self, broker_id: typing.Union[str, None], broker_code: typing.Union[str, None]) -> bool:
         broker_id_exist: bool = self.broker_id_exist(broker_id=broker_id)
         broker_code_exist: bool = self.broker_code_exist(broker_code=broker_code)
         if isinstance(broker_id_exist, bool) and isinstance(broker_code_exist, bool):
@@ -393,12 +404,16 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             self.timezone = timezone(Config.UTC_OFFSET)
 
     @use_context
-    def fetch_stock(self, stock_id: str):
+    def fetch_stock(self, stock_id: str) -> typing.Union[Stock, None]:
+        if not isinstance(stock_id, str):
+            return None
         stock: Stock = Stock.query(Stock.stock_id == stock_id).get()
         return stock
 
     @use_context
-    def fetch_broker(self, broker_id: str):
+    def fetch_broker(self, broker_id: str) -> typing.Union[Broker, None]:
+        if not isinstance(broker_id, str):
+            return None
         broker: Broker = Broker.query(Broker.broker_id == broker_id).get()
         return broker
 
@@ -440,14 +455,13 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def create_stock_model(self, exchange_id: str, sid: str, stock_id: str, broker_id: str) -> tuple:
-        # DONE -  use tasklets to fetch both stock and broker at the same time
-        # DONE - Verify that the tasklets return correct results
-        stock = self.fetch_stock(stock_id=stock_id)
-        broker = self.fetch_broker(broker_id=broker_id)
 
-        debug: bool = current_app.config.get('DEBUG')
-        if debug is True:
-            print("{}{}".format(stock, broker))
+        stock: typing.Union[Stock, None] = self.fetch_stock(stock_id=stock_id)
+        broker: typing.Union[Broker, None] = self.fetch_broker(broker_id=broker_id)
+        if not isinstance(stock, Stock):
+            return jsonify({'status': False, 'message': 'A stock with that ID was not found'}), 500
+        if not isinstance(broker, Broker):
+            return jsonify({'status': False, 'message': 'A broker with that ID was not found'}), 500
 
         stock_model_instance: StockModel = StockModel(exchange_id=exchange_id,
                                                       sid=sid, stock=stock, broker=broker)
