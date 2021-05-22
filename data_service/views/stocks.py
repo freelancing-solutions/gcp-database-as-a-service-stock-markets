@@ -598,23 +598,33 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             return jsonify({'status': False, 'message': 'exchange_id is required'}), 500
 
         if 'stock' in stock_model and stock_model['stock'] != "":
-            stock: Stock = stock_model['stock']
+            stock: typing.Union[Stock, None] = stock_model.get('stock')
         else:
             return jsonify({'status': False, 'message': 'stock is required'}), 500
 
         if 'broker' in stock_model and stock_model['broker'] != "":
-            broker: Broker = stock_model['broker']
+            broker: typing.Union[Broker, None] = stock_model.get('broker')
         else:
             return jsonify({'status': False, 'message': 'Broker is required'}), 500
         # TODO fix bug Stock and Broker would Dicts not Instances of Stock and Broker
         stock_model_instance: StockModel = StockModel.query(StockModel.transaction_id == transaction_id).get()
 
+        if stock is not None:
+            stock_instance: Stock = Stock.query(Stock.stock_code == stock['stock_code']).get()
+        else:
+            return jsonify({'status': False, 'message': 'stock is required'}), 500
+
+        if broker is not None:
+            broker_instance: Broker = Broker.query(Broker.broker_code == broker['broker_code']).get()
+        else:
+            return jsonify({'status': False, 'message': 'Broker is required'}), 500
+
         if isinstance(stock_model_instance, StockModel):
             stock_model = stock_model_instance
             stock_model.transaction_id = transaction_id
             stock_model.exchange_id = exchange_id
-            stock_model.stock = stock
-            stock_model.broker = broker
+            stock_model.stock = stock_instance
+            stock_model.broker = broker_instance
             key = stock_model.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is not None:
                 return jsonify({'status': True, 'payload': stock_model.to_dict(),
@@ -622,7 +632,6 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             else:
                 message: str = 'Something snapped while updating stock model'
                 raise DataServiceError(message)
-
         else:
             return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
 
