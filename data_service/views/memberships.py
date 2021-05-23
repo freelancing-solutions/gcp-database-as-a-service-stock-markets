@@ -1,7 +1,6 @@
 import functools
 import typing
 from google.api_core.exceptions import RetryError, Aborted
-from google.cloud import ndb
 from flask import jsonify, current_app
 from datetime import datetime, date
 from data_service.config.exceptions import DataServiceError
@@ -25,24 +24,26 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
-    def can_add_member(self, uid: str, plan_id: str, start_date: date) -> any:
+    def can_add_member(self, uid: str, plan_id: str, start_date: date) -> bool:
         user_valid: typing.Union[None, bool] = self.is_user_valid(uid=uid)
         plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
         date_valid: typing.Union[None, bool] = self.start_date_valid(start_date=start_date)
-        print('{} {} {}'.format(user_valid, plan_exist, date_valid))
+
         if isinstance(user_valid, bool) and isinstance(plan_exist, bool) and isinstance(date_valid, bool):
             return user_valid and not plan_exist and date_valid
+
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_add_plan(self, plan_name: str) -> any:
+    def can_add_plan(self, plan_name: str) -> bool:
         name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name)
         if isinstance(name_exist, bool):
-            return name_exist
+            return not name_exist
+
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_update_plan(self, plan_id: str, plan_name: str) -> any:
+    def can_update_plan(self, plan_id: str, plan_name: str) -> bool:
         plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
         plan_name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name=plan_name)
         if isinstance(plan_exist, bool) and isinstance(plan_name_exist, bool):
@@ -50,7 +51,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_add_coupon(self, code: str, expiration_time: int, discount: int) -> any:
+    def can_add_coupon(self, code: str, expiration_time: int, discount: int) -> bool:
         coupon_exist: typing.Union[None, bool] = self.coupon_exist(code=code)
         expiration_valid: typing.Union[None, bool] = self.expiration_valid(expiration_time=expiration_time)
         discount_valid: typing.Union[None, bool] = self.discount_valid(discount_valid=discount)
@@ -60,7 +61,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         message: str = "Unable to verify input data"
         raise DataServiceError(message)
 
-    def can_update_coupon(self, code: str, expiration_time: int, discount: int) -> any:
+    def can_update_coupon(self, code: str, expiration_time: int, discount: int) -> bool:
         coupon_exist: typing.Union[None, bool] = self.coupon_exist(code=code)
         expiration_valid: typing.Union[None, bool] = self.expiration_valid(expiration_time=expiration_time)
         discount_valid: typing.Union[None, bool] = self.discount_valid(discount_valid=discount)
@@ -179,21 +180,20 @@ class MembershipsView(Validators):
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def return_plan_members(self, plan_id) -> tuple:
-        """079 266 2590
+    def return_plan_members(self, plan_id: typing.Union[str, None]) -> tuple:
+        """
             return all members of a plan
         """
+        if not isinstance(plan_id, str) or (plan_id == ""):
+            return jsonify({'status': False, 'message': 'plan_id is required'}), 500
         membership_list: typing.List[Memberships] = Memberships.query(Memberships.plan_id == plan_id).fetch()
         if isinstance(membership_list, list) and len(membership_list) > 0:
             response_data: typing.List[dict] = [member.to_dict() for member in membership_list]
             message: str = 'successfully fetched members'
             return jsonify({'status': True, 'payload': response_data, 'message': message}), 200
         else:
-            plan_details: MembershipPlans = MembershipPlansView.get_plan(plan_id=plan_id)
-            if plan_details is None:
-                message: str = "Unable to find members of plan {}"
-                return jsonify({'status': False, 'message': message}), 500
-            return jsonify({'status': True, 'message': 'plan details found', 'payload': plan_details.to_dict()}), 200
+            message: str = "Unable to find members of plan {}"
+            return jsonify({'status': False, 'message': message}), 500
 
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context

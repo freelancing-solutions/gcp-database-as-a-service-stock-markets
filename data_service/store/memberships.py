@@ -2,10 +2,9 @@ import typing
 from datetime import datetime, date
 from google.api_core.exceptions import RetryError, Aborted
 from google.cloud import ndb
-from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import timestamp, get_days
+from data_service.utils.utils import get_days
 
 
 class MembershipValidators:
@@ -35,16 +34,15 @@ class PlanValidators:
         if plan_id == "":
             return False
         try:
-            plan_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).get()
+            plan_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
+            if isinstance(plan_instance, MembershipPlans):
+                return True
         except ConnectionRefusedError:
             return None
         except RetryError:
             return None
         except Aborted:
             return None
-        if isinstance(plan_instance, MembershipPlans):
-            return True
         return False
 
     @staticmethod
@@ -59,11 +57,9 @@ class PlanValidators:
         if plan_name == "":
             return False
         try:
-            plan_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_name == plan_name).get()
+            plan_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_name == plan_name).get()
             if isinstance(plan_instance, MembershipPlans):
                 return True
-
         except ConnectionRefusedError:
             return None
         except RetryError:
