@@ -19,7 +19,7 @@ from data_service.views.use_context import use_context
 
 stock_list_type = typing.List[Stock]
 
-# TODO Create Test Cases for Stock View and Documentations
+
 class StockDataWrappers:
     """
         # NOTES: request wrappers for stock, broker, buy_volume sell_volume, and net_volume
@@ -34,20 +34,20 @@ class StockDataWrappers:
         def wrapper(*args, **kwargs):
             stock_data: dict = kwargs.get('stock_data')
             if 'stock_id' in stock_data and stock_data['stock_id'] != "":
-                stock_id: str = stock_data.get('stock_id') or None
+                stock_id: typing.Union[str, None] = stock_data.get('stock_id')
             else:
                 stock_id = create_id(size=12)
             if 'stock_code' in stock_data and stock_data['stock_code'] != "":
-                stock_code: str = stock_data.get('stock_code') or None
+                stock_code: typing.Union[str, None] = stock_data.get('stock_code')
             else:
                 return jsonify({'status': False, 'message': 'Stock Code is required'}), 500
 
             if 'stock_name' in stock_data and stock_data['stock_name'] != "":
-                stock_name: str = stock_data.get('stock_name') or None
+                stock_name: typing.Union[str, None] = stock_data.get('stock_name')
             else:
                 return jsonify({'status': False, 'message': 'Stock Name is required'}), 500
             if 'symbol' in stock_data and stock_data['symbol'] != "":
-                symbol: str = stock_data.get('symbol') or None
+                symbol: typing.Union[str, None] = stock_data.get('symbol')
             else:
                 return jsonify({'status': False, 'message': 'Stock Symbol is required'}), 500
 
@@ -61,15 +61,15 @@ class StockDataWrappers:
         def wrapper(*args, **kwargs):
             broker_data: dict = kwargs.get('broker_data')
             if "broker_id" in broker_data and broker_data['broker_id'] != "":
-                broker_id: str = broker_data.get('broker_id') or None
+                broker_id: typing.Union[str, None] = broker_data.get('broker_id')
             else:
                 broker_id: str = create_id(size=12)
             if "broker_code" in broker_data and broker_data['broker_code'] != "":
-                broker_code: str = broker_data.get('broker_code') or None
+                broker_code: typing.Union[str, None] = broker_data.get('broker_code')
             else:
                 return jsonify({'status': False, 'message': 'Broker Code is required'}), 500
             if "broker_name" in broker_data and broker_data['broker_name'] != "":
-                broker_name: str = broker_data.get("broker_name")
+                broker_name: typing.Union[str, None] = broker_data.get("broker_name")
             else:
                 return jsonify({'status': False, 'message': 'Broker Name is required'}), 500
 
@@ -86,11 +86,10 @@ class StockDataWrappers:
                 return jsonify({'status': False, 'message': 'Please provide buy volume data'}), 500
 
             if "stock_id" in buy_data and buy_data['stock_id'] != "":
-                stock_id: str = buy_data.get('stock_id') or None
+                stock_id: typing.Union[str, None] = buy_data.get('stock_id')
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
             if "date_created" in buy_data and buy_data['date_created'] != "":
-                # TODO- insure that FORMAT is DD_MM-YYYY
                 try:
                     date_created: date_class = date_string_to_date(buy_data.get('date_created'))
                 except ValueError:
@@ -99,32 +98,32 @@ class StockDataWrappers:
                 return jsonify({'status': False, 'message': "date_created is required"}), 500
 
             if "buy_volume" in buy_data and buy_data['buy_volume'] != "":
-                buy_volume: int = int(buy_data.get('buy_volume'))
+                buy_volume: typing.Union[int, None] = int(buy_data.get('buy_volume'))
             else:
                 return jsonify({'status': False, 'message': "buy volume is required"}), 500
 
             if "buy_value" in buy_data and buy_data["buy_value"] != "":
-                buy_value: int = int(buy_data.get("buy_value"))
+                buy_value: typing.Union[int, None] = int(buy_data.get("buy_value"))
             else:
                 return jsonify({'status': False, 'message': "buy value is required"}), 500
 
             if "buy_ave_price" in buy_data and buy_data["buy_ave_price"] != "":
-                buy_ave_price: int = int(buy_data.get("buy_ave_price"))
+                buy_ave_price: typing.Union[int, None] = int(buy_data.get("buy_ave_price"))
             else:
                 return jsonify({'status': False, 'message': "buy average price is required"}), 500
 
             if "buy_market_val_percent" in buy_data and buy_data["buy_market_val_percent"] != "":
-                buy_market_val_percent: int = int(buy_data.get("buy_market_val_percent"))
+                buy_market_val_percent: typing.Union[int, None] = int(buy_data.get("buy_market_val_percent"))
             else:
                 return jsonify({'status': False, 'message': "buy market value percent is required"}), 500
 
             if "buy_trade_count" in buy_data and buy_data["buy_trade_count"] != "":
-                buy_trade_count: int = int(buy_data.get("buy_trade_count"))
+                buy_trade_count: typing.Union[int, None] = int(buy_data.get("buy_trade_count"))
             else:
                 return jsonify({'status': False, 'message': "buy trade account"}), 500
 
             if "transaction_id" in buy_data and buy_data["transaction_id"] != "":
-                transaction_id: str = buy_data.get("transaction_id")
+                transaction_id: typing.Union[str, None] = buy_data.get("transaction_id")
 
                 return func(stock_id=stock_id, date_created=date_created, buy_volume=buy_volume,
                             buy_value=buy_value, buy_ave_price=buy_ave_price,
@@ -146,7 +145,7 @@ class StockDataWrappers:
                 return jsonify({'status': False, 'message': 'Unable to get sell volume data'}), 500
 
             if "stock_id" in sell_data and sell_data['stock_id'] != "":
-                stock_id: str = sell_data.get('stock_id') or None
+                stock_id: typing.Union[str, None] = sell_data.get('stock_id')
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
 
@@ -159,31 +158,31 @@ class StockDataWrappers:
                 return jsonify({'status': False, 'message': "date_class is required"}), 500
 
             if "sell_volume" in sell_data and sell_data["sell_volume"] != "":
-                sell_volume: int = int(sell_data.get("sell_volume"))
+                sell_volume: typing.Union[int, None] = int(sell_data.get("sell_volume"))
             else:
                 return jsonify({"status": False, "message": "sell volume is required"}), 500
 
             if "sell_value" in sell_data and sell_data["sell_value"] != "":
-                sell_value: int = int(sell_data.get("sell_value"))
+                sell_value: typing.Union[int, None] = int(sell_data.get("sell_value"))
             else:
                 return jsonify({"status": False, "message": "sell value is required"}), 500
 
             if "sell_ave_price" in sell_data and sell_data["sell_ave_price"] != "":
-                sell_ave_price: int = int(sell_data.get("sell_ave_price"))
+                sell_ave_price: typing.Union[int, None] = int(sell_data.get("sell_ave_price"))
             else:
                 return jsonify({"status": False, "message": "sell ave price is required"}), 500
 
             if "sell_market_val_percent" in sell_data and sell_data["sell_market_val_percent"] != "":
-                sell_market_val_percent: int = int(sell_data.get("sell_market_val_percent"))
+                sell_market_val_percent: typing.Union[int, None] = int(sell_data.get("sell_market_val_percent"))
             else:
                 return jsonify({"status": False, "message": "sell market value percent price is required"}), 500
 
             if "sell_trade_count" in sell_data and sell_data["sell_trade_count"] != "":
-                sell_trade_count: int = int(sell_data.get("sell_trade_count"))
+                sell_trade_count: typing.Union[int, None] = int(sell_data.get("sell_trade_count"))
             else:
                 return jsonify({"status": False, "message": "sell trade account percent price is required"}), 500
             if 'transaction_id' in sell_data and sell_data['transaction_id'] != "":
-                transaction_id: str = sell_data['transaction_id']
+                transaction_id: typing.Union[str, None] = sell_data['transaction_id']
 
                 return func(stock_id=stock_id, date_created=date_created, sell_volume=sell_volume,
                             sell_value=sell_value,
@@ -206,7 +205,7 @@ class StockDataWrappers:
                 return jsonify({'status': False, 'message': 'please define net volume data'}), 500
 
             if "stock_id" in net_volume_data and net_volume_data["stock_id"] != "":
-                stock_id: str = net_volume_data.get("stock_id") or None
+                stock_id: typing.Union[str, None] = net_volume_data.get("stock_id")
             else:
                 return jsonify({'status': False, 'message': "stock id is required"}), 500
             if "date_created" in net_volume_data and net_volume_data['date_created'] != "":
@@ -216,27 +215,27 @@ class StockDataWrappers:
                 return jsonify({'status': False, 'message': "date_created is required"}), 500
 
             if "transaction_id" in net_volume_data and net_volume_data["transaction_id"] != "":
-                transaction_id: str = net_volume_data.get("transaction_id") or None
+                transaction_id: typing.Union[str, None] = net_volume_data.get("transaction_id")
             else:
                 return jsonify({'status': False, 'message': "transaction id is required"}), 500
 
             if "net_volume" in net_volume_data and net_volume_data["net_volume"] != "":
-                net_volume: int = int(net_volume_data.get("net_volume"))
+                net_volume: typing.Union[int, None] = int(net_volume_data.get("net_volume"))
             else:
                 return jsonify({'status': False, 'message': "net volume is required"}), 500
 
             if "net_value" in net_volume_data and net_volume_data["net_value"] != "":
-                net_value: int = int(net_volume_data.get("net_value"))
+                net_value: typing.Union[int, None] = int(net_volume_data.get("net_value"))
             else:
                 return jsonify({'status': False, 'message': "net value is required"}), 500
 
             if "total_value" in net_volume_data and net_volume_data["total_value"] != "":
-                total_value: int = int(net_volume_data.get("total_value"))
+                total_value:typing.Union[int, None] = int(net_volume_data.get("total_value"))
             else:
                 return jsonify({'status': False, 'message': "total value is required"}), 500
 
             if "total_volume" in net_volume_data and net_volume_data["total_volume"] != "":
-                total_volume: int = int(net_volume_data.get('total_volume'))
+                total_volume: typing.Union[int, None] = int(net_volume_data.get('total_volume'))
             else:
                 return jsonify({'status': False, 'message': "total volume is required"}), 500
 
@@ -268,7 +267,7 @@ class CatchStockErrors(StockViewContext):
     def symbol_exist(symbol: typing.Union[str, None]) -> typing.Union[None, bool]:
         # noinspection DuplicatedCode
         try:
-            if not(symbol, str):
+            if not isinstance(symbol, str):
                 return None
             stock_instance: Stock = Stock.query(Stock.symbol == symbol).get()
         except BadRequestError:
@@ -693,7 +692,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def get_stock_data(self, stock_id: typing.Union[str, None] = None, stock_code: typing.Union[str, None] = None,
-                       symbol:typing.Union[str, None] = None) -> tuple:
+                       symbol: typing.Union[str, None] = None) -> tuple:
         """
             with either stock_id or stock_code or symbol return stock_data
         """

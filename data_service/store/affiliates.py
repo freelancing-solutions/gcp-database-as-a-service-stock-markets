@@ -11,12 +11,12 @@ class AffiliatesValidators:
         super(AffiliatesValidators, self).__init__()
 
     @staticmethod
-    def affiliate_exist(affiliate_id: str) -> typing.Union[None, bool]:
+    def affiliate_exist(affiliate_id: typing.Union[str, None]) -> typing.Union[None, bool]:
         if not isinstance(affiliate_id, str) or affiliate_id == "":
             raise ValueError("Affiliate ID cannot be Null, and Should be a String")
         try:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.affiliate_id == affiliate_id).fetch()
-            if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
+            affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
+            if isinstance(affiliate_instance, Affiliates):
                 return True
             return False
         except ConnectionRefusedError:
@@ -27,12 +27,12 @@ class AffiliatesValidators:
             return None
 
     @staticmethod
-    def user_already_registered(uid: str) -> typing.Union[None, bool]:
+    def user_already_registered(uid: typing.Union[str, None]) -> typing.Union[None, bool]:
         if not isinstance(uid, str) or uid == "":
             raise ValueError("UID cannot be Null, and should be a string")
         try:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.uid == uid).fetch()
-            if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
+            affiliate_instance: Affiliates = Affiliates.query(Affiliates.uid == uid).get()
+            if isinstance(affiliate_instance, Affiliates):
                 return True
             return False
         except ConnectionRefusedError:
@@ -48,12 +48,12 @@ class RecruitsValidators:
         super(RecruitsValidators, self).__init__()
 
     @staticmethod
-    def user_already_recruited(uid: str) -> typing.Union[None, bool]:
+    def user_already_recruited(uid: typing.Union[str, None]) -> typing.Union[None, bool]:
         if not isinstance(uid, str) or uid == "":
             raise ValueError("UID cannot be Null, and can only be a string")
         try:
-            recruits_list: typing.List[Recruits] = Recruits.query(Recruits.uid == uid).fetch()
-            if isinstance(recruits_list, list) and len(recruits_list) > 0:
+            recruit_instance: Recruits = Recruits.query(Recruits.uid == uid).get()
+            if isinstance(recruit_instance, Recruits):
                 return True
             return False
         except ConnectionRefusedError:
@@ -64,13 +64,12 @@ class RecruitsValidators:
             return None
 
     @staticmethod
-    def user_already_an_affiliate(uid: str) -> typing.Union[None, bool]:
-
+    def user_already_an_affiliate(uid: typing.Union[str, None]) -> typing.Union[None, bool]:
         if not isinstance(uid, str) or (uid == ""):
             raise ValueError("UID cannot be Null, and can only be a string")
         try:
-            affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.uid == uid).fetch()
-            if isinstance(affiliates_list, list) and len(affiliates_list) > 0:
+            affiliate_instance: Affiliates = Affiliates.query(Affiliates.uid == uid).get()
+            if isinstance(affiliate_instance, Affiliates):
                 return True
             return False
         except ConnectionRefusedError:
@@ -107,7 +106,7 @@ class ClassSetters:
     def __init__(self):
         super(ClassSetters, self).__init__()
 
-    def set_id(self, value: str) -> str:
+    def set_id(self, value: typing.Union[str, None]) -> str:
         if (value == "") or (value is None):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
@@ -118,7 +117,7 @@ class ClassSetters:
         if not isinstance(value, int):
             raise TypeError("{} can only be an integer".format(str(self)))
         if value < 0:
-            raise ValueError('{} can only be postivie integer'.format(str(self)))
+            raise ValueError('{} can only be positive integer'.format(str(self)))
 
         return value
 
@@ -133,9 +132,6 @@ class ClassSetters:
         return value
 
     def set_percent(self, value: int) -> int:
-        if (value == "") or (value is None):
-            raise ValueError("{} cannot be Null".format(str(self)))
-
         if not isinstance(value, int):
             raise TypeError("{}, can only be an integer".format(str(self)))
 
