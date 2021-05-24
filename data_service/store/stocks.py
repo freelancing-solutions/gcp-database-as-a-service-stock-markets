@@ -107,7 +107,6 @@ class Broker(ndb.Model):
 
 class StockModel(ndb.Model):
     """
-        remember to set timezone info when saving date
         id,
         stock_id,
         broker_id,
