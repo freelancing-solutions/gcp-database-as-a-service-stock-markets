@@ -308,7 +308,7 @@ class NetVolumeModel(ndb.Model):
         daily net volume
     """
 
-    def set_id(self, value: str) -> str:
+    def set_id(self, value: typing.Union[str, None]) -> str:
 
         if value is None or value == "":
             raise ValueError("{} cannot be Null".format(str(self)))
