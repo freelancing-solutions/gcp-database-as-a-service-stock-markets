@@ -49,7 +49,7 @@ class PlanValidators:
     def plan_name_exist(plan_name: str) -> typing.Union[None, bool]:
         """
             returns True or False if plan exist or dont exist
-            returns None if an error occured
+            returns None if an error occurred
         """
         if not isinstance(plan_name, str):
             return False

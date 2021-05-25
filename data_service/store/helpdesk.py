@@ -15,6 +15,7 @@ class HelpDesk(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+
 class Ticket(ndb.Model):
     ticket_id: str = ndb.StringProperty()
     uid: str = ndb.StringProperty()
@@ -57,6 +58,7 @@ class TicketThread(ndb.Model):
     message: str = ndb.StringProperty()
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
 
+    # noinspection DuplicatedCode
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
