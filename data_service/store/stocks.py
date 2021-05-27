@@ -106,30 +106,6 @@ class Broker(ndb.Model):
 
 
 class StockModel(ndb.Model):
-    """
-        id,
-        stock_id,
-        broker_id,
-        stock_code,
-        stock_name,
-        broker_code,
-        date,
-        buy_volume,
-        buy_value,
-        buy_ave_price,
-        buy_market_val_percent,
-        buy_trade_count,
-        sell_volume,
-        sell_value,
-        sell_ave_price,
-        sell_market_val_percent,
-        sell_trade_count,
-        net_volume,
-        net_value,
-        total_volume,
-        total_value
-    """
-
     def set_id(self, value: str) -> str:
 
         if value is None or value == "":
