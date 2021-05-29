@@ -7,6 +7,7 @@ from data_service.views.memberships import MembershipsView, MembershipPlansView
 
 memberships_bp = Blueprint('memberships', __name__)
 
+
 # TODO Rewrite this to allow data to be passed as JSON variables
 
 @memberships_bp.route("/api/v1/members/<path:plan_id>", methods=['POST'])
@@ -14,6 +15,7 @@ memberships_bp = Blueprint('memberships', __name__)
 def get_members(plan_id: str) -> tuple:
     members_instance: MembershipsView = MembershipsView()
     return members_instance.return_plan_members(plan_id=plan_id)
+
 
 @memberships_bp.route("/api/v1/member", methods=['POST', 'PUT'])
 @handle_auth
@@ -44,6 +46,7 @@ def create_member() -> tuple:
     members_view_instance: MembershipsView = MembershipsView()
     return members_view_instance.add_membership(uid=uid, plan_id=plan_id, plan_start_date=plan_start_date)
 
+
 @memberships_bp.route("/api/v1/member/status/<path:uid>", methods=['GET', 'PUT'])
 @handle_auth
 def get_update_status(uid: str) -> tuple:
@@ -66,12 +69,14 @@ def get_update_status(uid: str) -> tuple:
         membership_view_instance: MembershipsView = MembershipsView()
         return membership_view_instance.is_member_off(uid=uid)
 
+
 @memberships_bp.route("/api/v1/members/<path:plan_id>/status/<path:status>", methods=["GET"])
 @handle_auth
 def get_plan_members_by_payment_status(plan_id: str, status: str) -> tuple:
     if plan_id != "" and status != "":
         membership_view_instance: MembershipsView = MembershipsView()
         return membership_view_instance.return_plan_members_by_payment_status(plan_id=plan_id, status=status)
+
 
 @memberships_bp.route("/api/v1/membership/plan/<path:plan_id>")
 @handle_auth
@@ -91,7 +96,6 @@ def change_membership_plan(plan_id: str) -> tuple:
         member_ship_instance_view: MembershipsView = MembershipsView()
         return member_ship_instance_view.change_membership(uid=uid, origin_plan_id=plan_id, dest_plan_id=dest_plan_id)
 
-# TODO - Finish up
 
 @memberships_bp.route('/api/v1/membership-plan', methods=["POST"])
 def create_membership_plan() -> tuple:
@@ -99,10 +103,11 @@ def create_membership_plan() -> tuple:
     member_ship_instance_view: MembershipPlansView = MembershipPlansView()
     return member_ship_instance_view.add_plan(membership_plan_data=membership_plan_data)
 
+
 @memberships_bp.route('/api/v1/membership-plans', methods=["GET"])
 def get_membership_plans() -> tuple:
     member_ship_instance_view: MembershipPlansView = MembershipPlansView()
     return member_ship_instance_view.return_all_plans()
 
-# TODO complete the intergration of memberships view and the
+# TODO complete the integration of memberships view and the
 #  API also refer to admin app

@@ -331,6 +331,7 @@ class MembershipPlansView(Validators):
         return jsonify({'status': True, 'message': 'successfully created new membership plan',
                         'payload': plan_instance.to_dict()}), 200
 
+    # noinspection DuplicatedCode
     @use_context
     @handle_view_errors
     def update_plan(self, plan_id: str, plan_name: str, description: str, schedule_day: int, schedule_term: str,
@@ -395,7 +396,8 @@ class MembershipPlansView(Validators):
         return jsonify({'status': False, 'payload': payload,
                         'message': 'successfully retrieved monthly plans'}), 200
 
-    def get_plan(self, plan_id: str) -> typing.Union[None, MembershipPlans]:
+    @staticmethod
+    def get_plan(plan_id: str) -> typing.Union[None, MembershipPlans]:
         """
             this utility will be used by other views to obtain information about membershipPlans
         """
@@ -424,7 +426,7 @@ class MembershipPlansView(Validators):
         return jsonify({'status': False, 'message': 'Unable to get plan'}), 500
 
     @staticmethod
-    def return_all_plans(self) -> tuple:
+    def return_all_plans() -> tuple:
         membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query().fetch()
         return jsonify({'status': True, 'payload': membership_plan_list,
                         'message': 'successfully fetched all memberships'}), 200
@@ -482,7 +484,7 @@ class CouponsView(Validators):
     @use_context
     @handle_view_errors
     def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
-        if self.can_add_coupon(code=code, expiration_time=expiration_time):
+        if self.can_add_coupon(code=code, expiration_time=expiration_time, discount=discount) is True:
             coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
             key = coupons_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
@@ -498,7 +500,7 @@ class CouponsView(Validators):
     @use_context
     @handle_view_errors
     def update_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
-        if self.can_update_coupon(code=code, expiration_time=expiration_time) is True:
+        if self.can_update_coupon(code=code, expiration_time=expiration_time, discount=discount) is True:
             coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
             coupon_instance.discount = discount
             coupon_instance.expiration_time = expiration_time
@@ -521,10 +523,10 @@ class CouponsView(Validators):
             message: str = "Coupon Code is required"
             return jsonify({'status': False, 'message': message}), 500
 
-        coupon_instace: Coupons = Coupons.query(Coupons.code == code).get()
-        if isinstance(coupon_instace, Coupons):
-            coupon_instace.is_valid = False
-            key = coupon_instace.put(retries=self._max_retries, timeout=self._max_timeout)
+        coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
+        if isinstance(coupon_instance, Coupons):
+            coupon_instance.is_valid = False
+            key = coupon_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to cancel coupon"
                 return jsonify({'status': False, 'message': message}), 500

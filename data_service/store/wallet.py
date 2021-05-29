@@ -16,7 +16,9 @@ class WalletValidator:
         return True if isinstance(wallet_instance, WalletModel) else False
 
     # TODO complete validations for all Wallet Models
-    # TODO be sure to intergrate all models to the view
+    # TODO be sure to integrate all models to the view
+
+
 class ClassSetters:
     def __init__(self):
         self.transaction_types = ['withdrawal', 'deposit']
@@ -60,6 +62,7 @@ class ClassSetters:
             raise ValueError("{} invalid argument".format(str(self)))
         return value
 
+
 class WalletModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
     available_funds: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_funds)
@@ -67,11 +70,13 @@ class WalletModel(ndb.Model):
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
     paypal_address: str = ndb.StringProperty(validator=ClassSetters.set_paypal)
 
+
 class WalletTransactionsModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
     transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     transaction_type: str = ndb.StringProperty(validator=ClassSetters.set_transaction_types)
     transaction_date: str = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
+
 
 class WalletTransactionItemModel(ndb.Model):
     transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)

@@ -1,6 +1,5 @@
 import typing
-from flask import jsonify
-
+from flask import jsonify, current_app
 from data_service.config.exceptions import DataServiceError
 from data_service.store.mixins import AmountMixin
 from data_service.store.wallet import WalletModel, WalletValidator
@@ -12,9 +11,11 @@ class Validator(WalletValidator):
 
     def __init__(self):
         super(Validator, self).__init__()
+        self._max_retries = current_app.config.get('DATASTORE_RETRIES')
+        self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
     def can_add_wallet(self, uid: typing.Union[None, str] = None) -> bool:
-        if uid is None:
+        if uid is None or (uid == ''):
             return False
 
         wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
@@ -23,7 +24,7 @@ class Validator(WalletValidator):
         raise DataServiceError('Unable to verify wallet data')
 
     def can_update_wallet(self, uid: typing.Union[None, str] = None) -> bool:
-        if uid is None:
+        if uid is None or uid == "":
             return False
 
         wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
@@ -32,7 +33,7 @@ class Validator(WalletValidator):
         raise DataServiceError('Unable to verify wallet data')
 
     def can_reset_wallet(self, uid: typing.Union[None, str]) -> bool:
-        if uid is None:
+        if uid is None or uid == "":
             return False
 
         wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
@@ -61,9 +62,11 @@ class WalletView(Validator):
             wallet_instance.uid = uid
             wallet_instance.available_funds = amount_instance
             wallet_instance.paypal_address = paypal_address
-            key = wallet_instance.put
-
-            return jsonify({'status': True, 'message': 'successfully created wallet', 'payload': wallet_instance.to_dict()}), 200
+            key = wallet_instance.put(retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                raise DataServiceError("An Error occurred creating Wallet")
+            return jsonify({'status': True, 'message': 'successfully created wallet',
+                            'payload': wallet_instance.to_dict()}), 200
 
     @use_context
     @handle_view_errors
@@ -75,14 +78,16 @@ class WalletView(Validator):
     @handle_view_errors
     def update_wallet(self, wallet_data: dict) -> tuple:
         uid: str = wallet_data.get("uid")
-        available_funds: int = wallet_data.get("available_funs")
+        available_funds: int = wallet_data.get("available_funds")
         paypal_address: str = wallet_data.get("paypal_address")
         if self.can_update_wallet(uid=uid) is True:
             wall_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
             wall_instance.uid = uid
             wall_instance.available_funds = available_funds
             wall_instance.paypal_address = paypal_address
-            key = wall_instance.put()
+            key = wall_instance.put(retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                raise DataServiceError("An Error occurred updating Wallet")
 
             return jsonify({'status': True, 'payload': wall_instance.to_dict(),
                             'message': 'successfully updated wallet'}), 200
@@ -94,7 +99,10 @@ class WalletView(Validator):
         if self.can_reset_wallet(uid=uid) is True:
             wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
             wallet_instance.available_funds = 0
-            key = wallet_instance.put()
+            key = wallet_instance.put(retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                raise DataServiceError("An Error occurred resetting Wallet")
+
             return jsonify({'status': True, 'payload': wallet_instance.to_dict(),
                             'message': 'wallet is rest'}), 200
 
