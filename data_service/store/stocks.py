@@ -1,3 +1,4 @@
+import typing
 from flask import current_app
 from google.cloud import ndb
 import datetime

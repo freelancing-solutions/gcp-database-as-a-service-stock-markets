@@ -9,7 +9,7 @@ cache_memberships: Cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache_users: Cache = Cache(config={'CACHE_TYPE': 'simple'})
 # Cache data for six hours- cached data should be volume data
 # TODO - there should be a function to purge the cache when not needed
-# but normally when the data-service is not being used it will shutdwon and thereby auto purging cache
+# but normally when the data-service is not being used it will shutdown and thereby auto purging cache
 default_timeout: int = 60*60*6
 
 
@@ -28,12 +28,14 @@ def create_app(config_class=Config):
     from data_service.api.memberships.routes import memberships_bp
     from data_service.api.affiliates.routes import affiliates_bp
     from data_service.api.coupons.routes import coupons_bp
-    from data_service.handlers.routes import default_handlers_bp
     from data_service.api.pubsub.routes import pubsub_bp
     from data_service.api.scrapper.routes import scrapper_bp
+    from data_service.api.wallet.routes import wallet_bp
+    from data_service.handlers.routes import default_handlers_bp
     from data_service.tasks.routers import task_bp
     from data_service.frontpage.routes import home_bp
 
+    app.register_blueprint(wallet_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(stocks_bp)
     app.register_blueprint(memberships_bp)
