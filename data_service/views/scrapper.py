@@ -5,9 +5,9 @@ from data_service.utils.utils import create_id
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
+
 # TODO Create Test Cases for Scrapper and Documentations
 class ScrapperView:
-
     def __init__(self):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')

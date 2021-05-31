@@ -180,8 +180,8 @@ class AffiliatesView(Validator):
         """
             return affiliates who are not active
         """
-        affiliates_list: typing.List[Affiliates] = Affiliates.query(
-            Affiliates.is_active == False, Affiliates.is_deleted == False).fetch()
+        affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.is_active == False,
+                                                                    Affiliates.is_deleted == False).fetch()
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
         return jsonify({'status': True, 'message': 'successfully returned all affiliates',
                         'payload': payload}), 200

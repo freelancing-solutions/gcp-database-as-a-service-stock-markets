@@ -10,6 +10,7 @@ from data_service.views.use_context import use_context
 
 users_type = typing.List[UserModel]
 
+
 # TODO create test cases for User View and Documentations
 class UserView:
     def __init__(self):
@@ -58,7 +59,7 @@ class UserView:
         user_instance.set_email(email=email)
         user_instance.set_password(password=password)
         user_instance.set_is_active(is_active=True)
-        user_instance.put( retries=self._max_retries, timeout=self._max_timeout)
+        user_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         return jsonify({'status': True,
                         "message": "Successfully created new user",
                         "payload": user_instance.to_dict()
@@ -105,12 +106,12 @@ class UserView:
             if isinstance(user_instance, UserModel):
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
-        if email != "" and (email is not None):
+        elif email != "" and (email is not None):
             user_instance: UserModel = UserModel.query(UserModel.email == email).get()
             if isinstance(user_instance, UserModel):
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
-        if cell != "" and (cell is not None):
+        elif cell != "" and (cell is not None):
             user_instance: UserModel = UserModel.query(UserModel.cell == cell).get()
             if isinstance(user_instance, UserModel):
                 # TODO- rather mark user as deleted

@@ -9,7 +9,7 @@ char_set = string.ascii_lowercase + string.digits
 def is_development() -> bool: return False if os.environ.get("IS_PRODUCTION") else True
 
 
-def create_id(size: int = 64, chars: str = char_set) -> str: return ''.join(random.choice(chars) for x in range(size))
+def create_id(size: int = 64, chars: str = char_set) -> str: return ''.join(random.choice(chars) for _ in range(size))
 
 
 def timestamp() -> int: return int(float(time.time()) * 1000)
@@ -18,7 +18,7 @@ def timestamp() -> int: return int(float(time.time()) * 1000)
 def get_days(days: int) -> int: return int(24 * days * 60 * 60 * 1000)
 
 
-def timestamp_difference(stamp1, stamp2) -> int: return int(stamp1 - stamp2)
+def timestamp_difference(stamp1: int, stamp2: int) -> int: return int(stamp1 - stamp2)
 
 
 def date_string_to_date(date_str: str) -> date:
@@ -38,16 +38,12 @@ def date_string_to_date(date_str: str) -> date:
             day: int = int(date_list[2])
         except KeyError:
             raise ValueError("Date Format invalid")
-
         if 0 < month > 12:
             raise ValueError("Date Format Invalid")
-
         if 0 < day > 31:
             raise ValueError("Date Format invalid")
-
         if year < 1990:
             raise ValueError("Date Format invalid")
-
         return date(year=year, month=month, day=day)
 
     elif isinstance(date_str, date):
@@ -65,7 +61,7 @@ def end_of_month() -> bool:
     return False
 
 
-def return_ttl(name) -> int:
+def return_ttl(name: str) -> int:
     cache_ttl_short: int = 60 * 60 * 3  # 3 hours
     cache_ttl_medium: int = 60 * 60 * 6  # 6 hours
     cache_ttl_long: int = 60 * 60 * 12  # 24 hours

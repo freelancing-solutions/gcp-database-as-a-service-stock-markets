@@ -238,7 +238,6 @@ class MembershipsView(Validators):
         """
             for a specific user set payment status
         """
-
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         if isinstance(membership_instance, Memberships):
             membership_instance.status = status
@@ -455,8 +454,7 @@ class AccessRightsView:
 
 # Coupon data wrapper
 def get_coupon_data(func):
-    functools.wraps(func)
-
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         coupon_data: dict = kwargs.get('coupon_data')
         if "code" in coupon_data and coupon_data['code'] != "":

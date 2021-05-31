@@ -242,7 +242,6 @@ class StockDataWrappers:
             return func(stock_id=stock_id, date_created=date_created, transaction_id=transaction_id,
                         net_volume=net_volume, net_value=net_value, total_value=total_value,
                         total_volume=total_volume, *args)
-
         return wrapper
 
 
@@ -253,7 +252,6 @@ class StockViewContext:
     """
         add common variables here
     """
-
     def __int__(self):
         pass
 
@@ -280,7 +278,6 @@ class CatchStockErrors(StockViewContext):
             return None
         except Aborted:
             return None
-
         if isinstance(stock_instance, Stock):
             return True
         return False

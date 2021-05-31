@@ -8,8 +8,7 @@ def handle_view_errors(func):
     """
         view error handler wrapper
     """
-    functools.wraps(func)
-
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -42,8 +41,7 @@ def handle_store_errors(func):
     """
         handle errors related to GCP datastore
     """
-    functools.wraps(func)
-
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
