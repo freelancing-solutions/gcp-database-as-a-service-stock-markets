@@ -10,7 +10,6 @@ def warmup() -> tuple:
     """
         Use Context will create a database connection
         APP-Engine Warm UP Handler
-        # TODO - Finalize the WarmUp Handler
     """
     return "OK", 200
 

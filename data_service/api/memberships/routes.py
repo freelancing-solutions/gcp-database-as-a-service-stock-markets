@@ -8,8 +8,6 @@ from data_service.views.memberships import MembershipsView, MembershipPlansView
 memberships_bp = Blueprint('memberships', __name__)
 
 
-# TODO Rewrite this to allow data to be passed as JSON variables
-
 @memberships_bp.route("/api/v1/members/<path:plan_id>", methods=['POST'])
 @handle_auth
 def get_members(plan_id: str) -> tuple:
@@ -109,5 +107,4 @@ def get_membership_plans() -> tuple:
     member_ship_instance_view: MembershipPlansView = MembershipPlansView()
     return member_ship_instance_view.return_all_plans()
 
-# TODO complete the integration of memberships view and the
 #  API also refer to admin app

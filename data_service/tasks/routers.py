@@ -19,13 +19,13 @@ def stock_task_handler(path: str) -> tuple:
     """
     stock_view_instance: StockView = StockView()
     if path == "create-stock":
-        stock_data: dict = json.loads(request.get_data(as_text=True))
+        stock_data: dict = request.get_json()
         return stock_view_instance.create_stock_data(stock_data=stock_data)
     elif path == "create-broker":
-        broker_data: dict = json.loads(request.get_data(as_text=True))
+        broker_data: dict = request.get_json()
         return stock_view_instance.create_broker_data(broker_data=broker_data)
     elif path == "create-stock-model":
-        json_data: dict = json.loads(request.get_data(as_text=True))
+        json_data: dict = request.get_json()
         if "exchange_id" in json_data and json_data["exchange_id"] != "":
             exchange_id = json_data.get("exchange_id")
         else:
@@ -48,13 +48,13 @@ def stock_task_handler(path: str) -> tuple:
                                                       broker_id=broker_id)
 
     elif path == "create-buy-volume":
-        buy_data: dict = json.loads(request.get_data(as_text=True))
+        buy_data: dict = request.get_json()
         return stock_view_instance.create_buy_model(buy_data=buy_data)
 
     elif path == "create-sell-volume":
-        sell_data: dict = json.loads(request.get_data(as_text=True))
+        sell_data: dict = request.get_json()
         return stock_view_instance.create_sell_volume(sell_data=sell_data)
 
     elif path == "create-net-volume":
-        net_data: dict = json.loads(request.get_data(as_text=True))
+        net_data: dict = request.get_json()
         return stock_view_instance.create_net_volume(net_volume_data=net_data)

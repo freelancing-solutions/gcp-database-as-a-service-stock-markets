@@ -17,7 +17,6 @@ def scrapper(path: str) -> tuple:
         scrapper_data: dict = request.get_json()
         if "data_id" in scrapper_data and scrapper_data["data_id"] != "":
             data_id: str = scrapper_data.get("data_id")
-
             return scrapper_temp_storage.delete_data(data_id=data_id)
     else:
         pass

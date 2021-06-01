@@ -19,7 +19,9 @@ class UserView:
 
     @use_context
     @handle_view_errors
-    def add_user(self, names: str, surname: str, cell: str, email: str, password: str, uid: str = None) -> tuple:
+    def add_user(self, names:  typing.Union[str, None], surname:  typing.Union[str, None],
+                 cell:  typing.Union[str, None], email:  typing.Union[str, None],
+                 password:  typing.Union[str, None], uid:  typing.Union[str, None] = None) -> tuple:
         """
             create new user
         :param names:
@@ -30,7 +32,7 @@ class UserView:
         :param uid:
         :return:
         """
-        if uid is not None:
+        if (uid is not None) and (uid != ""):
             user_list: users_type = UserModel.query(UserModel.uid == uid).fetch()
             if len(user_list) > 0:
                 return jsonify({'status': False, 'message': 'user already exists'}), 500
@@ -48,7 +50,7 @@ class UserView:
             '''
             return jsonify({'status': False, 'message': message}), 500
         user_instance: UserModel = UserModel()
-        if uid:
+        if (uid is not None) and (uid != ""):
             user_instance.set_uid(uid=uid)
         else:
             user_instance.set_uid(uid=create_id())
@@ -67,17 +69,13 @@ class UserView:
 
     @use_context
     @handle_view_errors
-    def update_user(self, uid: str, names: str, surname: str, cell: str, email: str) -> tuple:
+    def update_user(self, uid:  typing.Union[str, None], names:  typing.Union[str, None],
+                    surname:  typing.Union[str, None], cell:  typing.Union[str, None],
+                    email:  typing.Union[str, None]) -> tuple:
         """
             update user details
-        :param uid:
-        :param names:
-        :param surname:
-        :param cell:
-        :param email:
-        :return:
         """
-        if uid is None:
+        if uid is None or uid == "":
             return jsonify({'status': False, 'message': 'User ID is required'}), 500
 
         user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
@@ -93,7 +91,8 @@ class UserView:
 
     @use_context
     @handle_view_errors
-    def delete_user(self, uid: str = None, email: str = None, cell: str = None) -> tuple:
+    def delete_user(self, uid: typing.Union[str, None] = None, email: typing.Union[str, None] = None,
+                    cell:  typing.Union[str, None] = None) -> tuple:
         """
             given either, uid, email or cell delete user
         :param uid:
@@ -156,7 +155,8 @@ class UserView:
     @cache_users.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
-    def get_user(self, uid: str = None, cell: str = None, email: str = None) -> tuple:
+    def get_user(self, uid:  typing.Union[str, None] = None, cell:  typing.Union[str, None] = None,
+                 email:  typing.Union[str, None] = None) -> tuple:
         """
             return a user either by uid, cell or email
         :param uid:
@@ -164,19 +164,19 @@ class UserView:
         :param email:
         :return:
         """
-        if uid is not None:
+        if uid is not None and uid != "":
             user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
             if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by uid'
                 return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
-        if cell is not None:
+        if cell is not None and cell != "":
             user_instance: UserModel = UserModel.query(UserModel.cell == cell).get()
             if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by cell'
                 return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
-        if email is not None:
+        if email is not None and email != "":
             user_instance: UserModel = UserModel.query(UserModel.email == email).get()
             if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by email'
@@ -186,10 +186,10 @@ class UserView:
 
     @use_context
     @handle_view_errors
-    def check_password(self, uid: str, password: str) -> tuple:
-        if uid is None:
+    def check_password(self, uid: typing.Union[str, None], password:  typing.Union[str, None]) -> tuple:
+        if uid is None or uid == "":
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
-        if password is None:
+        if password is None or password == "":
             return jsonify({'status': False, 'message': 'please submit password'}), 500
 
         user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
@@ -203,8 +203,8 @@ class UserView:
 
     @use_context
     @handle_view_errors
-    def deactivate_user(self, uid: str) -> tuple:
-        if uid is None:
+    def deactivate_user(self, uid: typing.Union[str, None]) -> tuple:
+        if uid is None or uid == "":
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
         user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
         if isinstance(user_instance, UserModel):
@@ -218,7 +218,7 @@ class UserView:
 
     @use_context
     @handle_view_errors
-    def login(self, email: str, password: str) -> tuple:
+    def login(self, email:   typing.Union[str, None], password: typing.Union[str, None]) -> tuple:
         """
             this login utility may support client app , not necessary for admin and service to service calls
             Options:

@@ -9,7 +9,6 @@ settings_bp = Blueprint('settings_bp', __name__)
 @settings_bp.route('/api/v1/settings/<path:path>', methods=['GET', 'POST'])
 @handle_auth
 def settings(path):
-
     if request.method == "GET":
         if path == "scrapper":
             # TODO- load scrapper settings
@@ -18,7 +17,6 @@ def settings(path):
         elif path == "parser":
             # TODO- load parser settings
             pass
-
         elif path == "data-service":
             # TODO - load data-service settings
             pass
@@ -31,6 +29,7 @@ def settings(path):
             return scrapper_instances.add_scrapper_settings(scrapper_settings=json_data)
         else:
             pass
+
 
 @settings_bp.route('/api/v1/exchange/<path:path>', methods=['POST', 'GET'])
 @handle_auth
@@ -122,4 +121,3 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.delete_exchange(exchange_id=exchange_id)
         else:
             pass
-

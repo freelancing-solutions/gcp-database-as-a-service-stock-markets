@@ -4,6 +4,23 @@ from data_service.views.users import UserView
 users_bp = Blueprint("users", __name__)
 
 
+def get_kwargs(user_data: dict) -> tuple:
+    if "uid" in user_data and user_data["uid"] != "":
+        uid: str = user_data.get("uid")
+    else:
+        uid: str = ""
+    if "email" in user_data and user_data["email"] != "":
+        email: str = user_data.get("email")
+    else:
+        email: str = ""
+    if "cell" in user_data and user_data["cell"] != "":
+        cell: str = user_data.get("cell")
+    else:
+        cell: str = ""
+
+    return uid, email, cell
+
+
 @users_bp.route("/api/v1/create-user", methods=["POST"])
 @handle_auth
 def create_user() -> tuple:
@@ -32,6 +49,7 @@ def user(path: str) -> tuple:
     :param path:
     :return: json response as tuple
     """
+
     users_view_instance: UserView = UserView()
     if request.method == "GET":
         # get a specific user
@@ -49,39 +67,11 @@ def user(path: str) -> tuple:
                                                    cell=cell, email=email)
         elif path == "delete":
             user_data: dict = request.get_json()
-            if "uid" in user_data and user_data["uid"] != "":
-                uid: str = user_data.get("uid")
-            else:
-                uid: str = ""
-
-            if "email" in user_data and user_data["email"] != "":
-                email: str = user_data.get("email")
-            else:
-                email: str = ""
-
-            if "cell" in user_data and user_data["cell"] != "":
-                cell: str = user_data.get("cell")
-            else:
-                cell: str = ""
-
+            uid, email, cell = get_kwargs(user_data=user_data)
             return users_view_instance.delete_user(uid=uid, email=email, cell=cell)
         elif path == "get":
             user_data: dict = request.get_json()
-            if "uid" in user_data and user_data["uid"] != "":
-                uid: str = user_data.get("uid")
-            else:
-                uid: str = ""
-
-            if "email" in user_data and user_data["email"] != "":
-                email: str = user_data.get("email")
-            else:
-                email: str = ""
-
-            if "cell" in user_data and user_data["cell"] != "":
-                cell: str = user_data.get("cell")
-            else:
-                cell: str = ""
-
+            uid, email, cell = get_kwargs(user_data=user_data)
             return users_view_instance.get_user(uid=uid, email=email, cell=cell)
 
 
@@ -155,7 +145,7 @@ def login() -> tuple:
 def logout() -> tuple:
     user_view_instance: UserView = UserView()
     user_data: dict = request.get_json()
-    pass
+    return "OK", 200
 
 
 @users_bp.route("/api/v1/auth/register", methods=["POST"])

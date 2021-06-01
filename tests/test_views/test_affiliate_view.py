@@ -135,7 +135,10 @@ def test_get_affiliate(mocker):
         affiliates_view_instance = AffiliatesView()
         response, status = affiliates_view_instance.get_affiliate(affiliate_data=affiliate_data_mock)
         assert status == 200, 'unable to locate affiliate'
-        # TODO expand the test cases
+        response_data: dict = response.get_json()
+        assert isinstance(response_data['payload'], dict), 'payload is required'
+        assert response_data['status'] == True, "response is false"
+        assert isinstance(response_data['message'], str), "payload message is not set"
     mocker.stopall()
 
 
