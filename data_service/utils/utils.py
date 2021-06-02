@@ -1,3 +1,4 @@
+import functools
 import os, random, string, time, datetime
 from datetime import datetime, date
 from datetime import time as time_class
@@ -86,3 +87,24 @@ def time_now() -> time_class:
 
 def datetime_now() -> datetime:
     return datetime.now()
+
+
+def task_counter(timer_limit: int = 10000) -> any:
+    """
+        if request is to create task then
+            with connection read task count
+            add one to task count
+    """
+    y = 0
+    while y < timer_limit:
+        yield y
+        y += 1
+
+
+def get_timer() -> int:
+    return next(task_counter())
+
+
+if __name__ == '__main__':
+    for i in task_counter():
+        print(i)

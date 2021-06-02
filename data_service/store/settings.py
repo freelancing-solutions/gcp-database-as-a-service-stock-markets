@@ -15,6 +15,7 @@ class AdminSettingsModel(ndb.Model):
     #  TODO- complete this model
     # TODO - complete the neccessary dunder functions
 
+
 class ExchangeDataModel(ndb.Model):
     exchange_id: str = ndb.StringProperty()
     exchange_country: str = ndb.StringProperty()
@@ -56,6 +57,7 @@ class ExchangeDataModel(ndb.Model):
         self.exchange_tickers_list = tickers_list
         return True
     # TODO - complete the neccessary dunder functions
+
 
 class ScrappingPagesModel(ndb.Model):
     """
@@ -144,6 +146,7 @@ class ScrappingPagesModel(ndb.Model):
         return True
     # TODO - complete the neccessary dunder functions
 
+
 class StockAPIEndPointModel(ndb.Model):
     """
         the actual api to call and its method
@@ -203,4 +206,4 @@ class StockAPIEndPointModel(ndb.Model):
         self.api_key = api_key
         return True
 
-    # TODO - complete the neccessary dunder functions
+    # TODO - complete the necessary dunder functions

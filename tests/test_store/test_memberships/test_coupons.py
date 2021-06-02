@@ -9,6 +9,8 @@ from tests import int_positive
 from data_service.store.memberships import Coupons
 
 coupon_instance: Coupons = Coupons()
+
+
 def test_code():
     code: str = create_id()
     assert coupon_instance.code is None, "coupon code not initialized properly"
@@ -28,6 +30,7 @@ def test_discount():
         coupon_instance.discount = 0
     with raises(BadValueError):
         coupon_instance.discount = "0"
+
 
 def test_is_valid():
     is_valid: bool = False
@@ -51,6 +54,7 @@ def test_date_created():
     with raises(TypeError):
         coupon_instance.date_created = "0"
 
+
 def test_expiration_date():
     expiration_time: int = timestamp()
     assert coupon_instance.expiration_time == 0, "coupon expiration_time not initialized properly"
@@ -60,5 +64,3 @@ def test_expiration_date():
         coupon_instance.expiration_time = ""
     with raises(TypeError):
         coupon_instance.expiration_time = "0"
-
-
