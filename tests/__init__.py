@@ -11,7 +11,6 @@ def test_app():
         app.app_context().push()
     else:
         app = current_app
-
     app.testing = True
     return app
 
