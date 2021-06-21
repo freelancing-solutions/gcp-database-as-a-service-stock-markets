@@ -57,7 +57,7 @@ class AffiliatesView(Validator):
 
     @use_context
     @handle_view_errors
-    def increment_total_recruits(self, affiliate_data: dict) -> tuple:
+    def total_recruits(self, affiliate_data: dict, add: int = 0) -> tuple:
         """
             update an existing affiliate
         """
@@ -66,7 +66,7 @@ class AffiliatesView(Validator):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
         affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
         if isinstance(affiliate_instance, Affiliates):
-            affiliate_instance.total_recruits += 1
+            affiliate_instance.total_recruits += add
             key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Something went wrong while updating affiliate"

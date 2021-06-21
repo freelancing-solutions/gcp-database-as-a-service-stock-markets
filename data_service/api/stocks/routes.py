@@ -79,7 +79,6 @@ def stocks(path: str) -> tuple:
                             }), 500
         return jsonify({'status': True,
                         'message': 'Successfully added a broker task'}), 200
-
     else:
         # if error the error handlers will handle it
         pass

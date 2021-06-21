@@ -27,9 +27,9 @@ def affiliate(path: str) -> tuple:
     elif path == "register":
         return affiliate_view_instance.register_affiliate(affiliate_data=affiliate_data)
     elif path == "inc-recruits":
-        return affiliate_view_instance.increment_total_recruits(affiliate_data=affiliate_data)
+        return affiliate_view_instance.total_recruits(affiliate_data=affiliate_data, add=1)
     elif path == 'dec-recruits':
-        pass
+        return affiliate_view_instance.total_recruits(affiliate_data=affiliate_data, add=-1)
     elif path == 'delete':
         return affiliate_view_instance.delete_affiliate(affiliate_data=affiliate_data)
     elif path == 'mark-active':
@@ -72,4 +72,4 @@ def recruits(path: str) -> tuple:
     else:
         pass
 
-    # TODO Fully intergrate the Affiliate API to the Admin App
+    # TODO Fully integrate the Affiliate API to the Admin App

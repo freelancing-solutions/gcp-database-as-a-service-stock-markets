@@ -12,8 +12,8 @@ pubsub_bp = Blueprint('pubsub', __name__)
 def pubsub(path):
     """
         get messages from pubsub topics
-    :param path:
-    :return:
+        :param path:
+        :return:
     """
     stock_view_instance: StockView = StockView()
     if (request.args.get('token', '') !=
