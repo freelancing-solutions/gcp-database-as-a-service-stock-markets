@@ -26,7 +26,7 @@ def create_member() -> tuple:
         if "uid" in member_details and member_details["uid"] != "":
             uid: str = member_details.get("uid")
         else:
-            message: str = "User ID is required"
+            message: str = "uid is required"
             return jsonify({"status": False, "message": message}), 500
         if "plan_id" in member_details and member_details["plan_id"] != "":
             plan_id: str = member_details.get("plan_id")

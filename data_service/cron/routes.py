@@ -15,20 +15,43 @@ def get_exchange_tickers():
     """
     pass
 
+
 @cron_bp.route('/cron/get-sell-volume', methods=["GET"])
 def get_sell_volume():
     pass
 
+
 @cron_bp.route('/cron/get-buy-volume', methods=["GET"])
 def get_buy_volume():
     pass
+
 
 @cron_bp.route('/cron/get-net-volume', methods=["GET"])
 def get_net_volume():
     pass
 
 
-# TODO complete the intergration of Cron Jobs and use
-# task scheduler to execute the jobs
+# Memberships cron jobs
+@cron_bp.route('/cron/pay-memberships', methods=["GET"])
+def pay_memberships():
+    """
+        used to go through each membership plans and executes payments
+    """
+    pass
 
 
+@cron_bp.route('/cron/downgrade-memberships', methods=["GET"])
+def downgrade_unpaid():
+    """
+        goes through memberships plans and downgrade unpaid plans
+    """
+    pass
+
+
+# Affiliates cron jobs
+@cron_bp.route('/cron/send-affiliate-payment', methods=['GET'])
+def send_affiliate_payment():
+    """
+        send affiliate payment to wallet
+    """
+    pass

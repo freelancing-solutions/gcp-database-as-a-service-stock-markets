@@ -10,10 +10,12 @@ def warmup() -> tuple:
     """
         Use Context will create a database connection
         APP-Engine Warm UP Handler
+        # TODO - send a message that another instance has started up
     """
     return "OK", 200
 
 
+# TODO - send an sms notification or email message with the error message for each error
 # noinspection PyUnusedLocal
 @default_handlers_bp.app_errorhandler(BadRequest)
 def handle_bad_request(e: BadRequest) -> tuple:
