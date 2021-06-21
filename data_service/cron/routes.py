@@ -2,33 +2,33 @@ import os
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
 from data_service.config.exceptions import DataServiceError, InputError
-
+from jobs import cron_pay_memberships, cron_downgrade_unpaid_memberships, cron_send_affiliate_payments
 cron_bp = Blueprint('cron', __name__)
 
-
-@cron_bp.route('/cron/get-tickers-eod', methods=['GET'])
-def get_exchange_tickers():
-    """
-        https://eodhistoricaldata.com/api/exchange-symbol-list/PSE?api_token=6082f94d7285f7.55471245
-        use the above url to get exchange tickers data
-        #TODO see open issue about cron jobs on github
-    """
-    pass
-
-
-@cron_bp.route('/cron/get-sell-volume', methods=["GET"])
-def get_sell_volume():
-    pass
-
-
-@cron_bp.route('/cron/get-buy-volume', methods=["GET"])
-def get_buy_volume():
-    pass
-
-
-@cron_bp.route('/cron/get-net-volume', methods=["GET"])
-def get_net_volume():
-    pass
+#
+# @cron_bp.route('/cron/get-tickers-eod', methods=['GET'])
+# def get_exchange_tickers():
+#     """
+#         https://eodhistoricaldata.com/api/exchange-symbol-list/PSE?api_token=6082f94d7285f7.55471245
+#         use the above url to get exchange tickers data
+#         #TODO see open issue about cron jobs on github
+#     """
+#     pass
+#
+#
+# @cron_bp.route('/cron/get-sell-volume', methods=["GET"])
+# def get_sell_volume():
+#     pass
+#
+#
+# @cron_bp.route('/cron/get-buy-volume', methods=["GET"])
+# def get_buy_volume():
+#     pass
+#
+#
+# @cron_bp.route('/cron/get-net-volume', methods=["GET"])
+# def get_net_volume():
+#     pass
 
 
 # Memberships cron jobs
@@ -37,7 +37,8 @@ def pay_memberships():
     """
         used to go through each membership plans and executes payments
     """
-    pass
+    cron_pay_memberships()
+    return 'OK', 200
 
 
 @cron_bp.route('/cron/downgrade-memberships', methods=["GET"])
@@ -45,7 +46,8 @@ def downgrade_unpaid():
     """
         goes through memberships plans and downgrade unpaid plans
     """
-    pass
+    cron_downgrade_unpaid_memberships()
+    return 'OK', 200
 
 
 # Affiliates cron jobs
@@ -54,4 +56,5 @@ def send_affiliate_payment():
     """
         send affiliate payment to wallet
     """
-    pass
+    cron_send_affiliate_payments()
+    return 'OK', 200
