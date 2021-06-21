@@ -12,6 +12,8 @@ from tests import int_positive, int_negative
 from data_service.store.memberships import MembershipPlans
 
 membership_plan_instance: MembershipPlans = MembershipPlans()
+
+
 def test_plan_id():
     plan_id: str = create_id()
     assert membership_plan_instance.plan_id is None, "plan_id membership_plan plan_id default not set properly"
@@ -33,6 +35,7 @@ def test_plan_name():
     with raises(ValueError):
         membership_plan_instance.plan_name = ""
 
+
 def test_description():
     description: str = "bronze plan"
     assert membership_plan_instance.description is None, "membership_plan description is not being set correctly"
@@ -42,6 +45,7 @@ def test_description():
         membership_plan_instance.description = 0
     with raises(ValueError):
         membership_plan_instance.description = ""
+
 
 def set_total_members():
     total_members: int = 0
@@ -53,6 +57,7 @@ def set_total_members():
     with raises(ValueError):
         membership_plan_instance.total_members = int_negative()
 
+
 def set_schedule_day():
     schedule_day: int = 0
     assert membership_plan_instance.schedule_day is None, "membership_plan schedule_day default is not set correctly"
@@ -61,22 +66,24 @@ def set_schedule_day():
     with raises(TypeError):
         membership_plan_instance.schedule_day = "0"
 
+
 def set_schedule_term():
     schedule_term: str = "yearly"
     assert membership_plan_instance.schedule_term == "monthly", "membership_plan schedule term default is not " \
                                                                 "set correctly"
     membership_plan_instance.schedule_term = schedule_term
     assert membership_plan_instance.schedule_term == schedule_term, "membership_plan schedule_term is not set correctly"
-    schedule_term  = "quarterly"
+    schedule_term = "quarterly"
     membership_plan_instance.schedule_term = schedule_term
     assert membership_plan_instance.schedule_term == schedule_term, "membership_plan schedule term is not set correctly"
-    schedule_term  = "monthly"
+    schedule_term = "monthly"
     membership_plan_instance.schedule_term = schedule_term
     assert membership_plan_instance.schedule_term == schedule_term, "membership_plan schedule term is not set correctly"
     with raises(ValueError):
         membership_plan_instance.schedule_term = ""
     with raises(TypeError):
         membership_plan_instance.schedule_term = 0
+
 
 def test_term_payment_amount():
     payment_amount: int = int_positive()
@@ -86,12 +93,13 @@ def test_term_payment_amount():
     membership_plan_instance.term_payment_amount = amount_instance
     assert membership_plan_instance.term_payment_amount == amount_instance, "membership_plan term_payment amount not " \
                                                                             "set correctly"
-    assert membership_plan_instance.term_payment_amount == amount_instance , "membership_plan term_amount not " \
-                                                                             "set correctly"
+    assert membership_plan_instance.term_payment_amount == amount_instance, "membership_plan term_amount not " \
+                                                                            "set correctly"
     with raises(TypeError):
         membership_plan_instance.term_payment_amount = 0
     with raises(TypeError):
         membership_plan_instance.term_payment_amount = "o"
+
 
 def test_registration_amount():
     payment_amount: int = int_positive()
@@ -106,6 +114,7 @@ def test_registration_amount():
 
     with raises(TypeError):
         membership_plan_instance.registration_amount = "0"
+
 
 def test_is_active():
     is_active: bool = False
@@ -127,5 +136,3 @@ def test_date_created():
         membership_plan_instance.date_created = "o"
     with raises(TypeError):
         membership_plan_instance.date_created = "2021/07/07"
-
-

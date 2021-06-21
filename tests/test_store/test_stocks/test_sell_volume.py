@@ -6,10 +6,13 @@ from data_service.config.stocks import currency_symbols
 from data_service.store.stocks import SellVolumeModel
 from data_service.utils.utils import create_id, today
 from tests import test_app, int_positive, int_negative
+
 sell_volume_instance: SellVolumeModel = SellVolumeModel()
+
 
 def test_sell_sell_volume_instance():
     assert isinstance(sell_volume_instance, SellVolumeModel), "sell_volume_instance deploying correctly"
+
 
 def test_sell_volume_transaction_id():
     temp_id: str = create_id()
@@ -24,6 +27,7 @@ def test_sell_volume_transaction_id():
     with raises(TypeError):
         sell_volume_instance.transaction_id = {}
 
+
 def test_sell_volume_stock_id():
     temp_stock_id: str = create_id()
     assert sell_volume_instance.stock_id is None, "Sell Volume stock id initial value is invalid"
@@ -36,6 +40,7 @@ def test_sell_volume_stock_id():
     with raises(TypeError):
         sell_volume_instance.transaction_id = {}
 
+
 def test_sell_volume_date_created():
     t_date: datetime.date = today()
     assert sell_volume_instance.date_created is None, "Sell volume date_created initial value is invalid"
@@ -45,6 +50,7 @@ def test_sell_volume_date_created():
         sell_volume_instance.date_created = int_positive()
     with raises(BadValueError):
         sell_volume_instance.date_created = {}
+
 
 def test_sell_volume_currency():
     """
@@ -84,6 +90,7 @@ def test_sell_volume_sell_volume():
     with raises(TypeError):
         sell_volume_instance.sell_volume = "abcd"
 
+
 def test_sell_volume_sell_value():
     """
         test if the initial value is integer
@@ -108,6 +115,7 @@ def test_sell_volume_sell_value():
         sell_volume_instance.sell_value = "abed"
     with raises(TypeError):
         sell_volume_instance.sell_value = "0"
+
 
 def test_sell_volume_sell_ave_price():
     """
@@ -148,7 +156,7 @@ def test_sell_volume_sell_market_val_percent():
     assert sell_volume_instance.sell_market_val_percent == sell_percent, "sell Volume sell market percent is not " \
                                                                          "set correctly"
     sell_volume_instance.sell_market_val_percent = 0
-    assert sell_volume_instance.sell_market_val_percent == 0,  "sell Volume sell market percent is not set correctly"
+    assert sell_volume_instance.sell_market_val_percent == 0, "sell Volume sell market percent is not set correctly"
     with raises(TypeError):
         sell_volume_instance.sell_market_val_percent = "abed"
     with raises(ValueError):
@@ -177,7 +185,8 @@ def test_sell_volume_trade_account():
     with raises(ValueError):
         sell_volume_instance.sell_volume = int_negative()
 
-def set_sell_volume_mock(sell_volume: SellVolumeModel) ->  SellVolumeModel:
+
+def set_sell_volume_mock(sell_volume: SellVolumeModel) -> SellVolumeModel:
     sell_volume.transaction_id = "abcde"
     sell_volume.currency = choice(currency_symbols())
     sell_volume.stock_id = "abdfgt"

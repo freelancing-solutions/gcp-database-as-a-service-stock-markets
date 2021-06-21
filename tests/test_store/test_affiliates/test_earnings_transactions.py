@@ -7,8 +7,8 @@ from data_service.utils.utils import create_id
 from data_service.store.affiliates import AffiliateEarningsTransactions
 from tests import int_positive
 
-
 earnings_transactions_instance: AffiliateEarningsTransactions = AffiliateEarningsTransactions()
+
 
 def test_transaction_id():
     """"""
@@ -37,6 +37,7 @@ def test_total_earned():
     with raises(TypeError):
         earnings_transactions_instance.total_earned = 0
 
+
 def test_last_transaction_time():
     last_transaction_time: datetime = datetime.now()
     assert earnings_transactions_instance.last_transaction_time is None, "Last transaction time is not correctly set"
@@ -46,7 +47,4 @@ def test_last_transaction_time():
         earnings_transactions_instance.last_transaction_time = 0
 
     with raises(TypeError):
-        earnings_transactions_instance.last_transaction_time= ""
-
-
-
+        earnings_transactions_instance.last_transaction_time = ""

@@ -61,6 +61,7 @@ def test_surname():
         # noinspection PyTypeChecker
         user_model_instance.set_surname(50)
 
+
 def test_cell():
     result = user_model_instance.set_cell(cell="0762777153")
     assert isinstance(user_model_instance.cell, str), "invalid cell type"
@@ -74,6 +75,7 @@ def test_cell():
     with raises(TypeError):
         # noinspection PyTypeChecker
         user_model_instance.set_cell(123)
+
 
 def test_email():
     result = user_model_instance.set_email(email="mobiusndou@gmail.com")
@@ -89,6 +91,7 @@ def test_email():
         # noinspection PyTypeChecker
         user_model_instance.set_email(0)
 
+
 def test_password():
     password: str = "1234567890"
     result = user_model_instance.set_password(password=password)
@@ -103,6 +106,7 @@ def test_is_active():
     assert user_model_instance.is_active == True, "is_active is not being set correctly"
     assert isinstance(result, bool), "set_is_active result should be bool"
 
+
 def test_time_registered():
     time_stamp: int = timestamp()
     result = user_model_instance.set_time_registered(time_registered=time_stamp)
@@ -110,17 +114,20 @@ def test_time_registered():
     assert user_model_instance.time_registered == time_stamp, "time_registered is not being set correctly"
     assert isinstance(result, bool), "set_time_registered result should be bool"
 
+
 def test_is_admin():
     result = user_model_instance.set_admin(is_admin=False)
     assert isinstance(user_model_instance.is_admin, bool), "invalid is_admin type"
     assert user_model_instance.is_admin == False, "is_admin is not being set correctly"
     assert isinstance(result, bool), "set_is_admin result should be bool"
 
+
 def test_is_support():
     result = user_model_instance.set_support(is_support=False)
     assert isinstance(user_model_instance.is_support, bool), "invalid is_support type"
     assert user_model_instance.is_support == False, "is_support is not being set correctly"
     assert isinstance(result, bool), "set_is_support result should be bool"
+
 
 def test_address():
     address: AddressMixin = AddressMixin()

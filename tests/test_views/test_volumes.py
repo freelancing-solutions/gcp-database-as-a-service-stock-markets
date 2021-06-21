@@ -1,6 +1,7 @@
 import typing
 from datetime import datetime
 from random import randint, choice
+# noinspection PyUnresolvedReferences
 from google.cloud import ndb
 from data_service.config.stocks import currency_symbols
 from data_service.views.stocks import StockView

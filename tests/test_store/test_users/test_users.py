@@ -8,7 +8,9 @@ from data_service.utils.utils import create_id, timestamp
 from tests import int_positive
 from data_service.store.users import UserModel
 from werkzeug.security import check_password_hash
+
 user_instance: UserModel = UserModel()
+
 
 def test_uid():
     uid: str = create_id()
@@ -17,6 +19,7 @@ def test_uid():
     assert user_instance.uid == uid, "user instance uid not set properly"
     with raises(ValueError):
         user_instance.set_uid(uid="")
+
 
 def test_names():
     names: str = "john"
@@ -29,6 +32,7 @@ def test_names():
         # noinspection PyTypeChecker
         user_instance.set_names(names=0)
 
+
 def test_surname():
     surname: str = "doe"
     assert user_instance.surname is None, "user instance surname default not initialized properly"
@@ -40,8 +44,9 @@ def test_surname():
         # noinspection PyTypeChecker
         user_instance.set_surname(surname=0)
 
+
 def test_cell():
-    cell : str = "0761234567"
+    cell: str = "0761234567"
     assert user_instance.cell is None, "user instance cell default not initialized properly"
     user_instance.set_cell(cell=cell)
     assert user_instance.cell == cell, "user instance cell not being set properly"
@@ -50,6 +55,7 @@ def test_cell():
     with raises(TypeError):
         # noinspection PyTypeChecker
         user_instance.set_cell(cell=277627771)
+
 
 def test_email():
     email: str = "mobiusndou@gmail.com"
@@ -64,7 +70,7 @@ def test_email():
 
 
 def test_password():
-    password: str = "asidaosiduaosiduoaisd"
+    password: str = "1234567890"
     assert user_instance.password is None, "user instance password default is not set properly"
     user_instance.set_password(password=password)
     assert check_password_hash(user_instance.password, password), "user instance password not being set properly"
@@ -73,6 +79,7 @@ def test_password():
     with raises(TypeError):
         # noinspection PyTypeChecker
         user_instance.set_password(password=0)
+
 
 def test_is_active():
     is_active: bool = False
@@ -112,6 +119,7 @@ def test_is_admin():
         # noinspection PyTypeChecker
         user_instance.set_admin(is_admin="0")
 
+
 def test_is_support():
     is_support: bool = False
     assert not user_instance.is_support, "user instance is_support default not properly set"
@@ -124,6 +132,7 @@ def test_is_support():
         # noinspection PyTypeChecker
         user_instance.set_support(is_support="0")
 
+
 def test_address():
     address: AddressMixin = AddressMixin(line_1="joe slovo street", city="Johannesburg", zip_code="1000",
                                          province="gauteng")
@@ -132,4 +141,4 @@ def test_address():
     assert user_instance.address == address, "user instance address not properly set"
     with raises(TypeError):
         # noinspection PyTypeChecker
-        user_instance.set_address(address="joe slove street johanesburg")
+        user_instance.set_address(address="joe slovo street johannesburg")

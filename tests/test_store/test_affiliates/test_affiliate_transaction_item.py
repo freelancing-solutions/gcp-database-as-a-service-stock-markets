@@ -11,6 +11,7 @@ from tests import int_positive
 
 transaction_item_instance: AffiliateTransactionItems() = AffiliateTransactionItems()
 
+
 def test_transaction_id():
     transaction_id: str = create_id()
     assert transaction_item_instance.transaction_id is None, "Transaction Id is not set correctly"
@@ -20,6 +21,7 @@ def test_transaction_id():
         transaction_item_instance.transaction_id = 0
     with raises(ValueError):
         transaction_item_instance.transaction_id = ""
+
 
 def test_amount():
     amount_instance: AmountMixin = AmountMixin()
@@ -32,8 +34,10 @@ def test_amount():
     assert amount_instance.currency == currency, "currency symbol is not being set correctly"
     transaction_item_instance.amount = amount_instance
     assert transaction_item_instance.amount == amount_instance, "amount instance is not being set correctly"
+
     with raises(TypeError):
         transaction_item_instance.amount = 0
+
 
 def test_transaction_date():
     transaction_date: datetime = datetime.now()
@@ -42,4 +46,3 @@ def test_transaction_date():
     assert transaction_item_instance.transaction_date == transaction_date, "transaction_date is not being set correctly"
     with raises(TypeError):
         transaction_item_instance.transaction_date = 0
-

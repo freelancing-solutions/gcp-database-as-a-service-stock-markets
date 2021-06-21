@@ -7,6 +7,7 @@ from tests import test_app, int_positive, int_negative
 
 buy_volume_instance: BuyVolumeModel = BuyVolumeModel()
 
+
 def test_buy_volume_instance():
     assert isinstance(buy_volume_instance, BuyVolumeModel), "buy volume not instantiating correctly"
 
@@ -31,6 +32,7 @@ def test_stock_id():
     with raises(ValueError):
         buy_volume_instance.stock_id = ""
 
+
 def test_date_created():
     message: str = "Buy_volume date_created is not being set correctly"
     buy_volume_instance.date_created = today()
@@ -51,6 +53,7 @@ def test_currency():
             buy_volume_instance.currency = "XXX"
         assert buy_volume_instance.currency != "XXX", "False Currency Symbols are being accepted"
 
+
 def test_buy_volume():
     temp_buy: int = int_positive()
     assert buy_volume_instance.buy_volume == 0, "Buy Volume initial volume is invalid"
@@ -61,6 +64,7 @@ def test_buy_volume():
     with raises(ValueError):
         buy_volume_instance.buy_volume = int_negative()
     assert buy_volume_instance.buy_volume != int_negative(), "Buy volume not being set correctly"
+
 
 def test_buy_value():
     t_buy_value: int = int_positive()
@@ -76,6 +80,7 @@ def test_buy_value():
         buy_volume_instance.buy_value = ""
     with raises(ValueError):
         buy_volume_instance.buy_value = int_negative()
+
 
 def test_buy_ave_price():
     t_ave_price: int = int_positive()
@@ -113,6 +118,7 @@ def buy_trade_count():
     with raises(ValueError):
         buy_volume_instance.buy_trade_count = -10
 
+
 def set_buy_volume_mock_data(my_buy_volume_instance: BuyVolumeModel) -> BuyVolumeModel:
     my_buy_volume_instance.buy_volume = 100
     my_buy_volume_instance.buy_value = 100
@@ -121,6 +127,7 @@ def set_buy_volume_mock_data(my_buy_volume_instance: BuyVolumeModel) -> BuyVolum
     my_buy_volume_instance.currency = "PHP"
     my_buy_volume_instance.transaction_id = create_id()
     return my_buy_volume_instance
+
 
 def test_buy_volume_dunder_functions():
     first_buy: BuyVolumeModel = set_buy_volume_mock_data(my_buy_volume_instance=buy_volume_instance)

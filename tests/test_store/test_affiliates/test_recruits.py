@@ -3,8 +3,8 @@ from pytest import raises
 from data_service.utils.utils import create_id
 from data_service.store.affiliates import Recruits
 
-
 recruit_instance: Recruits = Recruits()
+
 
 def test_recruit_affiliate_id():
     rec_id: str = create_id()
@@ -17,6 +17,7 @@ def test_recruit_affiliate_id():
     with raises(ValueError):
         recruit_instance.affiliate_id = ""
 
+
 def test_recruit_referrer_uid():
     referrer_uid: str = create_id()
 
@@ -28,6 +29,7 @@ def test_recruit_referrer_uid():
     with raises(ValueError):
         recruit_instance.referrer_uid = ""
 
+
 def test_datetime_recruited():
     datetime_recruited: datetime = datetime.now()
 
@@ -38,6 +40,7 @@ def test_datetime_recruited():
         recruit_instance.datetime_recruited = 0
     with raises(TypeError):
         recruit_instance.datetime_recruited = "date"
+
 
 def test_datetime_updated():
     datetime_updated: datetime = datetime.now()
@@ -75,6 +78,7 @@ def test_plan_id():
     with raises(ValueError):
         recruit_instance.plan_id = ""
 
+
 def test_is_active():
     is_active: bool = False
     assert recruit_instance.is_active, "recruit is active is not being set correctly"
@@ -84,6 +88,7 @@ def test_is_active():
         recruit_instance.is_active = 0
     with raises(TypeError):
         recruit_instance.is_active = 1
+
 
 def test_is_deleted():
     is_deleted: bool = True

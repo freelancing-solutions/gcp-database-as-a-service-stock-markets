@@ -6,6 +6,7 @@ from data_service.store.memberships import Memberships
 
 membership_instance: Memberships = Memberships()
 
+
 def test_uid():
     uid: str = create_id()
     assert membership_instance.uid is None, "membership uid default not properly set"
@@ -15,6 +16,7 @@ def test_uid():
         membership_instance.uid = 0
     with raises(ValueError):
         membership_instance.uid = ""
+
 
 def test_plan_id():
     plan_id: str = create_id()
@@ -50,7 +52,8 @@ def test_date_created():
     with raises(TypeError):
         membership_instance.date_created = 0
     with raises(TypeError):
-        membership_instance.date_created =""
+        membership_instance.date_created = ""
+
 
 def test_plan_start_date():
     plan_start_date: datetime = datetime.now()
@@ -63,8 +66,3 @@ def test_plan_start_date():
         membership_instance.plan_start_date = "2017/09/09"
     with raises(TypeError):
         membership_instance.plan_start_date = ""
-
-
-
-
-

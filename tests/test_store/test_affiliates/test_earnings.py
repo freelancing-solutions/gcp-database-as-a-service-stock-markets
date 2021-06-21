@@ -6,6 +6,7 @@ from tests import int_positive
 
 recruitment_instance: Recruits = Recruits()
 
+
 def test_recruit_affiliate_id():
     affiliate_id: str = create_id()
     assert recruitment_instance.affiliate_id is None, "recruits affiliate_id default was not set correctly"
