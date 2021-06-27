@@ -127,5 +127,6 @@ list_of_currencies: typing.List[list] = [
     ["YER", "Yemen Rial"],
     ["ZWD", "Zimbabwe Dollar"]]
 
+
 def currency_symbols() -> typing.List[str]:
     return [currency[0] for currency in list_of_currencies]

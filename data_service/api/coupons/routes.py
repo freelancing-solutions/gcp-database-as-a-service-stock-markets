@@ -31,5 +31,5 @@ def coupons(path: str) -> tuple:
     else:
         pass
 
-    # TODO intergrate Coupons to admin app and allow for the app to
+    # TODO integrate Coupons to admin app and allow for the app to
     # generate and manage them

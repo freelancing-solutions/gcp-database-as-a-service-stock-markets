@@ -274,7 +274,7 @@ class RecruitsView(Validator):
             return jsonify({'status': False, 'message': 'is_active is required and can only be a boolean'}), 500
 
         recruits_list: typing.List[Recruits] = Recruits.query(Recruits.affiliate_id == affiliate_id).fetch()
-        if isinstance(recruits_list, list) and len(recruits_list) > 0:
+        if isinstance(recruits_list, list) and (len(recruits_list) > 0):
             recruits_instance: Recruits = recruits_list[0]
             recruits_instance.is_active = is_active
             key = recruits_instance.put(retries=self._max_retries, timeout=self._max_timeout)
@@ -292,7 +292,7 @@ class RecruitsView(Validator):
     @handle_view_errors
     def get_recruit(self, recruit_data: dict) -> tuple:
         affiliate_id: str = recruit_data.get('affiliate_id')
-        if affiliate_id is None or affiliate_id == "":
+        if (affiliate_id is None) or (affiliate_id == ""):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
         recruits_list: typing.List[Recruits] = Recruits.query(Recruits.affiliate_id == affiliate_id).fetch()
         if isinstance(recruits_list, list) and len(recruits_list) > 0:
@@ -332,7 +332,7 @@ class RecruitsView(Validator):
     @handle_view_errors
     def get_recruits_by_affiliate(self, affiliate_data: dict) -> tuple:
         affiliate_id: str = affiliate_data.get('affiliate_id')
-        if affiliate_id is None or affiliate_id == "":
+        if (affiliate_id is None) or (affiliate_id == ""):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
         recruits_list: typing.List[Recruits] = Recruits.query(Recruits.affiliate_id == affiliate_id).fetch()
         payload = [recruit.to_dict() for recruit in recruits_list]
@@ -345,7 +345,7 @@ class RecruitsView(Validator):
     @handle_view_errors
     def get_recruits_by_active_affiliate(self, affiliate_data: dict, is_active: bool) -> tuple:
         affiliate_id: str = affiliate_data.get('affiliate_id')
-        if affiliate_id is None or affiliate_id == "":
+        if (affiliate_id is None) or (affiliate_id == ""):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
 
         if not isinstance(is_active, bool):
@@ -361,7 +361,7 @@ class RecruitsView(Validator):
 class EarningsView(Validator):
     """
         Used by system to register new earnings for affiliates
-        # TODO finalize the Earnings Repository
+        # TODO finalize the Earnings Class
     """
 
     def __init__(self):

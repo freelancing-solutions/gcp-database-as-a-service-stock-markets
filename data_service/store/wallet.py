@@ -29,7 +29,6 @@ class ClassSetters:
 
         if not isinstance(value, str):
             raise ValueError(" {} can only be a string".format(str(self)))
-
         return value
 
     def set_funds(self, value: AmountMixin) -> AmountMixin:
@@ -43,7 +42,6 @@ class ClassSetters:
 
         if not isinstance(value, str):
             raise ValueError(" {} can only be a string".format(str(self)))
-
         return value
 
     def set_transaction_types(self, value: str) -> str:
@@ -54,7 +52,6 @@ class ClassSetters:
     def set_datetime(self, value: datetime) -> datetime:
         if not isinstance(value, datetime):
             raise ValueError("{} invalid argument".format(str(self)))
-
         return value
 
     def set_bool(self, value: bool) -> bool:

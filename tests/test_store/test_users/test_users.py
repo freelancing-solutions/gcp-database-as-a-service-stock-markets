@@ -17,6 +17,7 @@ def test_uid():
     assert user_instance.uid is None, "user instance uid default not initialized properly"
     user_instance.set_uid(uid)
     assert user_instance.uid == uid, "user instance uid not set properly"
+
     with raises(ValueError):
         user_instance.set_uid(uid="")
 
@@ -26,6 +27,7 @@ def test_names():
     assert user_instance.names is None, "user instance names default not initialized properlu"
     user_instance.set_names(names=names)
     assert user_instance.names == names, "user instance names not being set properly"
+
     with raises(ValueError):
         user_instance.set_names(names="")
     with raises(TypeError):
@@ -99,6 +101,7 @@ def test_time_registered():
     assert user_instance.time_registered, "user instance time_registered default not properly set"
     user_instance.set_time_registered(time_registered=time_registered)
     assert user_instance.time_registered == time_registered, "user instance time_registered default not set properly"
+
     with raises(TypeError):
         # noinspection PyTypeChecker
         user_instance.set_time_registered(time_registered="")

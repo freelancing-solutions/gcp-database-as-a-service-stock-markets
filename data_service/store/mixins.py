@@ -1,5 +1,6 @@
 from google.cloud import ndb
 
+
 class AmountMixin(ndb.Model):
     amount: int = ndb.IntegerProperty(default=0)
     currency: str = ndb.StringProperty()
@@ -18,6 +19,7 @@ class AmountMixin(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
 
 class UserMixin(ndb.Model):
     email: str = ndb.StringProperty()

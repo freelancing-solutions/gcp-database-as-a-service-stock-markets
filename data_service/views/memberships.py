@@ -75,7 +75,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
 
 class MembershipsView(Validators):
 
-    def __init__(self):
+    def  __init__(self):
         super(MembershipsView, self).__init__()
 
     @use_context
@@ -372,8 +372,7 @@ class MembershipPlansView(Validators):
         membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
         if isinstance(membership_plans_instance, MembershipPlans):
             membership_plans_instance.is_active = is_active
-            key = membership_plans_instance.put(retries=self._max_retries,
-                                                timeout=self._max_timeout)
+            key = membership_plans_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
                 return jsonify({'status': False, 'message': message}), 500
@@ -427,7 +426,8 @@ class MembershipPlansView(Validators):
     @staticmethod
     def return_all_plans() -> tuple:
         membership_plan_list: typing.List[MembershipPlans] = MembershipPlans.query().fetch()
-        return jsonify({'status': True, 'payload': membership_plan_list,
+        plan_list: typing.List[dict] = [plan.to_dict() for plan in membership_plan_list]
+        return jsonify({'status': True, 'payload': plan_list,
                         'message': 'successfully fetched all memberships'}), 200
 
 
