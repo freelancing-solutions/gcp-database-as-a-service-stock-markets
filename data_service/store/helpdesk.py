@@ -37,6 +37,10 @@ class Ticket(ndb.Model):
             return False
         if self.ticket_id != other.ticket_id:
             return False
+        if self.uid != other.uid:
+            return False
+        if self.topic != other.topic:
+            return False
         return True
 
     def __str__(self) -> str:

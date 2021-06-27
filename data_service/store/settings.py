@@ -7,13 +7,13 @@ from data_service.utils.utils import create_id
 class UserSettingsModel(ndb.Model):
     uid: str = ndb.StringProperty()
     #  TODO- complete this model
-    # TODO - complete the neccessary dunder functions
+    #  TODO - complete the necessary d_under functions
 
 
 class AdminSettingsModel(ndb.Model):
     uid: str = ndb.StringProperty()
     #  TODO- complete this model
-    # TODO - complete the neccessary dunder functions
+    #  TODO - complete the necessary d_under functions
 
 
 class ExchangeDataModel(ndb.Model):
@@ -26,6 +26,23 @@ class ExchangeDataModel(ndb.Model):
     last_accessed_results: bool = ndb.BooleanProperty(default=True)  # if results where positive
     # true else false
     errors_list: errors_type = ndb.StringProperty(repeated=True)  # comma separated list containing last accessed
+
+    def __str__(self) -> str:
+        return "<Exchange {} {}".format(self.exchange_name, self.exchange_country)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        if self.exchange_id != other.exchange_id:
+            return False
+        if self.exchange_name != other.exchange_name:
+            return False
+        if self.exchange_country != other.exchange_country:
+            return False
+        return True
 
     # errors if available
     def set_exchange_id(self) -> bool:
@@ -56,7 +73,7 @@ class ExchangeDataModel(ndb.Model):
             raise TypeError("exchange tickers can only be a list")
         self.exchange_tickers_list = tickers_list
         return True
-    # TODO - complete the neccessary dunder functions
+    # TODO - complete the necessary d_under functions
 
 
 class ScrappingPagesModel(ndb.Model):
@@ -78,6 +95,23 @@ class ScrappingPagesModel(ndb.Model):
     login_page_url: str = ndb.StringProperty(default="")
     username: str = ndb.StringProperty(default="")
     password: str = ndb.StringProperty(default="")
+
+    def __str__(self):
+        return "<ScrappingPage {} {}".format(self.target_url, self.login_page_url)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        if self.exchange_id != other.exchange_id:
+            return False
+        if self.page_id != other.page_id:
+            return False
+        if self.target_url != other.target_url:
+            return False
+        return True
 
     def set_exchange_id(self, exchange_id: str) -> bool:
         exchange_id = exchange_id.strip().lower()
@@ -144,7 +178,7 @@ class ScrappingPagesModel(ndb.Model):
             raise TypeError("password can only be a string")
         self.password = password
         return True
-    # TODO - complete the neccessary dunder functions
+    # TODO - complete the necessary d_under functions
 
 
 class StockAPIEndPointModel(ndb.Model):
@@ -159,6 +193,16 @@ class StockAPIEndPointModel(ndb.Model):
     require_api_key: bool = ndb.BooleanProperty(default=False)
     api_key: str = ndb.StringProperty()
 
+    def __str__(self):
+        return "{}{}".format(self.stocks_api_endpoint, self.method)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        if self.exchange_id != other.exchange
     def set_api_id(self) -> bool:
         self.api_id = create_id()
         return True
@@ -206,4 +250,4 @@ class StockAPIEndPointModel(ndb.Model):
         self.api_key = api_key
         return True
 
-    # TODO - complete the necessary dunder functions
+    # TODO - complete the necessary d_under functions

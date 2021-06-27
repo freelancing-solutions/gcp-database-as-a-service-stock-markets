@@ -1,8 +1,9 @@
 from google.cloud import ndb
 
+
 class ScrapperTempStore(ndb.Model):
     """
-        used to store scrapped data from sellenium
+        used to store scrapped data from selenium
         this is data still waiting to be parsed
         the parser should to be able to fill in info from external api endpoints
         available
