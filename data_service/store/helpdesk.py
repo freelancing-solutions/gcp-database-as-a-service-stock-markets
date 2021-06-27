@@ -75,7 +75,18 @@ class HelpDesk(ndb.Model):
 
 
 class TicketValid:
-    pass
+
+    @staticmethod
+    def is_topic_valid(topic: str) -> bool:
+        pass
+
+    @staticmethod
+    def is_subject_valid(subject: str) -> bool:
+        pass
+
+    @staticmethod
+    def is_message_valid(message: str) -> bool:
+        pass
 
 
 class Ticket(ndb.Model):
