@@ -67,6 +67,22 @@ class WalletModel(ndb.Model):
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
     paypal_address: str = ndb.StringProperty(validator=ClassSetters.set_paypal)
 
+    def __str__(self) -> str:
+        return "<Wallet {}{}{}{}".format(self.paypal_address, self.available_funds, self.time_created,
+                                         self.last_transaction_time)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.uid != other.uid:
+            return False
+        if self.paypal_address != other.paypal_address:
+            return False
+        return True
+
 
 class WalletTransactionsModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
@@ -74,9 +90,42 @@ class WalletTransactionsModel(ndb.Model):
     transaction_type: str = ndb.StringProperty(validator=ClassSetters.set_transaction_types)
     transaction_date: str = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
 
+    def __str__(self) -> str:
+        return "<Transactions {} {}".format(self.transaction_type, self.transaction_date)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.transaction_type != other.transaction_type:
+            return False
+        if self.transaction_date != other.transaction_date:
+            return False
+        return True
+
 
 class WalletTransactionItemModel(ndb.Model):
     transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     item_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
     amount: AmountMixin = ndb.StructuredProperty(AmountMixin)
     is_verified: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+
+    def __str__(self) -> str:
+        return "{}{}".format(self.amount, self.is_verified)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.transaction_id != other.transaction_id:
+            return False
+        if self.item_id != other.item_id:
+            return False
+        if self.amount != other.amount:
+            return False
+        return True
+

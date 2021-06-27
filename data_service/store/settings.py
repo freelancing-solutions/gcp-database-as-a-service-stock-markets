@@ -202,7 +202,14 @@ class StockAPIEndPointModel(ndb.Model):
     def __eq__(self, other):
         if self.__class__ != other.__class__:
             return False
-        if self.exchange_id != other.exchange
+        if self.exchange_id != other.exchange_id:
+            return False
+        if self.api_id != other.api_id:
+            return False
+        if self.stocks_api_endpoint != other.stocks_api_endpoint:
+            return False
+        return True
+
     def set_api_id(self) -> bool:
         self.api_id = create_id()
         return True

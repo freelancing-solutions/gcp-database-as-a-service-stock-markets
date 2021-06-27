@@ -35,6 +35,7 @@ class ClientTraffic(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+
 class DataServiceTraffic(ndb.Model):
     """
         use hooks on data-service app to update this stats
@@ -59,4 +60,3 @@ class DataServiceTraffic(ndb.Model):
 
     def __repr__(self):
         return self.__str__()
-
