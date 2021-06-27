@@ -2,21 +2,57 @@ from google.cloud import ndb
 from datetime import datetime
 
 
-def set_int(prop, value: int) -> int:
-    """
-        set positive integer
-    """
-    if not(isinstance(value, int)):
-        raise TypeError("{} can only be an integer".format(str(prop)))
-    if value < 0:
-        raise ValueError("{} can only be a positive integer".format(str(prop)))
-    return value
+class Setters:
+
+    @staticmethod
+    def set_int(prop, value: int) -> int:
+        """
+            set positive integer
+        """
+        if not (isinstance(value, int)):
+            raise TypeError("{} can only be an integer".format(str(prop)))
+        if value < 0:
+            raise ValueError("{} can only be a positive integer".format(str(prop)))
+        return value
+
+    @staticmethod
+    def set_email(prop, value: str) -> str:
+        """
+            TODO validate email
+        """
+        return value
+
+    @staticmethod
+    def set_cell(prop, value: str) -> str:
+        """
+            TODO validate cell
+        """
+        return value
+
+    @staticmethod
+    def set_bool(prop, value: bool) -> bool:
+        if not (isinstance(value, bool)):
+            raise TypeError("{} can only be a boolean".format(str(prop)))
+        return value
+
+    @staticmethod
+    def set_str(prop, value: str) -> str:
+        if not (isinstance(value, str)):
+            raise TypeError("{} can only be a string".format(str(prop)))
+        return value
+
+
+setters_init: Setters = Setters()
+
+
+class HelpDeskValid:
+    pass
 
 
 class HelpDesk(ndb.Model):
-    total_tickets: int = ndb.IntegerProperty(default=0, validator=set_int)
-    total_tickets_opened: int = ndb.IntegerProperty(default=0, validator=set_int)
-    total_tickets_closed: int = ndb.IntegerProperty(default=0, validator=set_int)
+    total_tickets: int = ndb.IntegerProperty(default=0, validator=setters_init.set_int)
+    total_tickets_opened: int = ndb.IntegerProperty(default=0, validator=setters_init.set_int)
+    total_tickets_closed: int = ndb.IntegerProperty(default=0, validator=setters_init.set_int)
 
     def __str__(self) -> str:
         return "<HelpDesk total_tickets: {}, total_open : {}, total_closed: {}".format(str(self.total_tickets),
@@ -38,45 +74,23 @@ class HelpDesk(ndb.Model):
         return True
 
 
-def set_str(prop, value: str) -> str:
-    if not(isinstance(value, str)):
-        raise TypeError("{} can only be a string".format(str(prop)))
-    return value
-
-
-def set_email(prop, value: str) -> str:
-    """
-        TODO validate email
-    """
-    return value
-
-
-def set_cell(prop, value: str) -> str:
-    """
-        TODO validate cell
-    """
-    return value
-
-
-def set_bool(prop, value: bool) -> bool:
-    if not(isinstance(value, bool)):
-        raise TypeError("{} can only be a boolean".format(str(prop)))
-    return value
+class TicketValid:
+    pass
 
 
 class Ticket(ndb.Model):
-    ticket_id: str = ndb.StringProperty(validator=set_str)
-    uid: str = ndb.StringProperty(validator=set_str)
-    topic: str = ndb.StringProperty(validator=set_str)
-    subject: str = ndb.StringProperty(validator=set_str)
-    message: str = ndb.StringProperty(validator=set_str)
-    email: str = ndb.StringProperty(validator=set_email)
-    cell: str = ndb.StringProperty(validator=set_cell)
+    ticket_id: str = ndb.StringProperty(validator=setters_init.set_str)
+    uid: str = ndb.StringProperty(validator=setters_init.set_str)
+    topic: str = ndb.StringProperty(validator=setters_init.set_str)
+    subject: str = ndb.StringProperty(validator=setters_init.set_str)
+    message: str = ndb.StringProperty(validator=setters_init.set_str)
+    email: str = ndb.StringProperty(validator=setters_init.set_email)
+    cell: str = ndb.StringProperty(validator=setters_init.set_cell)
     assigned: bool = ndb.BooleanProperty(default=False)
-    assigned_to_uid: str = ndb.StringProperty(validator=set_str)
-    response_sent: bool = ndb.BooleanProperty(default=False, validator=set_bool)
-    is_resolved: bool = ndb.BooleanProperty(default=False, validator=set_bool)
-    client_not_responding: bool = ndb.BooleanProperty(default=False, validator=set_bool)
+    assigned_to_uid: str = ndb.StringProperty(validator=setters_init.set_str)
+    response_sent: bool = ndb.BooleanProperty(default=False, validator=setters_init.set_bool)
+    is_resolved: bool = ndb.BooleanProperty(default=False, validator=setters_init.set_bool)
+    client_not_responding: bool = ndb.BooleanProperty(default=False, validator=setters_init.set_bool)
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
     time_updated: datetime = ndb.DateTimeProperty(auto_now=True)
 
@@ -99,15 +113,19 @@ class Ticket(ndb.Model):
         return self.__str__()
 
 
+class TicketThreadValid:
+    pass
+
+
 class TicketThread(ndb.Model):
     """
         sort by ticket_id, then time_created , then mark by sent_by to create thread
     """
-    ticket_id: str = ndb.StringProperty()
-    thread_id: str = ndb.StringProperty()
-    sent_by: str = ndb.StringProperty()  # Support Staff or Client
-    subject: str = ndb.StringProperty()
-    message: str = ndb.StringProperty()
+    ticket_id: str = ndb.StringProperty(validator=setters_init.set_str)
+    thread_id: str = ndb.StringProperty(validator=setters_init.set_str)
+    sent_by: str = ndb.StringProperty(validator=setters_init.set_str)  # Support Staff or Client
+    subject: str = ndb.StringProperty(validator=setters_init.set_str)
+    message: str = ndb.StringProperty(validator=setters_init.set_str)
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
 
     # noinspection DuplicatedCode
