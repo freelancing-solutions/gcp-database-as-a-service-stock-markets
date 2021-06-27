@@ -12,7 +12,7 @@ class AffiliatesValidators:
 
     @staticmethod
     def affiliate_exist(affiliate_id: typing.Union[str, None]) -> typing.Union[None, bool]:
-        if not isinstance(affiliate_id, str) or affiliate_id == "":
+        if not(isinstance(affiliate_id, str)) or (affiliate_id == ""):
             raise ValueError("Affiliate ID cannot be Null, and Should be a String")
         try:
             affiliate_instance: Affiliates = Affiliates.query(Affiliates.affiliate_id == affiliate_id).get()
@@ -28,7 +28,7 @@ class AffiliatesValidators:
 
     @staticmethod
     def user_already_registered(uid: typing.Union[str, None]) -> typing.Union[None, bool]:
-        if not isinstance(uid, str) or uid == "":
+        if not(isinstance(uid, str)) or (uid == ""):
             raise ValueError("UID cannot be Null, and should be a string")
         try:
             affiliate_instance: Affiliates = Affiliates.query(Affiliates.uid == uid).get()
@@ -47,9 +47,10 @@ class RecruitsValidators:
     def __init__(self):
         super(RecruitsValidators, self).__init__()
 
+    # noinspection DuplicatedCode
     @staticmethod
     def user_already_recruited(uid: typing.Union[str, None]) -> typing.Union[None, bool]:
-        if not isinstance(uid, str) or uid == "":
+        if not(isinstance(uid, str)) or (uid == ""):
             raise ValueError("UID cannot be Null, and can only be a string")
         try:
             recruit_instance: Recruits = Recruits.query(Recruits.uid == uid).get()
@@ -65,7 +66,7 @@ class RecruitsValidators:
 
     @staticmethod
     def user_already_an_affiliate(uid: typing.Union[str, None]) -> typing.Union[None, bool]:
-        if not isinstance(uid, str) or (uid == ""):
+        if not(isinstance(uid, str)) or (uid == ""):
             raise ValueError("UID cannot be Null, and can only be a string")
         try:
             affiliate_instance: Affiliates = Affiliates.query(Affiliates.uid == uid).get()
@@ -86,7 +87,7 @@ class EarningsValidators:
 
     @staticmethod
     def unclosed_earnings_already_exist(affiliate_id: str) -> typing.Union[None, bool]:
-        if not isinstance(affiliate_id, str) or affiliate_id == "":
+        if not(isinstance(affiliate_id, str)) or (affiliate_id == ""):
             raise ValueError("Affiliate_id cannot be Null, and can only be a string")
         try:
             earnings_list: typing.List[EarningsData] = EarningsData.query(
@@ -114,7 +115,7 @@ class ClassSetters:
         return value
 
     def set_number(self, value: int) -> int:
-        if not isinstance(value, int):
+        if not(isinstance(value, int)):
             raise TypeError("{} can only be an integer".format(str(self)))
         if value < 0:
             raise ValueError('{} can only be positive integer'.format(str(self)))
@@ -122,17 +123,17 @@ class ClassSetters:
         return value
 
     def set_date(self, value: datetime) -> datetime:
-        if not isinstance(value, datetime):
+        if not(isinstance(value, datetime)):
             raise TypeError("{}, can only be a datetime".format(str(self)))
         return value
 
     def set_bool(self, value: bool) -> bool:
-        if not isinstance(value, bool):
+        if not(isinstance(value, bool)):
             raise TypeError("{}, can only be a boolean".format(str(self)))
         return value
 
     def set_percent(self, value: int) -> int:
-        if not isinstance(value, int):
+        if not(isinstance(value, int)):
             raise TypeError("{}, can only be an integer".format(str(self)))
 
         if 0 < value > 100:
@@ -141,7 +142,7 @@ class ClassSetters:
         return value
 
     def set_amount(self, amount: AmountMixin) -> AmountMixin:
-        if not isinstance(amount, AmountMixin):
+        if not(isinstance(amount, AmountMixin)):
             raise TypeError('{} is invalid'.format(str(self)))
         return amount
 
@@ -152,7 +153,7 @@ class Affiliates(ndb.Model):
     """
 
     def set_date_time(self, value: datetime) -> datetime:
-        if not isinstance(value, datetime):
+        if not(isinstance(value, datetime)):
             raise TypeError("{} can only be a datetime object".format(str(self)))
         return value
 

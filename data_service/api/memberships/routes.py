@@ -23,18 +23,18 @@ def create_member() -> tuple:
     """
     try:
         member_details: dict = request.get_json()
-        if "uid" in member_details and member_details["uid"] != "":
+        if ("uid" in member_details) and (member_details["uid"] != ""):
             uid: str = member_details.get("uid")
         else:
             message: str = "uid is required"
             return jsonify({"status": False, "message": message}), 500
-        if "plan_id" in member_details and member_details["plan_id"] != "":
+        if ("plan_id" in member_details) and (member_details["plan_id"] != ""):
             plan_id: str = member_details.get("plan_id")
         else:
             message: str = "plan_id is required"
             return jsonify({"status": False, "message": message}), 500
 
-        if "plan_start_date" in member_details and member_details["plan_start_date"] != "":
+        if ("plan_start_date" in member_details) and (member_details["plan_start_date"] != ""):
             plan_start_date: date = date_string_to_date(member_details.get("plan_start_date"))
         else:
             plan_start_date: date = datetime.now().date()
@@ -53,8 +53,8 @@ def get_update_status(uid: str) -> tuple:
     """
     if request.method == "PUT":
         json_data: dict = request.get_json()
-        if "status" in json_data and json_data["status"] != "":
-            status: str = json_data["status"]
+        if ("status" in json_data) and (json_data["status"] != ""):
+            status: str = json_data.get("status")
         else:
             message: str = "status is required and should be paid or unpaid"
             return jsonify({'status': True, 'message': message}), 500
@@ -71,7 +71,7 @@ def get_update_status(uid: str) -> tuple:
 @memberships_bp.route("/api/v1/members/<path:plan_id>/status/<path:status>", methods=["GET"])
 @handle_auth
 def get_plan_members_by_payment_status(plan_id: str, status: str) -> tuple:
-    if plan_id != "" and status != "":
+    if (plan_id != "") and (status != ""):
         membership_view_instance: MembershipsView = MembershipsView()
         return membership_view_instance.return_plan_members_by_payment_status(plan_id=plan_id, status=status)
 
@@ -81,13 +81,13 @@ def get_plan_members_by_payment_status(plan_id: str, status: str) -> tuple:
 def change_membership_plan(plan_id: str) -> tuple:
     if plan_id != "":
         json_data: dict = request.get_json()
-        if "uid" in json_data and json_data['uid'] != "":
-            uid: str = json_data["uid"]
+        if ("uid" in json_data) and (json_data['uid'] != ""):
+            uid: str = json_data.get("uid")
         else:
             return jsonify({'status': False, 'message': 'User Id is required'}), 500
 
-        if 'dest_plan_id' in json_data and json_data['dest_plan_id'] != "":
-            dest_plan_id: str = json_data["dest_plan_id"]
+        if ('dest_plan_id' in json_data) and (json_data['dest_plan_id'] != ""):
+            dest_plan_id: str = json_data.get("dest_plan_id")
         else:
             return jsonify({"status": False, "message": "destination plan id is required"}), 500
 
