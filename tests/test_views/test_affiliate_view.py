@@ -80,7 +80,7 @@ def test_increment_decrement_total_recruits(mocker):
 
     with test_app().app_context():
         affiliates_view_instance = AffiliatesView()
-        response, status = affiliates_view_instance.increment_total_recruits(affiliate_data=affiliate_data_mock)
+        response, status = affiliates_view_instance.total_recruits(affiliate_data=affiliate_data_mock, add=1)
         affiliate_dict: dict = response.get_json()
         assert affiliate_dict['payload']['total_recruits'] == 1, 'failed to increment number of affiliates'
         assert affiliate_dict['status'], "failing to set the return boolean status"

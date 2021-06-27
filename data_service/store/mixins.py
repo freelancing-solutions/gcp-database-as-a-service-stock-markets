@@ -1,5 +1,4 @@
 from google.cloud import ndb
-
 from data_service.config.stocks import currency_symbols
 
 
@@ -31,7 +30,7 @@ class AmountMixin(ndb.Model):
         return True
 
     def __str__(self) -> str:
-        return "{} {}".format(self.currency, self.amount)
+        return "Amount: {} {}".format(self.currency, self.amount)
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -93,7 +92,8 @@ class AddressMixin(ndb.Model):
         return True
 
     def __str__(self) -> str:
-        return "<Address : {} {} {} {}".format(self.line_1, self.city, self.zip_code, self.province)
+        return "<Address : {} {} {} {}".format(self.line_1, self.city, self.zip_code,
+                                               self.province)
 
     def __repr__(self) -> str:
         return self.__str__()
