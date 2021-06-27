@@ -75,7 +75,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
 
 class MembershipsView(Validators):
 
-    def  __init__(self):
+    def __init__(self):
         super(MembershipsView, self).__init__()
 
     @use_context

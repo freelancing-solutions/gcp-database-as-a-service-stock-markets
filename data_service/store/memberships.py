@@ -106,7 +106,7 @@ class CouponsValidator:
 
 class ClassSetters:
     def set_id(self, value: str) -> str:
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string ".format(str(self)))
@@ -115,7 +115,7 @@ class ClassSetters:
         return value.strip()
 
     def set_status(self, value: str) -> str:
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
             raise TypeError("{} invalid status".format(str(self)))
@@ -130,14 +130,14 @@ class ClassSetters:
         return value
 
     def set_string(self, value: str) -> str:
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string ".format(str(self)))
         return value.strip()
 
     def set_schedule_term(self, value: str) -> str:
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(self)))
         if not isinstance(value, str):
             raise TypeError("{} can only be a string ".format(str(self)))
@@ -173,6 +173,7 @@ class ClassSetters:
         return value
 
 
+# noinspection DuplicatedCode
 class Memberships(ndb.Model):
     """
         TODO - add validators
@@ -187,12 +188,16 @@ class Memberships(ndb.Model):
     # become active
 
     def __eq__(self, other) -> bool:
+
         if self.__class__ != other.__class__:
             return False
         if self.uid != other.uid:
             return False
-
         if self.plan_id != other.plan_id:
+            return False
+        if self.date_created != other.date_created:
+            return False
+        if self.plan_start_date != other.plan_start_date:
             return False
         return True
 
@@ -204,6 +209,7 @@ class Memberships(ndb.Model):
         return "Memberships: {}{}{}".format(self.uid, self.plan_id, self.status)
 
 
+# noinspection DuplicatedCode
 class MembershipPlans(ndb.Model):
     """
         contains a definition of all membership plans
@@ -239,6 +245,7 @@ class MembershipPlans(ndb.Model):
         return "<Memberships: {}{}".format(self.plan_id, self.plan_name)
 
 
+# noinspection DuplicatedCode
 class Coupons(ndb.Model):
     """
         applied on checkout of memberships
@@ -270,6 +277,7 @@ class Coupons(ndb.Model):
     expiration_time: int = ndb.IntegerProperty(default=0, validator=set_expiration_time)
 
 
+# noinspection DuplicatedCode
 class AccessRights(ndb.Model):
     """
         # TODO - add validators

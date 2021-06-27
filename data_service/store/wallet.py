@@ -24,7 +24,7 @@ class ClassSetters:
         self.transaction_types = ['withdrawal', 'deposit']
 
     def set_id(self, value: str) -> str:
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError(" {} cannot be Null".format(str(self)))
 
         if not isinstance(value, str):
@@ -37,7 +37,7 @@ class ClassSetters:
         return value
 
     def set_paypal(self, value: str) -> str:
-        if value is None or value == "":
+        if (value is None) or (value == ""):
             raise ValueError(" {} cannot be Null".format(str(self)))
 
         if not isinstance(value, str):

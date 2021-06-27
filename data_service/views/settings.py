@@ -161,37 +161,37 @@ class ScrappingPagesView:
     @use_context
     @handle_view_errors
     def add_scrapper_settings(self, scrapper_settings: dict) -> tuple:
-        if "exchange_id" in scrapper_settings and scrapper_settings['exchange_id'] != "":
-            exchange_id: str = scrapper_settings.get('exchange_id') or None
+        if ("exchange_id" in scrapper_settings) and (scrapper_settings['exchange_id'] != ""):
+            exchange_id: str = scrapper_settings.get('exchange_id')
         else:
             return jsonify({"status": False, "message": "exchange id is required"}), 500
 
-        if "target_url" in scrapper_settings and scrapper_settings["target_url"] != "":
-            target_url: str = scrapper_settings.get("target_url") or None
+        if ("target_url" in scrapper_settings) and (scrapper_settings["target_url"] != ""):
+            target_url: str = scrapper_settings.get("target_url")
         else:
             return jsonify({"status": False, "message": "target url is required"}), 500
 
-        if "access_timestamps" in scrapper_settings and scrapper_settings["access_timestamps"] != "":
+        if ("access_timestamps" in scrapper_settings) and (scrapper_settings["access_timestamps"] != ""):
             access_timestamps: typing.List[int] = scrapper_settings.get('access_timestamps') or None
         else:
             return jsonify({"status": False, "message": "access timestamps is required"}), 500
 
-        if "require_login" in scrapper_settings and scrapper_settings["require_login"] != "":
-            require_login: bool = scrapper_settings.get("require_login") or None
+        if ("require_login" in scrapper_settings) and (scrapper_settings["require_login"] != ""):
+            require_login: bool = scrapper_settings.get("require_login")
             scrapper_settings_instance: ScrappingPagesModel = ScrappingPagesModel()
             if require_login:
-                if "login_page_url" in scrapper_settings and scrapper_settings["login_page_url"] != "":
-                    login_page_url: str = scrapper_settings.get("login_page_url") or None
+                if ("login_page_url" in scrapper_settings) and (scrapper_settings["login_page_url"] != ""):
+                    login_page_url: str = scrapper_settings.get("login_page_url")
                 else:
                     return jsonify({"status": False, "message": "login page url is required"}), 500
 
-                if "username" in scrapper_settings and scrapper_settings["username"] != "":
-                    username: str = scrapper_settings.get("username") or None
+                if ("username" in scrapper_settings) and (scrapper_settings["username"] != ""):
+                    username: str = scrapper_settings.get("username")
                 else:
                     return jsonify({"status": False, "message": "login_name is required"}), 500
 
-                if "password" in scrapper_settings and scrapper_settings["password"] != "":
-                    password: str = scrapper_settings.get('password') or None
+                if ("password" in scrapper_settings) and (scrapper_settings["password"] != ""):
+                    password: str = scrapper_settings.get('password')
                 else:
                     return jsonify({"status": False, "message": "password is required"}), 500
                 try:

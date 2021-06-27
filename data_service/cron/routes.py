@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
 from data_service.config.exceptions import DataServiceError, InputError
-from jobs import cron_pay_memberships, cron_downgrade_unpaid_memberships, cron_send_affiliate_payments
+from jobs import cron_pay_memberships, cron_down_grade_unpaid_memberships, cron_send_affiliate_payments
 cron_bp = Blueprint('cron', __name__)
 
 #
@@ -46,7 +46,7 @@ def downgrade_unpaid():
     """
         goes through memberships plans and downgrade unpaid plans
     """
-    cron_downgrade_unpaid_memberships()
+    cron_down_grade_unpaid_memberships()
     return 'OK', 200
 
 
