@@ -1,9 +1,25 @@
 from google.cloud import ndb
 
+from data_service.config.stocks import currency_symbols
+
+
+def set_amount(prop, value) -> int:
+    if not(isinstance(value, int)):
+        raise TypeError("{} can only be integer".format(str(prop)))
+    return value
+
+
+def set_currency(prop, value) -> str:
+    if not(isinstance(value, str)):
+        raise TypeError("{} can only be string".format(prop))
+    if value not in currency_symbols():
+        raise ValueError("{} not a valid currency symbol".format(str(prop)))
+    return value
+
 
 class AmountMixin(ndb.Model):
-    amount: int = ndb.IntegerProperty(default=0)
-    currency: str = ndb.StringProperty()
+    amount: int = ndb.IntegerProperty(default=0, validator=set_amount)
+    currency: str = ndb.StringProperty(validator=set_currency)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -21,9 +37,23 @@ class AmountMixin(ndb.Model):
         return self.__str__()
 
 
+def set_email(prop, value) -> str:
+    """
+        TODO validate email here
+    """
+    return value
+
+
+def set_password(prop, value) -> str:
+    """
+        TODO validate password here
+    """
+    return value
+
+
 class UserMixin(ndb.Model):
-    email: str = ndb.StringProperty()
-    password: str = ndb.StringProperty()
+    email: str = ndb.StringProperty(validator=set_email)
+    password: str = ndb.StringProperty(validator=set_password)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -41,11 +71,13 @@ class UserMixin(ndb.Model):
         return self.__str__()
 
 
+# TODO add validators for address
 class AddressMixin(ndb.Model):
     line_1: str = ndb.StringProperty()
     city: str = ndb.StringProperty()
     zip_code: str = ndb.StringProperty()
     province: str = ndb.StringProperty()
+    country: str = ndb.StringProperty()
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:

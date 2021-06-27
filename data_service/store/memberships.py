@@ -271,10 +271,30 @@ class Coupons(ndb.Model):
         return value
 
     code: str = ndb.StringProperty(validator=set_code)
-    discount: int = ndb.StructuredProperty(AmountMixin)
+    discount: AmountMixin = ndb.StructuredProperty(AmountMixin)
     is_valid: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
     date_created: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
     expiration_time: int = ndb.IntegerProperty(default=0, validator=set_expiration_time)
+
+    def __str__(self) -> str:
+        return "Code: {} Discount: {} Is Valid: {} Date Created: {} Expire at : {}".format(self.code, self.discount,
+                                                                                           self.is_valid,
+                                                                                           self.date_created,
+                                                                                           self.expiration_time)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.code != other.code:
+            return False
+        if self.discount != other.discount:
+            return False
+        if self.expiration_time != other.expiration_time:
+            return False
+        return True
 
 
 # noinspection DuplicatedCode
