@@ -307,4 +307,27 @@ class MembershipDailyStats(ndb.Model):
     expected_earnings_this_month: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
     total_earned_so_far: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
 
-    # TODO - finish this
+    def __str__(self) -> str:
+        return "<Stats Users: {} Members: {}  Earnings: {} Total: {}".format(self.total_users,
+                                                                             self.total_members,
+                                                                             self.expected_earnings_this_month,
+                                                                             self.total_earned_so_far)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.daily_id != other.daily_id:
+            return False
+        if self.total_users != other.total_users:
+            return False
+        if self.total_members != other.total_members:
+            return False
+        if self.expected_earnings_this_month != other.expected_earnings_this_month:
+            return False
+        if self.total_earned_so_far != other.total_earned_so_far:
+            return False
+        return True
+

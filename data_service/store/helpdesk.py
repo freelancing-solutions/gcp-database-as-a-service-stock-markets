@@ -15,6 +15,17 @@ class HelpDesk(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.total_tickets != other.total_tickets:
+            return False
+        if self.total_tickets_opened != other.total_tickets_opened:
+            return False
+        if self.total_tickets_closed != other.total_tickets_closed:
+            return False
+        return True
+
 
 class Ticket(ndb.Model):
     ticket_id: str = ndb.StringProperty()
