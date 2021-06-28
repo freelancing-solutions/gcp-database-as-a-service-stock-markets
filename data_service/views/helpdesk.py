@@ -176,15 +176,42 @@ class TicketView(Validators):
                             'message': 'successfully updated ticket'}), 200
         return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
 
+    @use_context
+    @handle_view_errors
+    def assign_ticket(self, ticket_id: str, assigned_to_uid: str) -> tuple:
+        ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
+        if isinstance(ticket_instance, Ticket):
+            ticket_instance.assigned_to_uid = assigned_to_uid
+            key = ticket_instance.put()
+            if key is None:
+                return jsonify({'status': False, 'message': 'General error updating database'}), 500
+            return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
+                            'message': 'successfully updated ticket'}), 200
+        return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
 
+    @use_context
+    @handle_view_errors
+    def send_response_by_email(self, ticket_id: str, subject: str, message: str) -> tuple:
+        """
+            find ticket send email response mark ticket save ticket save response
+        """
+        ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
+        if isinstance(ticket_instance, Ticket):
+            ticket_instance.response_sent = True
+            key = ticket_instance.put()
+            # TODO Send response here
+            if key is None:
+                return jsonify({'status': False, 'message': 'General error updating database'}), 500
+            return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
+                            'message': 'successfully updated ticket'}), 200
+        return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
 
-    def assign_ticket(self):
-        pass
-
-    def send_response_by_email(self):
-        pass
-
-    def send_sms_notification(self):
+    @use_context
+    @handle_view_errors
+    def send_sms_notification(self, ticket_id: str, subject: str, message: str) -> tuple:
+        """
+            find ticket send notification update ticket to reflect that notification was sent
+        """
         pass
 
     def add_response(self):
