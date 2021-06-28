@@ -68,6 +68,8 @@ class HelpDeskView(Validators):
                             'message': 'help desk already created'}), 200
         help_desk_instance = HelpDesk()
         key = help_desk_instance.put()
+        if key is None:
+            return jsonify({'status': False, 'message': 'Error updating database'}), 500
         return jsonify({'status': True, 'payload': help_desk_instance.to_dict(),
                         'message': 'help desk created'}), 200
 
@@ -121,14 +123,60 @@ class TicketView(Validators):
             ticket_instance.email = email
             ticket_instance.cell = cell
             key = ticket_instance.put()
+
+            if key is None:
+                return jsonify({'status': False, 'message': 'Error updating database'}), 500
             return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
                             'message': 'successfully created ticket'}), 200
 
-    def close_ticket(self):
-        pass
+    @use_context
+    @handle_view_errors
+    def resolve_ticket(self, ticket_id: str) -> tuple:
+        """
+            ticket_id: str
+            return: resolved ticket
+        """
+        ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
+        if isinstance(ticket_instance, Ticket):
+            ticket_instance.is_resolved = True
 
-    def update_ticket(self):
-        pass
+            key = ticket_instance.put()
+            if key is None:
+                return jsonify({'status': False, 'message': 'General error updating database'}), 500
+            return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
+                            'message': 'successfully resolved ticket'}), 200
+
+        return jsonify({'status': False, 'message': 'Ticket not found'}), 500
+
+    @use_context
+    @handle_view_errors
+    def update_ticket(self, ticket_id: typing.Union[str, None], topic: typing.Union[str, None] = None,
+                      subject: typing.Union[str, None] = None, message: typing.Union[str, None] = None,
+                      email: str = typing.Union[str, None], cell: typing.Union[str, None] = None,
+                      assigned_to_uid: typing.Union[str, None] = None) -> tuple:
+
+        ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
+        if isinstance(ticket_instance, Ticket):
+            if topic is not None:
+                ticket_instance.topic = topic
+            if subject is not None:
+                ticket_instance.subject = subject
+            if message is not None:
+                ticket_instance.message = message
+            if email is not None:
+                ticket_instance.email = email
+            if cell is not None:
+                ticket_instance.cell = cell
+            if assigned_to_uid is not None:
+                ticket_instance.assigned_to_uid = assigned_to_uid
+            key = ticket_instance.put()
+            if key is None:
+                return jsonify({'status': False, 'message': 'General error updating database'}), 500
+            return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
+                            'message': 'successfully updated ticket'}), 200
+        return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
+
+
 
     def assign_ticket(self):
         pass
@@ -137,9 +185,6 @@ class TicketView(Validators):
         pass
 
     def send_sms_notification(self):
-        pass
-
-    def resolve_ticket(self):
         pass
 
     def add_response(self):
