@@ -744,8 +744,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def get_stock_model(self, transaction_id: str = None) -> tuple:
-        if transaction_id is None:
+    def get_stock_model(self, transaction_id: typing.Union[str, None] = None) -> tuple:
+        if (transaction_id is None) or (transaction_id == ""):
             return jsonify({"status": False, "message": "transaction id is required"}), 500
 
         stock_model: StockModel = StockModel.query(StockModel.transaction_id == transaction_id).get()
@@ -770,15 +770,16 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def get_buy_volume(self, transaction_id: str = None, date_created: date_class = None,
-                       stock_id: str = None) -> tuple:
+    def get_buy_volume(self, transaction_id: typing.Union[str, None] = None,
+                       date_created: typing.Union[date_class, None] = None,
+                       stock_id: typing.Union[str, None] = None) -> tuple:
         """
             get a specific buy volume filtered by transaction_id or
             by date_class and stock_id
         """
-        if transaction_id is not None:
+        if (transaction_id is not None) and (transaction_id != ""):
             buy_volume: BuyVolumeModel = BuyVolumeModel.query(BuyVolumeModel.transaction_id == transaction_id).get()
-        elif date_created is not None:
+        elif (date_created is not None) and (date_created != ""):
             # for a specific date_class buy volume should be filtered by stock
             buy_volume: BuyVolumeModel = BuyVolumeModel.query(
                 BuyVolumeModel.date_created == date_created, BuyVolumeModel.stock_id == stock_id).get()
@@ -795,7 +796,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         """
             return buy volumes for all stocks for a specific date_class
         """
-        if date_created is None:
+        if (date_created is None) or (date_created == ""):
             return jsonify({'status': True, 'message': 'date is required'}), 500
 
         buy_volume_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
@@ -811,7 +812,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         """
             for a specific stock return daily buy volumes
         """
-        if stock_id is None:
+        if (stock_id is None) or (stock_id == ""):
             return jsonify({'status': False, 'message': 'Stock ID cannot be None'}), 500
 
         buy_volume_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
@@ -830,11 +831,11 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             for a specific transaction_id return the related transaction_id
             or for date_class and stock_id return a specific sell_volume
         """
-        if transaction_id is not None:
+        if (transaction_id is not None) or (transaction_id == ""):
             sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
                 SellVolumeModel.transaction_id == transaction_id).fetch()
 
-        elif (date_class is not None) and (stock_id is not None):
+        elif (date_created is not None) and (stock_id is not None):
             sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
                 SellVolumeModel.date_created == date_created, SellVolumeModel.stock_id == stock_id).fetch()
         else:
@@ -866,7 +867,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def get_daily_sell_volumes_by_stock(self, stock_id: typing.Union[str, None] = None) -> tuple:
-        if stock_id is None:
+        if (stock_id is None) or (stock_id == ""):
             return jsonify({'status': False, "message": "stock_id cannot be None"}), 500
 
         sell_volume_list: typing.List[SellVolumeModel] = SellVolumeModel.query(
@@ -883,7 +884,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                        date_created: typing.Union[date_class, None] = None,
                        stock_id: typing.Union[str, None] = None) -> tuple:
 
-        if transaction_id is not None:
+        if (transaction_id is not None) and (transaction_id != ""):
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
                 NetVolumeModel.transaction_id == transaction_id).fetch()
         elif date_class and stock_id:
@@ -901,7 +902,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def get_day_net_volumes(self, date_created: typing.Union[date_class, None] = None) -> tuple:
-        if date_class is not None:
+        if (date_created is not None) and (date_created != ""):
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
                 NetVolumeModel.date_created == date_created).fetch()
 
@@ -917,7 +918,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def get_daily_net_volumes_by_stock(self, stock_id: typing.Union[str, None] = None) -> tuple:
-        if stock_id is not None:
+        if (stock_id is not None) and (stock_id != ""):
             net_volume_list: typing.List[NetVolumeModel] = NetVolumeModel.query(
                 NetVolumeModel.stock_id == stock_id).fetch()
             payload: typing.List[dict] = [net_volume.to_dict() for net_volume in net_volume_list]
