@@ -1,13 +1,12 @@
-import functools
 import typing
-from google.api_core.exceptions import RetryError, Aborted
-from flask import jsonify, current_app
-from datetime import datetime, date
+from flask import jsonify
 from data_service.store.helpdesk import HelpDeskValid, TicketValid, TicketThreadValid, Ticket
 from data_service.store.helpdesk import HelpDesk
 from data_service.utils.utils import create_id
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
+import re
+import functools
 
 
 class Validators(HelpDeskValid, TicketValid, TicketThreadValid):
@@ -23,6 +22,7 @@ class Validators(HelpDeskValid, TicketValid, TicketThreadValid):
         """
             TODO find out if uid contains valid user
         """
+
         return True
 
     @staticmethod
@@ -31,7 +31,8 @@ class Validators(HelpDeskValid, TicketValid, TicketThreadValid):
             TODO - check if user owns email
             TODO - or if email is being used by another user
         """
-        return True
+        regex = '\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b'
+        return True if re.search(regex, email) is not None else False
 
     @staticmethod
     def is_cell_valid(cell: str) -> bool:
@@ -75,6 +76,7 @@ class HelpDeskView(Validators):
 
     @use_context
     @handle_view_errors
+    @functools.lru_cache(maxsize=1)
     def get_help_desk(self) -> tuple:
         help_desk_instance: HelpDesk = HelpDesk.query().get()
         if isinstance(help_desk_instance, HelpDesk):

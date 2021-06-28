@@ -21,6 +21,8 @@ class ScrapperView:
             scrapper_instance.data_id = create_id()
             scrapper_instance.data = scrapper_data.get('data')
             key = scrapper_instance.put()
+            if key is None:
+                return jsonify({'status': False, 'message': 'Unable to update database'}), 500
             return jsonify({'status': False, 'message': "successfully created scrapped data"}), 200
         else:
             return jsonify({'status': False, 'message': "invalid data format"}), 500

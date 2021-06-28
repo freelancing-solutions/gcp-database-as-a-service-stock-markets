@@ -14,32 +14,35 @@ class Validator(WalletValidator):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
-    def can_add_wallet(self, uid: typing.Union[None, str] = None) -> bool:
-        if uid is None or (uid == ''):
-            return False
+    @staticmethod
+    def is_uid_none(uid: typing.Union[None, str]) -> bool:
+        if (uid is None) or (uid == ''):
+            return True
+        return False
 
-        wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
-        if isinstance(wallet_exist, bool):
-            return not wallet_exist
-        raise DataServiceError('Unable to verify wallet data')
+    def can_add_wallet(self, uid: typing.Union[None, str] = None) -> bool:
+        if not(self.is_uid_none(uid=uid)):
+            wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
+            if isinstance(wallet_exist, bool):
+                return not wallet_exist
+            raise DataServiceError('Unable to verify wallet data')
+        return False
 
     def can_update_wallet(self, uid: typing.Union[None, str] = None) -> bool:
-        if uid is None or uid == "":
-            return False
-
-        wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
-        if isinstance(wallet_exist, bool):
-            return wallet_exist
-        raise DataServiceError('Unable to verify wallet data')
+        if not(self.is_uid_none(uid=uid)):
+            wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
+            if isinstance(wallet_exist, bool):
+                return wallet_exist
+            raise DataServiceError('Unable to verify wallet data')
+        return False
 
     def can_reset_wallet(self, uid: typing.Union[None, str]) -> bool:
-        if uid is None or uid == "":
-            return False
-
-        wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
-        if isinstance(wallet_exist, bool):
-            return wallet_exist
-        raise DataServiceError('Unable to verify wallet data')
+        if not(self.is_uid_none(uid=uid)):
+            wallet_exist: typing.Union[bool, None] = self.wallet_exist(uid=uid)
+            if isinstance(wallet_exist, bool):
+                return wallet_exist
+            raise DataServiceError('Unable to verify wallet data')
+        return False
 
 
 class WalletView(Validator):
@@ -70,9 +73,11 @@ class WalletView(Validator):
 
     @use_context
     @handle_view_errors
-    def get_wallet(self, uid: str) -> tuple:
-        wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
-        return jsonify({'status': True, 'payload': wallet_instance.to_dict(), 'message': 'wallet found'}), 200
+    def get_wallet(self, uid: typing.Union[str, None]) -> tuple:
+        if not(self.is_uid_none(uid=uid)):
+            wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
+            return jsonify({'status': True, 'payload': wallet_instance.to_dict(), 'message': 'wallet found'}), 200
+        return jsonify({'status': True, 'message': 'uid cannot be None'}), 500
 
     @use_context
     @handle_view_errors
