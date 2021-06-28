@@ -84,9 +84,7 @@ class MembershipsView(Validators):
         if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date) is True:
             # can use get to simplify this and make transactions faster
             membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
-            if isinstance(membership_instance, Memberships):
-                pass
-            else:
+            if not(isinstance(membership_instance, Memberships)):
                 membership_instance: Memberships = Memberships()
                 membership_instance.plan_id = create_id()
                 membership_instance.status = 'Unpaid'
@@ -116,20 +114,24 @@ class MembershipsView(Validators):
     def set_membership_status(self, uid: str, status: str) -> tuple:
 
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
-        membership_instance.status = status
-        key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
-        if key is None:
-            message: str = "Unable to save membership instance to database, please try again"
-            raise DataServiceError(message)
+        if isinstance(membership_instance, Memberships):
+            membership_instance.status = status
+            key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
+            if key is None:
+                message: str = "Unable to save membership instance to database, please try again"
+                raise DataServiceError(message)
 
-        message: str = "Successfully update membership status"
+            message: str = "Successfully update membership status"
+            return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message}), 200
+        message: str = "Memberships record not found"
         return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message}), 200
 
     @use_context
     @handle_view_errors
     def change_membership(self, uid: str, origin_plan_id: str, dest_plan_id: str) -> tuple:
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
-        if membership_instance.plan_id == origin_plan_id:
+
+        if isinstance(membership_instance, Memberships) and (membership_instance.plan_id == origin_plan_id):
             if self.plan_exist(plan_id=dest_plan_id) is True:
                 membership_instance.plan_id = dest_plan_id
                 key = membership_instance.put(retries=self._max_retries,
