@@ -173,17 +173,19 @@ class ClassSetters:
         return value
 
 
+setters: ClassSetters = ClassSetters()
+
 # noinspection DuplicatedCode
 class Memberships(ndb.Model):
     """
         TODO - add validators
     """
-    uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    status: str = ndb.StringProperty(default="unpaid", validator=ClassSetters.set_status)  # Paid/ Unpaid
+    uid: str = ndb.StringProperty(validator=setters.set_id)
+    plan_id: str = ndb.StringProperty(validator=setters.set_id)
+    status: str = ndb.StringProperty(default="unpaid", validator=setters.set_status)  # Paid/ Unpaid
     date_created: date = ndb.DateTimeProperty(auto_now_add=True,
-                                              validator=ClassSetters.set_datetime)
-    plan_start_date: date = ndb.DateProperty(validator=ClassSetters.set_datetime)  # the date this plan will
+                                              validator=setters.set_datetime)
+    plan_start_date: date = ndb.DateProperty(validator=setters.set_datetime)  # the date this plan will
 
     # become active
 
@@ -215,19 +217,19 @@ class MembershipPlans(ndb.Model):
         contains a definition of all membership plans
         TODO - add validators
     """
-    plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    plan_name: str = ndb.StringProperty(validator=ClassSetters.set_string)
-    description: str = ndb.StringProperty(validator=ClassSetters.set_string)
-    total_members: int = ndb.IntegerProperty(validator=ClassSetters.set_number)
+    plan_id: str = ndb.StringProperty(validator=setters.set_id)
+    plan_name: str = ndb.StringProperty(validator=setters.set_string)
+    description: str = ndb.StringProperty(validator=setters.set_string)
+    total_members: int = ndb.IntegerProperty(validator=setters.set_number)
     schedule_day: int = ndb.IntegerProperty(default=0,
-                                            validator=ClassSetters.set_schedule_day)  # 1 or 2 or 3 of every month or
+                                            validator=setters.set_schedule_day)  # 1 or 2 or 3 of every month or
     # week, or three months
     schedule_term: str = ndb.StringProperty(default="monthly",
-                                            validator=ClassSetters.set_schedule_term)  # Monthly, Quarterly, Annually
-    term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    registration_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    is_active: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
-    date_created: int = ndb.DateProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
+                                            validator=setters.set_schedule_term)  # Monthly, Quarterly, Annually
+    term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    registration_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    is_active: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
+    date_created: int = ndb.DateProperty(auto_now_add=True, validator=setters.set_datetime)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -272,8 +274,8 @@ class Coupons(ndb.Model):
 
     code: str = ndb.StringProperty(validator=set_code)
     discount: AmountMixin = ndb.StructuredProperty(AmountMixin)
-    is_valid: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
-    date_created: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
+    is_valid: bool = ndb.BooleanProperty(default=True, validator=setters.set_bool)
+    date_created: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_datetime)
     expiration_time: int = ndb.IntegerProperty(default=0, validator=set_expiration_time)
 
     def __str__(self) -> str:
@@ -306,7 +308,7 @@ class AccessRights(ndb.Model):
         #  the route should accept route and uid and then respond with True or False
         # of all the routes he or she can access
     """
-    plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    plan_id: str = ndb.StringProperty(validator=setters.set_id)
     access_rights_list: typing.List[str] = ndb.StringProperty(repeated=True)  # a list containing the rights of users
 
     # TODO - finish this
@@ -318,14 +320,14 @@ class MembershipDailyStats(ndb.Model):
 
         run update stats task against this class daily
     """
-    daily_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    daily_id: str = ndb.StringProperty(validator=setters.set_id)
     total_users: int = ndb.IntegerProperty(default=0)
     total_members: int = ndb.IntegerProperty(default=0)
-    expected_monthly_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    expected_quarterly_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    expected_annual_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    expected_earnings_this_month: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    total_earned_so_far: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    expected_monthly_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    expected_quarterly_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    expected_annual_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    expected_earnings_this_month: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    total_earned_so_far: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
 
     def __str__(self) -> str:
         return "<Stats Users: {} Members: {}  Earnings: {} Total: {}".format(self.total_users,

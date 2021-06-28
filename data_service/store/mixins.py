@@ -34,7 +34,7 @@ class Setters:
     @staticmethod
     def set_password(prop, value) -> str:
         """
-            TODO validate password here
+            TODO validate password here, using regex
         """
         return value
 
