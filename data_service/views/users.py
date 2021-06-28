@@ -75,7 +75,7 @@ class UserView:
         """
             update user details
         """
-        if uid is None or uid == "":
+        if (uid is None) or (uid == ""):
             return jsonify({'status': False, 'message': 'User ID is required'}), 500
 
         user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
@@ -100,17 +100,17 @@ class UserView:
         :param cell:
         :return:
         """
-        if uid != "" and (uid is not None):
+        if (uid != "") and (uid is not None):
             user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
             if isinstance(user_instance, UserModel):
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
-        elif email != "" and (email is not None):
+        elif (email != "") and (email is not None):
             user_instance: UserModel = UserModel.query(UserModel.email == email).get()
             if isinstance(user_instance, UserModel):
                 user_instance.key.delete()
                 return jsonify({'status': True, 'message': 'successfully deleted user'}), 200
-        elif cell != "" and (cell is not None):
+        elif (cell != "") and (cell is not None):
             user_instance: UserModel = UserModel.query(UserModel.cell == cell).get()
             if isinstance(user_instance, UserModel):
                 # TODO- rather mark user as deleted
@@ -164,19 +164,19 @@ class UserView:
         :param email:
         :return:
         """
-        if uid is not None and uid != "":
+        if (uid is not None) and (uid != ""):
             user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
             if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by uid'
                 return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
-        if cell is not None and cell != "":
+        if (cell is not None) and (cell != ""):
             user_instance: UserModel = UserModel.query(UserModel.cell == cell).get()
             if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by cell'
                 return jsonify({'status': True, 'payload': user_instance.to_dict(), 'message': message}), 200
 
-        if email is not None and email != "":
+        if (email is not None) and (email != ""):
             user_instance: UserModel = UserModel.query(UserModel.email == email).get()
             if isinstance(user_instance, UserModel):
                 message: str = 'successfully retrieved user by email'
@@ -187,9 +187,9 @@ class UserView:
     @use_context
     @handle_view_errors
     def check_password(self, uid: typing.Union[str, None], password:  typing.Union[str, None]) -> tuple:
-        if uid is None or uid == "":
+        if (uid is None) or (uid == ""):
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
-        if password is None or password == "":
+        if (password is None) or (password == ""):
             return jsonify({'status': False, 'message': 'please submit password'}), 500
 
         user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
@@ -204,7 +204,7 @@ class UserView:
     @use_context
     @handle_view_errors
     def deactivate_user(self, uid: typing.Union[str, None]) -> tuple:
-        if uid is None or uid == "":
+        if (uid is None) or (uid == ""):
             return jsonify({'status': False, 'message': 'please submit user id'}), 500
         user_instance: UserModel = UserModel.query(UserModel.uid == uid).get()
         if isinstance(user_instance, UserModel):
