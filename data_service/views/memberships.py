@@ -141,7 +141,6 @@ class MembershipsView(Validators):
                 membership_instance.plan_id = dest_plan_id
                 key = membership_instance.put(retries=self._max_retries,
                                               timeout=self._max_timeout)
-                print("key is : {}".format(key))
             if key is None:
                 message: str = "Unable to Change Membership, please try again later"
                 raise DataServiceError(message)
@@ -270,37 +269,37 @@ class MembershipPlansView(Validators):
 
         """
 
-        if "plan_name" in membership_plan_data and membership_plan_data['plan_name'] != "":
+        if ("plan_name" in membership_plan_data) and (membership_plan_data['plan_name'] != ""):
             plan_name = membership_plan_data.get('plan_name')
         else:
             return jsonify({'status': False, 'message': 'plan name is required'}), 500
 
-        if 'description' in membership_plan_data and membership_plan_data['description'] != "":
+        if ('description' in membership_plan_data) and (membership_plan_data['description'] != ""):
             description: str = membership_plan_data.get('description')
         else:
             return jsonify({'status': False, 'message': 'description is required'}), 500
 
-        if 'schedule_day' in membership_plan_data and membership_plan_data['schedule_day'] != "":
+        if ('schedule_day' in membership_plan_data) and (membership_plan_data['schedule_day'] != ""):
             schedule_day: str = membership_plan_data.get('schedule_day')
         else:
             return jsonify({'status': False, 'message': 'scheduled day is required'}), 500
 
-        if 'schedule_term' in membership_plan_data and membership_plan_data['schedule_term'] != "":
+        if ('schedule_term' in membership_plan_data) and (membership_plan_data['schedule_term'] != ""):
             schedule_term: str = membership_plan_data.get('schedule_term')
         else:
             return jsonify({'status': False, 'message': 'schedule term is required'}), 500
 
-        if 'term_payment' in membership_plan_data and membership_plan_data['term_payment'] != "":
+        if ('term_payment' in membership_plan_data) and (membership_plan_data['term_payment'] != ""):
             term_payment: int = int(membership_plan_data.get('term_payment'))
         else:
             return jsonify({'status': False, 'message': 'term payment is required'}), 500
 
-        if 'registration_amount' in membership_plan_data and membership_plan_data['registration_amount'] != "":
+        if ('registration_amount' in membership_plan_data) and (membership_plan_data['registration_amount'] != ""):
             registration_amount: int = int(membership_plan_data.get('registration_amount'))
         else:
             return jsonify({'status': False, 'message': 'registration amount is required'}), 500
 
-        if 'currency' in membership_plan_data and membership_plan_data['currency'] != "":
+        if ('currency' in membership_plan_data) and (membership_plan_data['currency'] != ""):
             currency: str = str(membership_plan_data.get('currency'))
         else:
             return jsonify({'status': False, 'message': 'currency is required'}), 500
@@ -459,15 +458,15 @@ def get_coupon_data(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         coupon_data: dict = kwargs.get('coupon_data')
-        if "code" in coupon_data and coupon_data['code'] != "":
+        if ("code" in coupon_data) and (coupon_data['code'] != ""):
             code: str = coupon_data.get('code')
         else:
             return jsonify({'status': False, 'message': 'coupon code is required'}), 500
-        if "discount" in coupon_data and coupon_data['discount'] != "":
+        if ("discount" in coupon_data) and (coupon_data['discount'] != ""):
             discount: int = int(coupon_data.get('discount'))
         else:
             return jsonify({'status': False, 'message': 'discount is required'}), 500
-        if "expiration_time" in coupon_data and coupon_data['expiration_time'] != "":
+        if ("expiration_time" in coupon_data) and (coupon_data['expiration_time'] != ""):
             expiration_time: int = int(coupon_data['expiration_time'])
         else:
             return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
