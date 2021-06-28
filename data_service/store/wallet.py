@@ -21,51 +21,61 @@ class WalletValidator:
 
 class ClassSetters:
     def __init__(self):
-        self.transaction_types = ['withdrawal', 'deposit']
+        pass
 
-    def set_id(self, value: str) -> str:
+    @staticmethod
+    def set_id(prop, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError(" {} cannot be Null".format(str(self)))
+            raise ValueError(" {} cannot be Null".format(str(prop)))
 
         if not isinstance(value, str):
-            raise ValueError(" {} can only be a string".format(str(self)))
+            raise ValueError(" {} can only be a string".format(str(prop)))
         return value
 
-    def set_funds(self, value: AmountMixin) -> AmountMixin:
+    @staticmethod
+    def set_funds(prop, value: AmountMixin) -> AmountMixin:
         if not isinstance(value, AmountMixin):
-            raise ValueError(" {} Invalid Argument Type".format(str(self)))
+            raise ValueError(" {} Invalid Argument Type".format(str(prop)))
         return value
 
-    def set_paypal(self, value: str) -> str:
+    @staticmethod
+    def set_paypal(prop, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError(" {} cannot be Null".format(str(self)))
+            raise ValueError(" {} cannot be Null".format(str(prop)))
 
         if not isinstance(value, str):
-            raise ValueError(" {} can only be a string".format(str(self)))
+            raise ValueError(" {} can only be a string".format(str(prop)))
         return value
 
-    def set_transaction_types(self, value: str) -> str:
-        if value not in self.transaction_types:
-            raise ValueError(" {} invalid transaction type".format(str(self)))
+    @staticmethod
+    def set_transaction_types(prop, value: str) -> str:
+        transaction_types = ['withdrawal', 'deposit']
+        if value not in transaction_types:
+            raise ValueError(" {} invalid transaction type".format(str(prop)))
         return value
 
-    def set_datetime(self, value: datetime) -> datetime:
-        if not isinstance(value, datetime):
-            raise ValueError("{} invalid argument".format(str(self)))
+    @staticmethod
+    def set_datetime(prop, value: datetime) -> datetime:
+        if not(isinstance(value, datetime)):
+            raise ValueError("{} invalid argument".format(str(prop)))
         return value
 
-    def set_bool(self, value: bool) -> bool:
-        if not isinstance(value, bool):
-            raise ValueError("{} invalid argument".format(str(self)))
+    @staticmethod
+    def set_bool(prop, value: bool) -> bool:
+        if not(isinstance(value, bool)):
+            raise ValueError("{} invalid argument".format(str(prop)))
         return value
+
+
+setters: ClassSetters = ClassSetters()
 
 
 class WalletModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    available_funds: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_funds)
+    available_funds: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_funds)
     time_created: datetime = ndb.DateTimeProperty(auto_now_add=True)
     last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True)
-    paypal_address: str = ndb.StringProperty(validator=ClassSetters.set_paypal)
+    paypal_address: str = ndb.StringProperty(validator=setters.set_paypal)
 
     def __str__(self) -> str:
         return "<Wallet {}{}{}{}".format(self.paypal_address, self.available_funds, self.time_created,
@@ -85,10 +95,10 @@ class WalletModel(ndb.Model):
 
 
 class WalletTransactionsModel(ndb.Model):
-    uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    transaction_type: str = ndb.StringProperty(validator=ClassSetters.set_transaction_types)
-    transaction_date: str = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_datetime)
+    uid: str = ndb.StringProperty(validator=setters.set_id)
+    transaction_id: str = ndb.StringProperty(validator=setters.set_id)
+    transaction_type: str = ndb.StringProperty(validator=setters.set_transaction_types)
+    transaction_date: str = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_datetime)
 
     def __str__(self) -> str:
         return "<Transactions {} {}".format(self.transaction_type, self.transaction_date)
@@ -107,10 +117,10 @@ class WalletTransactionsModel(ndb.Model):
 
 
 class WalletTransactionItemModel(ndb.Model):
-    transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    item_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    transaction_id: str = ndb.StringProperty(validator=setters.set_id)
+    item_id: str = ndb.StringProperty(validator=setters.set_id)
     amount: AmountMixin = ndb.StructuredProperty(AmountMixin)
-    is_verified: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    is_verified: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
 
     def __str__(self) -> str:
         return "{}{}".format(self.amount, self.is_verified)
@@ -128,4 +138,3 @@ class WalletTransactionItemModel(ndb.Model):
         if self.amount != other.amount:
             return False
         return True
-
