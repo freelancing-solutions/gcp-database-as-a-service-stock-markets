@@ -1,6 +1,7 @@
 from datetime import datetime
 from random import choice
 
+from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 
 from data_service.config.stocks import currency_symbols
@@ -27,7 +28,7 @@ def test_amount():
     amount_instance: AmountMixin = AmountMixin()
     amount: int = int_positive()
     currency: str = choice(currency_symbols())
-    assert transaction_item_instance.amount is None, "Amount default is not being set correctly"
+    assert amount_instance.amount == 0, "Amount default is not being set correctly"
     amount_instance.amount = amount
     amount_instance.currency = currency
     assert amount_instance.amount == amount, "amount is not being set correctly"
@@ -35,7 +36,7 @@ def test_amount():
     transaction_item_instance.amount = amount_instance
     assert transaction_item_instance.amount == amount_instance, "amount instance is not being set correctly"
 
-    with raises(TypeError):
+    with raises(BadValueError):
         transaction_item_instance.amount = 0
 
 

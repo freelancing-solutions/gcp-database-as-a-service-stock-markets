@@ -1,5 +1,7 @@
 from datetime import datetime
 from random import choice
+
+from google.cloud.ndb.exceptions import BadValueError
 from pytest import raises
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
@@ -34,7 +36,7 @@ def test_total_earned():
     assert total_earned.currency == symbol, "Total Earned Currency Symbol not being set correctly"
     earnings_transactions_instance.total_earned = total_earned
     assert earnings_transactions_instance.total_earned == total_earned, "Total earned is not be set properly"
-    with raises(TypeError):
+    with raises(BadValueError):
         earnings_transactions_instance.total_earned = 0
 
 

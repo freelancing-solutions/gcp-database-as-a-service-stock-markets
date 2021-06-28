@@ -105,75 +105,88 @@ class CouponsValidator:
 
 
 class ClassSetters:
-    def set_id(self, value: str) -> str:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def set_id(prop, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError("{} cannot be Null".format(str(self)))
+            raise ValueError("{} cannot be Null".format(str(prop)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string ".format(str(self)))
+            raise TypeError("{} can only be a string ".format(str(prop)))
         if len(value) > 64:
             raise ValueError("Invalid format for ID")
         return value.strip()
 
-    def set_status(self, value: str) -> str:
+    @staticmethod
+    def set_status(prop, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError("{} cannot be Null".format(str(self)))
+            raise ValueError("{} cannot be Null".format(str(prop)))
         if not isinstance(value, str):
-            raise TypeError("{} invalid status".format(str(self)))
+            raise TypeError("{} invalid status".format(str(prop)))
         value = value.strip().lower()
         if value not in ['paid', 'unpaid']:
-            raise TypeError("{} invalid status".format(str(self)))
+            raise TypeError("{} invalid status".format(str(prop)))
         return value
 
-    def set_datetime(self, value: date) -> object:
+    @staticmethod
+    def set_datetime(prop, value: date) -> object:
         if not isinstance(value, date):
-            raise TypeError("{}, invalid datetime".format(str(self)))
+            raise TypeError("{}, invalid datetime".format(str(prop)))
         return value
 
-    def set_string(self, value: str) -> str:
+    @staticmethod
+    def set_string(prop, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError("{} cannot be Null".format(str(self)))
+            raise ValueError("{} cannot be Null".format(str(prop)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string ".format(str(self)))
+            raise TypeError("{} can only be a string ".format(str(prop)))
         return value.strip()
 
-    def set_schedule_term(self, value: str) -> str:
+    @staticmethod
+    def set_schedule_term(prop, value: str) -> str:
         if (value is None) or (value == ""):
-            raise ValueError("{} cannot be Null".format(str(self)))
+            raise ValueError("{} cannot be Null".format(str(prop)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string ".format(str(self)))
+            raise TypeError("{} can only be a string ".format(str(prop)))
         value = value.strip().lower()
         if value in ["monthly", "quarterly", "annually"]:
             return value
         raise ValueError("Invalid scheduled term")
 
-    def set_schedule_day(self, value: int) -> int:
+    @staticmethod
+    def set_schedule_day(prop, value: int) -> int:
         if not isinstance(value, int):
-            raise TypeError('{} can only be an integer'.format(str(self)))
+            raise TypeError('{} can only be an integer'.format(str(prop)))
         if value not in [1, 2, 3, 4, 5]:
-            raise ValueError('{} can only be between 1 -> 5 of every month'.format(str(self)))
+            raise ValueError('{} can only be between 1 -> 5 of every month'.format(str(prop)))
         return value
 
-    def set_number(self, value: int) -> int:
+    @staticmethod
+    def set_number(prop, value: int) -> int:
         if not isinstance(value, int):
-            raise TypeError('{} can only be an integer'.format(str(self)))
+            raise TypeError('{} can only be an integer'.format(str(prop)))
 
         if value < 0:
-            raise TypeError("{} no negative numbers".format(str(self)))
+            raise TypeError("{} no negative numbers".format(str(prop)))
 
         return value
 
-    def set_bool(self, value: bool) -> bool:
+    @staticmethod
+    def set_bool(prop, value: bool) -> bool:
         if not isinstance(value, bool):
-            raise TypeError("{}, should be boolean".format(str(self)))
+            raise TypeError("{}, should be boolean".format(str(prop)))
         return value
 
-    def set_amount(self, value: AmountMixin) -> AmountMixin:
+    @staticmethod
+    def set_amount(prop, value: AmountMixin) -> AmountMixin:
         if not isinstance(value, AmountMixin):
-            raise TypeError("{}, Amount Invalid".format(str(self)))
+            raise TypeError("{}, Amount Invalid".format(str(prop)))
         return value
 
 
 setters: ClassSetters = ClassSetters()
+
 
 # noinspection DuplicatedCode
 class Memberships(ndb.Model):
@@ -352,4 +365,3 @@ class MembershipDailyStats(ndb.Model):
         if self.total_earned_so_far != other.total_earned_so_far:
             return False
         return True
-

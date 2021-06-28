@@ -105,46 +105,56 @@ class EarningsValidators:
 
 class ClassSetters:
     def __init__(self):
-        super(ClassSetters, self).__init__()
+        pass
 
-    def set_id(self, value: typing.Union[str, None]) -> str:
-        if (value == "") or (value is None):
-            raise ValueError("{} cannot be Null".format(str(self)))
+    @staticmethod
+    def set_id(prop, value: typing.Union[str, None]) -> str:
+        print('value  : {}'.format(value))
+        if value == "":
+            raise ValueError("{} cannot be Null".format(str(prop)))
         if not isinstance(value, str):
-            raise TypeError("{} can only be a string".format(str(self)))
+            raise TypeError("{} can only be a string".format(str(prop)))
         return value
 
-    def set_number(self, value: int) -> int:
+    @staticmethod
+    def set_number(prop, value: int) -> int:
         if not(isinstance(value, int)):
-            raise TypeError("{} can only be an integer".format(str(self)))
+            raise TypeError("{} can only be an integer".format(str(prop)))
         if value < 0:
-            raise ValueError('{} can only be positive integer'.format(str(self)))
+            raise ValueError('{} can only be positive integer'.format(str(prop)))
 
         return value
 
-    def set_date(self, value: datetime) -> datetime:
+    @staticmethod
+    def set_date(prop, value: datetime) -> datetime:
         if not(isinstance(value, datetime)):
-            raise TypeError("{}, can only be a datetime".format(str(self)))
+            raise TypeError("{}, can only be a datetime".format(str(prop)))
         return value
 
-    def set_bool(self, value: bool) -> bool:
+    @staticmethod
+    def set_bool(prop, value: bool) -> bool:
         if not(isinstance(value, bool)):
-            raise TypeError("{}, can only be a boolean".format(str(self)))
+            raise TypeError("{}, can only be a boolean".format(str(prop)))
         return value
 
-    def set_percent(self, value: int) -> int:
+    @staticmethod
+    def set_percent(prop, value: int) -> int:
         if not(isinstance(value, int)):
-            raise TypeError("{}, can only be an integer".format(str(self)))
+            raise TypeError("{}, can only be an integer".format(str(prop)))
 
         if 0 < value > 100:
-            raise ValueError("{}, should be a percent".format(str(self)))
+            raise ValueError("{}, should be a percent".format(str(prop)))
 
         return value
 
-    def set_amount(self, amount: AmountMixin) -> AmountMixin:
+    @staticmethod
+    def set_amount(prop, amount: AmountMixin) -> AmountMixin:
         if not(isinstance(amount, AmountMixin)):
-            raise TypeError('{} is invalid'.format(str(self)))
+            raise TypeError('{} is invalid'.format(str(prop)))
         return amount
+
+
+setters: ClassSetters = ClassSetters()
 
 
 class Affiliates(ndb.Model):
@@ -157,13 +167,13 @@ class Affiliates(ndb.Model):
             raise TypeError("{} can only be a datetime object".format(str(self)))
         return value
 
-    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    affiliate_id: str = ndb.StringProperty(validator=setters.set_id)
     uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
     last_updated: datetime = ndb.DateTimeProperty(auto_now=True, validator=set_date_time)
     datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=set_date_time)
-    total_recruits: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_number)
-    is_active: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
-    is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    total_recruits: int = ndb.IntegerProperty(default=0, validator=setters.set_number)
+    is_active: bool = ndb.BooleanProperty(default=True, validator=setters.set_bool)
+    is_deleted: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -186,14 +196,14 @@ class Recruits(ndb.Model):
     """
         class used to track recruited affiliates
     """
-    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    referrer_uid: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_date)
-    datetime_updated: datetime = ndb.DateTimeProperty(auto_now=True, validator=ClassSetters.set_date)
-    is_member: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
-    plan_id: str = ndb.StringProperty(validator=ClassSetters.set_id)  # Membership plan id allows to get payment fees
-    is_active: bool = ndb.BooleanProperty(default=True, validator=ClassSetters.set_bool)
-    is_deleted: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    affiliate_id: str = ndb.StringProperty(validator=setters.set_id)
+    referrer_uid: str = ndb.StringProperty(validator=setters.set_id)
+    datetime_recruited: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_date)
+    datetime_updated: datetime = ndb.DateTimeProperty(auto_now=True, validator=setters.set_date)
+    is_member: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
+    plan_id: str = ndb.StringProperty(validator=setters.set_id)  # Membership plan id allows to get payment fees
+    is_active: bool = ndb.BooleanProperty(default=True, validator=setters.set_bool)
+    is_deleted: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -222,12 +232,12 @@ class EarningsData(ndb.Model):
             raise ValueError("{} is invalid".format(str(self)))
         return value
 
-    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
+    affiliate_id: str = ndb.StringProperty(validator=setters.set_id)
     start_date: date = ndb.DateProperty(auto_now_add=True)
     last_updated: date = ndb.DateProperty(validator=set_date)
-    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    is_paid: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
-    on_hold: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
+    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    is_paid: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
+    on_hold: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -250,10 +260,10 @@ class AffiliateEarningsTransactions(ndb.Model):
     """
         keeps track of amounts paid from earningsData
     """
-    affiliate_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
+    affiliate_id: str = ndb.StringProperty(validator=setters.set_id)
+    total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin)
     transaction_id_list: typing.List[str] = ndb.StringProperty(repeated=True)
-    last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True, validator=ClassSetters.set_date)
+    last_transaction_time: datetime = ndb.DateTimeProperty(auto_now=True, validator=setters.set_date)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -275,9 +285,9 @@ class AffiliateTransactionItems(ndb.Model):
     """
         keeps track of singular transaction items
     """
-    transaction_id: str = ndb.StringProperty(validator=ClassSetters.set_id)
-    amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=ClassSetters.set_date)
+    transaction_id: str = ndb.StringProperty(validator=setters.set_id)
+    amount: AmountMixin = ndb.StructuredProperty(AmountMixin)
+    transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_date)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -300,10 +310,10 @@ class AffiliateSettingsStats(ndb.Model):
         if earnings are recurring then an affiliate will continue to earn income
         on their down-line , if not then income will be earned once off when a recruited user becomes a member.
     """
-    earnings_percent: int = ndb.IntegerProperty(validator=ClassSetters.set_percent)
-    recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=ClassSetters.set_bool)
-    total_affiliates_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=ClassSetters.set_amount)
-    total_affiliates: int = ndb.IntegerProperty(default=0, validator=ClassSetters.set_number)
+    earnings_percent: int = ndb.IntegerProperty(validator=setters.set_percent)
+    recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
+    total_affiliates_earnings: AmountMixin = ndb.StructuredProperty(AmountMixin)
+    total_affiliates: int = ndb.IntegerProperty(default=0, validator=setters.set_number)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
