@@ -70,6 +70,7 @@ class WalletView(Validator):
                 raise DataServiceError("An Error occurred creating Wallet")
             return jsonify({'status': True, 'message': 'successfully created wallet',
                             'payload': wallet_instance.to_dict()}), 200
+        return jsonify({'status': False, 'message': 'Unable to create wallet'}), 500
 
     @use_context
     @handle_view_errors
@@ -77,7 +78,7 @@ class WalletView(Validator):
         if not(self.is_uid_none(uid=uid)):
             wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
             return jsonify({'status': True, 'payload': wallet_instance.to_dict(), 'message': 'wallet found'}), 200
-        return jsonify({'status': True, 'message': 'uid cannot be None'}), 500
+        return jsonify({'status': False, 'message': 'uid cannot be None'}), 500
 
     @use_context
     @handle_view_errors
@@ -96,6 +97,7 @@ class WalletView(Validator):
 
             return jsonify({'status': True, 'payload': wall_instance.to_dict(),
                             'message': 'successfully updated wallet'}), 200
+        return jsonify({'status': False, 'message': 'Unable to update wallet'}), 500
 
     @use_context
     @handle_view_errors
@@ -110,6 +112,7 @@ class WalletView(Validator):
 
             return jsonify({'status': True, 'payload': wallet_instance.to_dict(),
                             'message': 'wallet is rest'}), 200
+        return jsonify({'status': False, 'message': 'Unable to reset wallet'}), 500
 
     @use_context
     @handle_view_errors
