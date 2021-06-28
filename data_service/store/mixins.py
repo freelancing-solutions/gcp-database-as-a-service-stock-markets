@@ -1,24 +1,50 @@
 from google.cloud import ndb
 from data_service.config.stocks import currency_symbols
+import re
 
 
-def set_amount(prop, value) -> int:
-    if not(isinstance(value, int)):
-        raise TypeError("{} can only be integer".format(str(prop)))
-    return value
+class Setters:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def set_amount(prop, value) -> int:
+        if not (isinstance(value, int)):
+            raise TypeError("{} can only be integer".format(str(prop)))
+        return value
+
+    @staticmethod
+    def set_currency(prop, value) -> str:
+        if not (isinstance(value, str)):
+            raise TypeError("{} can only be string".format(prop))
+        if value not in currency_symbols():
+            raise ValueError("{} not a valid currency symbol".format(str(prop)))
+        return value
+
+    @staticmethod
+    def set_email(prop, value) -> str:
+        """
+            TODO validate email here
+        """
+        regex = '\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b'
+        if re.search(regex, value) is not None:
+            return value
+        raise ValueError("{} invalid email address".format(str(prop)))
+
+    @staticmethod
+    def set_password(prop, value) -> str:
+        """
+            TODO validate password here
+        """
+        return value
 
 
-def set_currency(prop, value) -> str:
-    if not(isinstance(value, str)):
-        raise TypeError("{} can only be string".format(prop))
-    if value not in currency_symbols():
-        raise ValueError("{} not a valid currency symbol".format(str(prop)))
-    return value
+setters: Setters = Setters()
 
 
 class AmountMixin(ndb.Model):
-    amount: int = ndb.IntegerProperty(default=0, validator=set_amount)
-    currency: str = ndb.StringProperty(validator=set_currency)
+    amount: int = ndb.IntegerProperty(default=0, validator=setters.set_amount)
+    currency: str = ndb.StringProperty(validator=setters.set_currency)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -36,23 +62,9 @@ class AmountMixin(ndb.Model):
         return self.__str__()
 
 
-def set_email(prop, value) -> str:
-    """
-        TODO validate email here
-    """
-    return value
-
-
-def set_password(prop, value) -> str:
-    """
-        TODO validate password here
-    """
-    return value
-
-
 class UserMixin(ndb.Model):
-    email: str = ndb.StringProperty(validator=set_email)
-    password: str = ndb.StringProperty(validator=set_password)
+    email: str = ndb.StringProperty(validator=setters.set_email)
+    password: str = ndb.StringProperty(validator=setters.set_password)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
