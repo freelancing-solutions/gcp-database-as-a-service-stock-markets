@@ -104,6 +104,7 @@ class HelpDeskView(Validators):
         return False
 
 
+# noinspection DuplicatedCode
 class TicketView(Validators):
     def __init__(self):
         super(TicketView, self).__init__()
@@ -212,10 +213,35 @@ class TicketView(Validators):
         """
             find ticket send notification update ticket to reflect that notification was sent
         """
-        pass
+        ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
+        if isinstance(ticket_instance, Ticket):
+            ticket_instance.response_sent = True
+            key = ticket_instance.put()
+            # TODO Send response here
+            if key is None:
+                return jsonify({'status': False, 'message': 'General error updating database'}), 500
+            return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
+                            'message': 'successfully updated ticket'}), 200
+        return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
 
-    def add_response(self):
-        pass
+    @use_context
+    @handle_view_errors
+    def add_response(self, ticket_id: str, subject: str, message: str) -> tuple:
+        """
+            find ticket add response
+        """
+        ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
+        if isinstance(ticket_instance, Ticket):
+            ticket_instance.response_sent = True
+            key = ticket_instance.put()
+            # TODO Send response here
+            if key is None:
+                return jsonify({'status': False, 'message': 'General error updating database'}), 500
+            return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
+                            'message': 'successfully updated ticket'}), 200
+        return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
+
+    # TODO - refactor response sending algorithms for tickets
 
 
 class TicketThreadView(Validators):
