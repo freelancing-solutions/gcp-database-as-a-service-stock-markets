@@ -28,13 +28,13 @@ class ClassSetters:
         if (value is None) or (value == ""):
             raise ValueError(" {} cannot be Null".format(str(prop)))
 
-        if not isinstance(value, str):
+        if not(isinstance(value, str)):
             raise ValueError(" {} can only be a string".format(str(prop)))
         return value
 
     @staticmethod
     def set_funds(prop, value: AmountMixin) -> AmountMixin:
-        if not isinstance(value, AmountMixin):
+        if not(isinstance(value, AmountMixin)):
             raise ValueError(" {} Invalid Argument Type".format(str(prop)))
         return value
 
@@ -43,7 +43,7 @@ class ClassSetters:
         if (value is None) or (value == ""):
             raise ValueError(" {} cannot be Null".format(str(prop)))
 
-        if not isinstance(value, str):
+        if not(isinstance(value, str)):
             raise ValueError(" {} can only be a string".format(str(prop)))
         return value
 

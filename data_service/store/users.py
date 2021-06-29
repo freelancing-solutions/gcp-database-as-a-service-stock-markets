@@ -65,8 +65,6 @@ class UserModel(ndb.Model):
         return True
 
     def set_cell(self, cell: str) -> bool:
-        # TODO find a way to better check for Cell Number
-        #  a regex can work best here
         if (cell is None) or (cell == ""):
             raise ValueError('cell cannot be Null')
         if not isinstance(cell, str):

@@ -133,3 +133,24 @@ class WalletView(Validator):
                                                                   WalletModel.available_funds < higher_bound).fetch()
         payload: typing.List[dict] = [wallet.to_dict() for wallet in wallet_list]
         return jsonify({'status': True, 'payload': payload, 'message': 'wallets returned'}), 200
+
+    @use_context
+    @handle_view_errors
+    def wallet_transact(self, uid: str, add: int = None, sub: int = None) -> tuple:
+        if self.can_update_wallet(uid=uid) is True:
+            wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
+            if isinstance(wallet_instance, WalletModel):
+                if add is not None:
+                    wallet_instance.available_funds.amount += add
+                if sub is not None:
+                    wallet_instance.available_funds.amount -= sub
+                key = wallet_instance.put()
+                if key is None:
+                    message: str = "General error updating database"
+                    return jsonify({'status': False, 'message': message}), 500
+                message: str = "Successfully created transaction"
+                return jsonify({'status': True, 'payload': wallet_instance.to_dict(),
+                                'message': message}), 200
+        message: str = "Unable to find wallet"
+        return jsonify({'status': False, 'message': message}), 500
+

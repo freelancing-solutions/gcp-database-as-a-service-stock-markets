@@ -19,7 +19,7 @@ class Setters:
         """
         if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(prop)))
-        if not isinstance(value, str):
+        if not(isinstance(value, str)):
             raise TypeError("{} can only be a string".format(str(prop)))
         return value.strip()
 
@@ -30,7 +30,7 @@ class Setters:
         """
         if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(prop)))
-        if not isinstance(value, str):
+        if not(isinstance(value, str)):
             raise TypeError("{} can only be a string".format(str(prop)))
         return value.strip().lower()
 
@@ -38,7 +38,7 @@ class Setters:
     def set_id(prop, value: str) -> str:
         if (value is None) or (value == ""):
             raise ValueError("{} can only accept a string".format(str(prop)))
-        if not isinstance(value, str):
+        if not(isinstance(value, str)):
             raise TypeError("{} can only be a string".format(str(prop)))
         return value.strip()
 
@@ -46,7 +46,7 @@ class Setters:
     def set_broker_code(prop, broker_code: str) -> str:
         if (broker_code is None) or (broker_code == ""):
             raise ValueError("{} cannot be Null".format(str(prop)))
-        if not isinstance(broker_code, str):
+        if not(isinstance(broker_code, str)):
             raise TypeError("{} can only be a string".format(str(prop)))
         return broker_code.strip()
 
@@ -54,7 +54,7 @@ class Setters:
     def set_broker_name(prop, broker_name: str) -> str:
         if (broker_name is None) or (broker_name == ""):
             raise ValueError("{} cannot be Null".format(str(prop)))
-        if not isinstance(broker_name, str):
+        if not(isinstance(broker_name, str)):
             raise TypeError("{} can only be a string".format(str(prop)))
         return broker_name.strip().lower()
 
@@ -73,6 +73,8 @@ class Stock(ndb.Model):
     symbol: str = ndb.StringProperty(required=True, indexed=True, validator=setters.set_string)
 
     def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
         if self.stock_id != other.stock_id:
             return False
         if self.stock_code != other.stock_code:
@@ -164,7 +166,7 @@ class StockModelSetters:
     def set_percent(prop, value: int) -> int:
         if (value is None) or (value == ""):
             raise ValueError("{} cannot be Null".format(str(prop)))
-        if not isinstance(value, int):
+        if not(isinstance(value, int)):
             raise TypeError("{} can only be an integer".format(str(prop)))
         if (value < 0) or (value > 100):
             raise ValueError("{} should be a percentage".format(str(prop)))
@@ -185,6 +187,10 @@ class StockModel(ndb.Model):
         if self.__class__ != other.__class__:
             return False
         if self.transaction_id != other.transaction_id:
+            return False
+        if self.stock != other.stock:
+            return False
+        if self.broker != other.broker:
             return False
         return True
 
@@ -214,6 +220,10 @@ class BuyVolumeModel(ndb.Model):
         if self.__class__ != other.__class__:
             return False
         if self.transaction_id != other.transaction_id:
+            return False
+        if self.stock_id != other.stock_id:
+            return False
+        if self.date_created != other.date_created:
             return False
         return True
 
@@ -248,6 +258,10 @@ class SellVolumeModel(ndb.Model):
             return False
         if self.transaction_id != other.transaction_id:
             return False
+        if self.stock_id != other.stock_id:
+            return False
+        if self.date_created != other.date_created:
+            return False
         return True
 
     def __str__(self) -> str:
@@ -279,6 +293,10 @@ class NetVolumeModel(ndb.Model):
         if self.__class__ != other.__class__:
             return False
         if self.transaction_id != other.transaction_id:
+            return False
+        if self.stock_id != other.stock_id:
+            return False
+        if self.date_created != other.date_created:
             return False
         return True
 

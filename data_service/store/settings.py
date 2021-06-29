@@ -1,3 +1,5 @@
+import typing
+
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from data_service.config.types import tickers_type, errors_type, timestamps_type
@@ -49,27 +51,27 @@ class ExchangeDataModel(ndb.Model):
         self.exchange_id = create_id()
         return True
 
-    def set_exchange_country(self, country: str) -> bool:
+    def set_exchange_country(self, country:typing.Union[str, None]) -> bool:
         country = country.strip().lower()
-        if country is None or country == "":
+        if (country is None) or (country == ""):
             raise ValueError("country name cannot be Null")
 
-        if not isinstance(country, str):
+        if not(isinstance(country, str)):
             raise TypeError("Country can only be a string")
         self.exchange_country = country
         return True
 
-    def set_exchange_name(self, exchange: str) -> bool:
+    def set_exchange_name(self, exchange: typing.Union[str, None]) -> bool:
         exchange = exchange.strip().lower()
-        if exchange is None or exchange == "":
+        if (exchange is None) or (exchange == ""):
             raise ValueError("exchange name cannot be Null")
-        if not isinstance(exchange, str):
+        if not(isinstance(exchange, str)):
             raise TypeError("Exchange can only be a string")
         self.exchange_name = exchange
         return True
 
     def set_exchange_tickers_list(self, tickers_list: tickers_type) -> bool:
-        if not isinstance(tickers_list, tickers_type):
+        if not(isinstance(tickers_list, tickers_type)):
             raise TypeError("exchange tickers can only be a list")
         self.exchange_tickers_list = tickers_list
         return True
@@ -113,32 +115,31 @@ class ScrappingPagesModel(ndb.Model):
             return False
         return True
 
-    def set_exchange_id(self, exchange_id: str) -> bool:
-        exchange_id = exchange_id.strip().lower()
-        if exchange_id is None or exchange_id == "":
+    def set_exchange_id(self, exchange_id: typing.Union[str, None]) -> bool:
+
+        if (exchange_id is None) or (exchange_id == ""):
             raise ValueError('exchange_id can not be Null')
-        if not isinstance(exchange_id, str):
+        if not(isinstance(exchange_id, str)):
             raise TypeError("exchange_id can only be a string")
-        self.exchange_id = exchange_id
+        self.exchange_id = exchange_id.strip()
         return True
 
     def set_page_id(self) -> bool:
         self.page_id = create_id()
         return True
 
-    def set_target_url(self, target_url: str) -> bool:
-        target_url = target_url.strip().lower()
-        if target_url is None or target_url == "":
+    def set_target_url(self, target_url: typing.Union[str, None]) -> bool:
+        if (target_url is None) or (target_url == ""):
             raise ValueError('Scrapping page url can not be Null')
-        if not isinstance(target_url, str):
+        if not(isinstance(target_url, str)):
             raise TypeError("Scrapping Page URl can only be a string")
-        self.target_url = target_url
+        self.target_url = target_url.strip().lower()
         return True
 
     def set_access_timestamps(self, access_timestamps: timestamps_type) -> bool:
-        if access_timestamps is None or access_timestamps == "":
+        if (access_timestamps is None) or (access_timestamps == ""):
             raise ValueError('Exchange access timestamps cannot be Null')
-        if not isinstance(access_timestamps, timestamps_type):
+        if not(isinstance(access_timestamps, timestamps_type)):
             raise TypeError("Exchange access timestamps can only be list of stringed integers")
         self.access_timestamps = access_timestamps
         return True
@@ -152,31 +153,28 @@ class ScrappingPagesModel(ndb.Model):
             return True
         raise TypeError('require login can only be a boolean')
 
-    def set_login_page_url(self, login_page_url: str) -> bool:
-        login_page_url = login_page_url.strip()
-        if login_page_url is None or login_page_url == "":
+    def set_login_page_url(self, login_page_url: typing.Union[str, None]) -> bool:
+        if (login_page_url is None) or (login_page_url == ""):
             raise ValueError('Login page url cannot be Null')
-        if not isinstance(login_page_url, str):
+        if not(isinstance(login_page_url, str)):
             raise TypeError('Login page url can only be a string')
-        self.login_page_url = login_page_url
+        self.login_page_url = login_page_url.strip().lower()
         return True
 
-    def set_username(self, username: str) -> bool:
-        username = username.strip()
-        if username is None or username == "":
+    def set_username(self, username: typing.Union[str, None]) -> bool:
+        if (username is None) or (username == ""):
             raise ValueError("login name cannot be Null")
-        if not isinstance(username, str):
+        if not(isinstance(username, str)):
             raise TypeError("login name can only be a string")
-        self.username = username
+        self.username = username.strip()
         return True
 
-    def set_password(self, password: str) -> bool:
-        password = password.strip()
-        if password is None or password == "":
+    def set_password(self, password: typing.Union[str, None]) -> bool:
+        if (password is None) or (password == ""):
             raise ValueError("password cannot be Null")
-        if not isinstance(password, str):
+        if not(isinstance(password, str)):
             raise TypeError("password can only be a string")
-        self.password = password
+        self.password = password.strip()
         return True
     # TODO - complete the necessary d_under functions
 
@@ -216,17 +214,17 @@ class StockAPIEndPointModel(ndb.Model):
 
     def set_api_endpoint(self, api_endpoint: str) -> bool:
         api_endpoint = api_endpoint.strip().lower()
-        if api_endpoint is None or api_endpoint == "":
+        if (api_endpoint is None) or (api_endpoint == ""):
             raise ValueError('API Endpoint cannot be null')
-        if not isinstance(api_endpoint, str):
+        if not(isinstance(api_endpoint, str)):
             raise TypeError("API Endpoint can only be a string")
         self.stocks_api_endpoint = api_endpoint
         return True
 
     def set_exchange_access_timestamps(self, access_timestamps: timestamps_type) -> bool:
-        if access_timestamps is None or access_timestamps == "":
+        if (access_timestamps is None) or (access_timestamps == ""):
             raise ValueError('Exchange access timestamps cannot be Null')
-        if not isinstance(access_timestamps, timestamps_type):
+        if not(isinstance(access_timestamps, timestamps_type)):
             raise TypeError("Exchange access timestamps can only be list of stringed integers")
         self.exchange_access_timestamps = access_timestamps
         return True
@@ -235,9 +233,8 @@ class StockAPIEndPointModel(ndb.Model):
         return self.exchange_access_timestamps
 
     def set_method(self, method: str) -> bool:
-        if not isinstance(method, str):
+        if not(isinstance(method, str)):
             raise TypeError('Invalid argument Type')
-
         method = method.strip().upper()
         if method in ["GET", "POST", "PUT"]:
             self.method = method
@@ -245,14 +242,14 @@ class StockAPIEndPointModel(ndb.Model):
         raise ValueError('Invalid HTTP Method')
 
     def set_require_api_key(self, require_api_key: bool) -> bool:
-        if not isinstance(require_api_key, bool):
+        if not(isinstance(require_api_key, bool)):
             raise TypeError("require api key can only be a boolean")
         self.require_api_key = require_api_key
         return True
 
     def set_api_key(self, api_key: str) -> bool:
         api_key = api_key.strip()
-        if api_key is None or api_key == "":
+        if (api_key is None) or (api_key == ""):
             raise ValueError("API Key cannot be null")
         self.api_key = api_key
         return True
