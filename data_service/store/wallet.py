@@ -24,7 +24,7 @@ class ClassSetters:
         pass
 
     @staticmethod
-    def set_id(prop, value: str) -> str:
+    def set_id(prop, value: typing.Union[str, None]) -> str:
         if (value is None) or (value == ""):
             raise ValueError(" {} cannot be Null".format(str(prop)))
 
@@ -39,7 +39,7 @@ class ClassSetters:
         return value
 
     @staticmethod
-    def set_paypal(prop, value: str) -> str:
+    def set_paypal(prop, value: typing.Union[str, None]) -> str:
         if (value is None) or (value == ""):
             raise ValueError(" {} cannot be Null".format(str(prop)))
 
@@ -48,7 +48,7 @@ class ClassSetters:
         return value
 
     @staticmethod
-    def set_transaction_types(prop, value: str) -> str:
+    def set_transaction_types(prop, value: typing.Union[str, None]) -> str:
         transaction_types = ['withdrawal', 'deposit']
         if value not in transaction_types:
             raise ValueError(" {} invalid transaction type".format(str(prop)))

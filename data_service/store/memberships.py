@@ -196,8 +196,7 @@ class Memberships(ndb.Model):
     uid: str = ndb.StringProperty(validator=setters.set_id)
     plan_id: str = ndb.StringProperty(validator=setters.set_id)
     status: str = ndb.StringProperty(default="unpaid", validator=setters.set_status)  # Paid/ Unpaid
-    date_created: date = ndb.DateTimeProperty(auto_now_add=True,
-                                              validator=setters.set_datetime)
+    date_created: date = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_datetime)
     plan_start_date: date = ndb.DateProperty(validator=setters.set_datetime)  # the date this plan will
 
     # become active
@@ -234,11 +233,10 @@ class MembershipPlans(ndb.Model):
     plan_name: str = ndb.StringProperty(validator=setters.set_string)
     description: str = ndb.StringProperty(validator=setters.set_string)
     total_members: int = ndb.IntegerProperty(validator=setters.set_number)
-    schedule_day: int = ndb.IntegerProperty(default=0,
-                                            validator=setters.set_schedule_day)  # 1 or 2 or 3 of every month or
-    # week, or three months
-    schedule_term: str = ndb.StringProperty(default="monthly",
-                                            validator=setters.set_schedule_term)  # Monthly, Quarterly, Annually
+    schedule_day: int = ndb.IntegerProperty(default=0, validator=setters.set_schedule_day)  # 1 or 2 or 3 of
+    # every month or # week, or three months
+    schedule_term: str = ndb.StringProperty(default="monthly", validator=setters.set_schedule_term)  # Monthly,
+    # Quarterly, Annually
     term_payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
     registration_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
     is_active: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
@@ -274,7 +272,7 @@ class Coupons(ndb.Model):
 
         return value
 
-    def set_discount(self, value):
+    def set_discount(self, value: int) -> int:
         if not(isinstance(value, int)):
             raise TypeError("{} can only be an integer".format(str(self)))
         return value

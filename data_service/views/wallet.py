@@ -83,13 +83,15 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def update_wallet(self, wallet_data: dict) -> tuple:
-        uid: str = wallet_data.get("uid")
-        available_funds: int = wallet_data.get("available_funds")
-        paypal_address: str = wallet_data.get("paypal_address")
+        uid: typing.Union[str, None] = wallet_data.get("uid")
+        available_funds: typing.Union[int, None] = wallet_data.get("available_funds")
+        currency: typing.Union[str, None] = wallet_data.get('currency')
+        paypal_address: typing.Union[str, None] = wallet_data.get("paypal_address")
         if self.can_update_wallet(uid=uid) is True:
             wall_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
             wall_instance.uid = uid
-            wall_instance.available_funds = available_funds
+            amount_instance: AmountMixin = AmountMixin(amount=available_funds, currency=currency)
+            wall_instance.available_funds = amount_instance
             wall_instance.paypal_address = paypal_address
             key = wall_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
@@ -102,10 +104,12 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def reset_wallet(self, wallet_data: dict) -> tuple:
-        uid: str = wallet_data.get('uid')
+        uid: typing.Union[str, None] = wallet_data.get('uid')
+        currency: typing.Union[str, None] = wallet_data.get('currency')
         if self.can_reset_wallet(uid=uid) is True:
             wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
-            wallet_instance.available_funds = 0
+            amount_instance: AmountMixin = AmountMixin(amount=0, currency=currency)
+            wallet_instance.available_funds = amount_instance
             key = wallet_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 raise DataServiceError("An Error occurred resetting Wallet")
