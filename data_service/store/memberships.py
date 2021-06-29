@@ -184,6 +184,12 @@ class ClassSetters:
             raise TypeError("{}, Amount Invalid".format(str(prop)))
         return value
 
+    @staticmethod
+    def set_date(prop, value: date) -> date:
+        if not(isinstance(value, date)):
+            raise TypeError("{}, Invalid Type".format(str(prop)))
+        return value
+
 
 setters: ClassSetters = ClassSetters()
 
@@ -196,7 +202,7 @@ class Memberships(ndb.Model):
     uid: str = ndb.StringProperty(validator=setters.set_id)
     plan_id: str = ndb.StringProperty(validator=setters.set_id)
     status: str = ndb.StringProperty(default="unpaid", validator=setters.set_status)  # Paid/ Unpaid
-    date_created: date = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_datetime)
+    date_created: date = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_date)
     plan_start_date: date = ndb.DateProperty(validator=setters.set_datetime)  # the date this plan will
 
     # become active
@@ -256,6 +262,18 @@ class MembershipPlans(ndb.Model):
 
     def __repr__(self) -> str:
         return "<Memberships: {}{}".format(self.plan_id, self.plan_name)
+
+
+# noinspection DuplicatedCode
+class MembershipInvoices(ndb.Model):
+    uid: str = ndb.StringProperty(validator=setters.set_id)
+    plan_id: str = ndb.StringProperty(validator=setters.set_id)
+    invoice_id: str = ndb.StringProperty(validator=setters.set_id)
+    invoice_number: str = ndb.StringProperty(validator=setters.set_id)
+    date_created: date = ndb.DateProperty(auto_now_add=True, validator=setters.set_date)
+    invoice_sent: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
+    invoice_paid: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
+    date_paid: date = ndb.DateProperty(validator=setters.set_date)
 
 
 # noinspection DuplicatedCode
