@@ -2,9 +2,8 @@ import typing
 from datetime import datetime, date
 from google.api_core.exceptions import RetryError, Aborted
 from google.cloud import ndb
-
 from data_service.store.mixins import AmountMixin
-from data_service.utils.utils import get_days
+from data_service.utils.utils import get_days, get_payment_methods
 
 
 class MembershipValidators:
@@ -190,6 +189,14 @@ class ClassSetters:
             raise TypeError("{}, Invalid Type".format(str(prop)))
         return value
 
+    @staticmethod
+    def set_payment_method(prop, value: str) -> str:
+        if not(isinstance(value, str)):
+            raise TypeError("{}, Invalid Type".format(str(prop)))
+        if value not in get_payment_methods():
+            raise ValueError("{}, Invalid Payment Method".format(str(prop)))
+        return value
+
 
 setters: ClassSetters = ClassSetters()
 
@@ -204,7 +211,7 @@ class Memberships(ndb.Model):
     status: str = ndb.StringProperty(default="unpaid", validator=setters.set_status)  # Paid/ Unpaid
     date_created: date = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_date)
     plan_start_date: date = ndb.DateProperty(validator=setters.set_datetime)  # the date this plan will
-
+    payment_method: str = ndb.StringProperty(validator=setters.set_payment_method)
     # become active
 
     def __eq__(self, other) -> bool:
@@ -274,6 +281,44 @@ class MembershipInvoices(ndb.Model):
     invoice_sent: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
     invoice_paid: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
     date_paid: date = ndb.DateProperty(validator=setters.set_date)
+    payment_amount: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+    amount_paid: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.uid != other.uid:
+            return False
+        if self.invoice_id != other.invoice_id:
+            return False
+        if self.payment_amount.amount != other.payment_amount.amount:
+            return False
+        if self.payment_amount.currency != other.payment_amount.currency:
+            return False
+        if self.amount_paid.amount != other.amount_paid.amount:
+            return False
+        if self.amount_paid.currency != other.amount_paid.currency:
+            return False
+        return True
+
+    def __sub__(self, other) -> int:
+        if self.payment_amount.currency != other.payment_amount.currency:
+            raise TypeError("Incompatible currencies")
+        return self.payment_amount.amount - other.payment_amount.amount
+
+    def __add__(self, other) -> int:
+        if self.payment_amount.currency != other.payment_amount.currency:
+            raise TypeError("Incompatible currencies")
+        return self.payment_amount.amount + other.payment_amount.amount
+
+    def __str__(self) -> str:
+        return "<Invoice invoice_number: {} , date_created: {}, payment: {}, paid: {}".format(self.invoice_number,
+                                                                                              self.date_created,
+                                                                                              self.payment_amount,
+                                                                                              self.amount_paid)
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 # noinspection DuplicatedCode

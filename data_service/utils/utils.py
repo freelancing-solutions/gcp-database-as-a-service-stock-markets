@@ -105,6 +105,9 @@ def get_timer() -> int:
     return next(task_counter())
 
 
+def get_payment_methods() -> typing.List[str]:
+    return ['eft', 'paypal']
+
+
 if __name__ == '__main__':
-    for i in task_counter():
-        print(i)
+    pass
