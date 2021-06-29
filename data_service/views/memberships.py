@@ -24,7 +24,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         self._max_retries = current_app.config.get('DATASTORE_RETRIES')
         self._max_timeout = current_app.config.get('DATASTORE_TIMEOUT')
 
-    def can_add_member(self, uid: str, plan_id: str, start_date: date) -> bool:
+    def can_add_member(self, uid: typing.Union[str, None], plan_id: typing.Union[str, None], start_date: date) -> bool:
         user_valid: typing.Union[None, bool] = self.is_user_valid(uid=uid)
         plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
         date_valid: typing.Union[None, bool] = self.start_date_valid(start_date=start_date)
@@ -35,15 +35,14 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_add_plan(self, plan_name: str) -> bool:
+    def can_add_plan(self, plan_name: typing.Union[str, None]) -> bool:
         name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name)
         if isinstance(name_exist, bool):
             return not name_exist
-
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_update_plan(self, plan_id: str, plan_name: str) -> bool:
+    def can_update_plan(self, plan_id: typing.Union[str, None], plan_name: typing.Union[str, None]) -> bool:
         plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
         plan_name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name=plan_name)
         if isinstance(plan_exist, bool) and isinstance(plan_name_exist, bool):
@@ -51,7 +50,8 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         message: str = "Unable to verify input data, due to database error, please try again later"
         raise DataServiceError(message)
 
-    def can_add_coupon(self, code: str, expiration_time: int, discount: int) -> bool:
+    def can_add_coupon(self, code: typing.Union[str, None], expiration_time: typing.Union[int, None],
+                       discount: typing.Union[int, None]) -> bool:
         coupon_exist: typing.Union[None, bool] = self.coupon_exist(code=code)
         expiration_valid: typing.Union[None, bool] = self.expiration_valid(expiration_time=expiration_time)
         discount_valid: typing.Union[None, bool] = self.discount_valid(discount_valid=discount)
@@ -61,14 +61,14 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         message: str = "Unable to verify input data"
         raise DataServiceError(message)
 
-    def can_update_coupon(self, code: str, expiration_time: int, discount: int) -> bool:
+    def can_update_coupon(self, code: typing.Union[str, None], expiration_time: typing.Union[int, None],
+                          discount: typing.Union[int, None]) -> bool:
         coupon_exist: typing.Union[None, bool] = self.coupon_exist(code=code)
         expiration_valid: typing.Union[None, bool] = self.expiration_valid(expiration_time=expiration_time)
         discount_valid: typing.Union[None, bool] = self.discount_valid(discount_valid=discount)
 
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return coupon_exist and expiration_valid and discount_valid
-
         message: str = "Unable to verify input data"
         raise DataServiceError(message)
 
@@ -80,7 +80,7 @@ class MembershipsView(Validators):
 
     @use_context
     @handle_view_errors
-    def _create_or_update_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
+    def _create_or_update_membership(self, uid: typing.Union[str, None], plan_id: typing.Union[str, None], plan_start_date: date) -> tuple:
         if self.can_add_member(uid=uid, plan_id=plan_id, start_date=plan_start_date) is True:
             # can use get to simplify this and make transactions faster
             membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
@@ -103,15 +103,16 @@ class MembershipsView(Validators):
         due to errors in database connections or duplicate data"""
         return jsonify({'status': False, 'message': message}), 500
 
-    def add_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
+    def add_membership(self, uid: typing.Union[str, None], plan_id: typing.Union[str, None],
+                       plan_start_date: date) -> tuple:
         return self._create_or_update_membership(uid=uid, plan_id=plan_id, plan_start_date=plan_start_date)
 
-    def update_membership(self, uid: str, plan_id: str, plan_start_date: date) -> tuple:
+    def update_membership(self, uid: typing.Union[str, None], plan_id: typing.Union[str, None], plan_start_date: date) -> tuple:
         return self._create_or_update_membership(uid=uid, plan_id=plan_id, plan_start_date=plan_start_date)
 
     @use_context
     @handle_view_errors
-    def set_membership_status(self, uid: str, status: str) -> tuple:
+    def set_membership_status(self, uid: typing.Union[str, None], status: typing.Union[str, None]) -> tuple:
 
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
         if isinstance(membership_instance, Memberships):
@@ -120,7 +121,6 @@ class MembershipsView(Validators):
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
                 raise DataServiceError(message)
-
             message: str = "Successfully update membership status"
             return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message}), 200
         message: str = "Memberships record not found"
@@ -128,9 +128,9 @@ class MembershipsView(Validators):
 
     @use_context
     @handle_view_errors
-    def change_membership(self, uid: str, origin_plan_id: str, dest_plan_id: str) -> tuple:
+    def change_membership(self, uid: typing.Union[str, None], origin_plan_id: typing.Union[str, None],
+                          dest_plan_id: str) -> tuple:
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
-
         if isinstance(membership_instance, Memberships) and (membership_instance.plan_id == origin_plan_id):
             if self.plan_exist(plan_id=dest_plan_id) is True:
                 membership_instance.plan_id = dest_plan_id
@@ -153,7 +153,7 @@ class MembershipsView(Validators):
     # noinspection PyUnusedLocal
     @use_context
     @handle_view_errors
-    def send_welcome_email(self, uid: str, plan_id: str) -> tuple:
+    def send_welcome_email(self, uid: typing.Union[str, None], plan_id: typing.Union[str, None]) -> tuple:
         """
             just send a request to the email service to send emails
         """
@@ -162,7 +162,7 @@ class MembershipsView(Validators):
     @cache_memberships.cached(timeout=return_ttl(name='long'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def return_plan_members_by_payment_status(self, plan_id: str, status: str) -> tuple:
+    def return_plan_members_by_payment_status(self, plan_id: typing.Union[str, None], status: typing.Union[str, None]) -> tuple:
         """
             for members of this plan_id return members by payment_status
             payment status should either be paid or unpaid
@@ -199,7 +199,7 @@ class MembershipsView(Validators):
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def is_member_off(self, uid: str) -> tuple:
+    def is_member_off(self, uid: typing.Union[str, None]) -> tuple:
         """
             returns user membership details
         """
@@ -213,7 +213,7 @@ class MembershipsView(Validators):
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
-    def payment_amount(self, uid: str) -> tuple:
+    def payment_amount(self, uid: typing.Union[str, None]) -> tuple:
         """
             for a specific user return payment amount
         """
@@ -235,8 +235,9 @@ class MembershipsView(Validators):
 
     @use_context
     @handle_view_errors
-    def set_payment_status(self, uid: str, status: str) -> tuple:  # status is paid or unpaid
+    def set_payment_status(self, uid: typing.Union[str, None], status: typing.Union[str, None]) -> tuple:
         """
+            # status is paid or unpaid
             for a specific user set payment status
         """
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
@@ -337,8 +338,7 @@ class MembershipPlansView(Validators):
     def update_plan(self, plan_id: str, plan_name: str, description: str, schedule_day: int, schedule_term: str,
                     term_payment: int, registration_amount: int, currency: str, is_active: bool) -> tuple:
         if self.can_update_plan(plan_id=plan_id, plan_name=plan_name) is True:
-            membership_plans_instance: MembershipPlans = MembershipPlans.query(
-                MembershipPlans.plan_id == plan_id).get()
+            membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
             if isinstance(membership_plans_instance, MembershipPlans):
                 curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
                 curr_registration_amount: AmountMixin = AmountMixin(amount=registration_amount,
@@ -350,26 +350,22 @@ class MembershipPlansView(Validators):
                 membership_plans_instance.term_payment_amount = curr_term_payment
                 membership_plans_instance.registration_amount = curr_registration_amount
                 membership_plans_instance.is_active = is_active
-                key = membership_plans_instance.put(retries=self._max_retries,
-                                                    timeout=self._max_timeout)
+                key = membership_plans_instance.put(retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
                     message: str = 'for some reason we are unable to create a new plan'
                     return jsonify({'status': False, 'message': message}), 500
-
                 return jsonify({'status': True, 'message': 'successfully created new membership plan',
                                 'payload': membership_plans_instance.to_dict()}), 200
-
             else:
                 message: str = 'Membership plan not found'
                 return jsonify({'status': False, 'message': message}), 500
-
         else:
             message: str = 'Conditions to update plan not satisfied'
             return jsonify({'status': False, 'message': message}), 500
 
     @use_context
     @handle_view_errors
-    def set_is_active(self, plan_id: str, is_active: bool) -> tuple:
+    def set_is_active(self, plan_id: typing.Union[str, None], is_active: bool) -> tuple:
         membership_plans_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
         if isinstance(membership_plans_instance, MembershipPlans):
             membership_plans_instance.is_active = is_active
@@ -380,7 +376,6 @@ class MembershipPlansView(Validators):
 
             return jsonify({'status': True, 'message': 'successfully update membership plan status',
                             'payload': membership_plans_instance.to_dict()}), 200
-
         else:
             message: str = 'Membership plan not found'
             return jsonify({'status': False, 'message': message}), 500
@@ -459,15 +454,15 @@ def get_coupon_data(func):
     def wrapper(*args, **kwargs):
         coupon_data: dict = kwargs.get('coupon_data')
         if ("code" in coupon_data) and (coupon_data['code'] != ""):
-            code: str = coupon_data.get('code')
+            code: typing.Union[str, None] = coupon_data.get('code')
         else:
             return jsonify({'status': False, 'message': 'coupon code is required'}), 500
         if ("discount" in coupon_data) and (coupon_data['discount'] != ""):
-            discount: int = int(coupon_data.get('discount'))
+            discount: typing.Union[int, None] = int(coupon_data.get('discount'))
         else:
             return jsonify({'status': False, 'message': 'discount is required'}), 500
         if ("expiration_time" in coupon_data) and (coupon_data['expiration_time'] != ""):
-            expiration_time: int = int(coupon_data['expiration_time'])
+            expiration_time: typing.Union[int, None] = int(coupon_data['expiration_time'])
         else:
             return jsonify({'status': False, 'message': 'expiration_time is required'}), 500
         return func(code=code, discount=discount, expiration_time=expiration_time, *args)
@@ -482,7 +477,8 @@ class CouponsView(Validators):
     @get_coupon_data
     @use_context
     @handle_view_errors
-    def add_coupon(self, code: str, discount: int, expiration_time: int) -> tuple:
+    def add_coupon(self, code: typing.Union[str, None], discount: typing.Union[int, None],
+                   expiration_time: typing.Union[int, None]) -> tuple:
         if self.can_add_coupon(code=code, expiration_time=expiration_time, discount=discount) is True:
             coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
             key = coupons_instance.put(retries=self._max_retries, timeout=self._max_timeout)

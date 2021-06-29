@@ -109,7 +109,6 @@ class ClassSetters:
 
     @staticmethod
     def set_id(prop, value: typing.Union[str, None]) -> str:
-        print('value  : {}'.format(value))
         if value == "":
             raise ValueError("{} cannot be Null".format(str(prop)))
         if not isinstance(value, str):

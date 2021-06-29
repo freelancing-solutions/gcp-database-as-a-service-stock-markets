@@ -39,7 +39,7 @@ list_of_currencies: typing.List[list] = [
     ["CRC", "Costa Rica Colon"],
     ["HRK", "Croatia Kuna"],
     ["CUP", "Cuba Peso"],
-    ["CZK", "Czech Republic Koruna"],
+    ["CZK", "Czech Republic Krona"],
     ["DKK", "Denmark Krone"],
     ["DOP", "Dominican Republic Peso"],
     ["XCD", "East Caribbean Dollar"],

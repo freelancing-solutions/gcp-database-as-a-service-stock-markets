@@ -66,8 +66,8 @@ def exchange_data(path: str) -> tuple:
                 name: str = json_data.get('name') or None
             else:
                 return jsonify({"status": False, "message": "Name is required"}), 500
-
             return exchange_data_instance.update_exchange(exchange_id=exchange_id, country=country, name=name)
+
         elif path == "add-tickers":
             json_data = request.get_json()
             if 'exchange_id' in json_data and json_data['exchange_id'] != "":
@@ -78,7 +78,6 @@ def exchange_data(path: str) -> tuple:
                 tickers: list = json_data.get('tickers') or []
             else:
                 return jsonify({"status": False, "message": "Tickers is required"}), 500
-
             return exchange_data_instance.add_complete_stock_tickers_list(exchange_id=exchange_id, tickers_list=tickers)
 
         elif path == "get-tickers":
@@ -87,7 +86,6 @@ def exchange_data(path: str) -> tuple:
                 exchange_id: str = json_data.get('exchange_id') or None
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
-
             return exchange_data_instance.get_exchange_tickers(exchange_id=exchange_id)
 
         elif path == "get-exchange":
@@ -96,7 +94,6 @@ def exchange_data(path: str) -> tuple:
                 exchange_id: str = json_data.get('exchange_id') or None
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
-
             return exchange_data_instance.get_exchange(exchange_id=exchange_id)
 
         elif path == "get-all-exchanges":
@@ -108,7 +105,6 @@ def exchange_data(path: str) -> tuple:
                 exchange_id: str = json_data.get('exchange_id') or None
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
-
             return exchange_data_instance.return_exchange_errors(exchange_id=exchange_id)
 
         elif path == "delete-exchange":
@@ -117,7 +113,6 @@ def exchange_data(path: str) -> tuple:
                 exchange_id: str = json_data.get('exchange_id') or None
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
-
             return exchange_data_instance.delete_exchange(exchange_id=exchange_id)
         else:
             pass

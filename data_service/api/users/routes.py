@@ -5,15 +5,15 @@ users_bp = Blueprint("users", __name__)
 
 
 def get_kwargs(user_data: dict) -> tuple:
-    if "uid" in user_data and user_data["uid"] != "":
+    if ("uid" in user_data) and (user_data["uid"] != ""):
         uid: str = user_data.get("uid")
     else:
         uid: str = ""
-    if "email" in user_data and user_data["email"] != "":
+    if ("email" in user_data) and (user_data["email"] != ""):
         email: str = user_data.get("email")
     else:
         email: str = ""
-    if "cell" in user_data and user_data["cell"] != "":
+    if ("cell" in user_data) and (user_data["cell"] != ""):
         cell: str = user_data.get("cell")
     else:
         cell: str = ""
@@ -128,11 +128,11 @@ def de_activate_user() -> tuple:
 def login() -> tuple:
     user_view_instance: UserView = UserView()
     user_data: dict = request.get_json()
-    if "email" in user_data and user_data["email"] != "":
+    if ("email" in user_data) and (user_data["email"] != ""):
         email = user_data.get("email")
     else:
         return jsonify({"status": False,  "message": "email is required"}), 500
-    if "password" in user_data and user_data["password"] != "":
+    if ("password" in user_data) and (user_data["password"] != ""):
         password = user_data.get("password")
     else:
         return jsonify({"status": False, "message": "password is required"}), 500
@@ -153,27 +153,27 @@ def logout() -> tuple:
 def register() -> tuple:
     user_view_instance: UserView = UserView()
     user_data: dict = request.get_json()
-    if "email" in user_data and user_data["email"] != "":
+    if ("email" in user_data) and (user_data["email"] != ""):
         email: str = user_data.get("email")
     else:
         return jsonify({"status": False, "message": "Email is required"}), 500
 
-    if "cell" in user_data and user_data["cell"] != "":
+    if ("cell" in user_data) and (user_data["cell"] != ""):
         cell: str = user_data.get("cell")
     else:
         return jsonify({"status": False, "message": "Cell is Required"})
 
-    if "password" in user_data and user_data["password"] != "":
+    if ("password" in user_data) and (user_data["password"] != ""):
         password: str = user_data.get("password")
     else:
         return jsonify({"status": False, "message": "Password is required"}), 500
 
-    if "names" in user_data and user_data["names"] != "":
+    if ("names" in user_data) and (user_data["names"] != ""):
         names: str = user_data.get("names")
     else:
         return jsonify({"status": False, "message": "Names is required"}), 500
 
-    if "surname" in user_data and user_data["surname"] != "":
+    if ("surname" in user_data) and (user_data["surname"] != ""):
         surname: str = user_data.get("surname")
     else:
         return jsonify({"status": False, "message": "Surname is required"}), 500

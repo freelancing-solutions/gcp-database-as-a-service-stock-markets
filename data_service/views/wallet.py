@@ -1,8 +1,11 @@
+import functools
 import typing
 from flask import jsonify, current_app
 from data_service.config.exceptions import DataServiceError
+from data_service.main import cache_stocks
 from data_service.store.mixins import AmountMixin
 from data_service.store.wallet import WalletModel, WalletValidator
+from data_service.utils.utils import return_ttl, end_of_month
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
@@ -72,6 +75,7 @@ class WalletView(Validator):
                             'payload': wallet_instance.to_dict()}), 200
         return jsonify({'status': False, 'message': 'Unable to create wallet'}), 500
 
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
     def get_wallet(self, uid: typing.Union[str, None]) -> tuple:
@@ -83,20 +87,23 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def update_wallet(self, wallet_data: dict) -> tuple:
+
         uid: typing.Union[str, None] = wallet_data.get("uid")
         available_funds: typing.Union[int, None] = wallet_data.get("available_funds")
         currency: typing.Union[str, None] = wallet_data.get('currency')
         paypal_address: typing.Union[str, None] = wallet_data.get("paypal_address")
+
         if self.can_update_wallet(uid=uid) is True:
+
             wall_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
             wall_instance.uid = uid
             amount_instance: AmountMixin = AmountMixin(amount=available_funds, currency=currency)
             wall_instance.available_funds = amount_instance
             wall_instance.paypal_address = paypal_address
             key = wall_instance.put(retries=self._max_retries, timeout=self._max_timeout)
+
             if key is None:
                 raise DataServiceError("An Error occurred updating Wallet")
-
             return jsonify({'status': True, 'payload': wall_instance.to_dict(),
                             'message': 'successfully updated wallet'}), 200
         return jsonify({'status': False, 'message': 'Unable to update wallet'}), 500
@@ -113,11 +120,11 @@ class WalletView(Validator):
             key = wallet_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 raise DataServiceError("An Error occurred resetting Wallet")
-
             return jsonify({'status': True, 'payload': wallet_instance.to_dict(),
                             'message': 'wallet is rest'}), 200
         return jsonify({'status': False, 'message': 'Unable to reset wallet'}), 500
 
+    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
     def return_all_wallets(self) -> tuple:
@@ -129,6 +136,8 @@ class WalletView(Validator):
     @use_context
     @handle_view_errors
     def return_wallets_by_balance(self, lower_bound: int, higher_bound: int) -> tuple:
+        if not(isinstance(lower_bound, int) and isinstance(higher_bound, int)):
+            return jsonify({'status': False, 'message': "specify lower bound and higher bound"}), 500
         wallet_list: typing.List[WalletModel] = WalletModel.query(WalletModel.available_funds > lower_bound,
                                                                   WalletModel.available_funds < higher_bound).fetch()
         payload: typing.List[dict] = [wallet.to_dict() for wallet in wallet_list]

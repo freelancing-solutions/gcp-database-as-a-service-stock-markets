@@ -1,3 +1,5 @@
+import typing
+
 from google.cloud import ndb
 from datetime import datetime
 
@@ -77,16 +79,22 @@ class HelpDesk(ndb.Model):
 class TicketValid:
 
     @staticmethod
-    def is_topic_valid(topic: str) -> bool:
-        pass
+    def is_topic_valid(topic: typing.Union[str, None]) -> bool:
+        if not(isinstance(topic, str)) or (topic == ""):
+            return False
+        return True
 
     @staticmethod
-    def is_subject_valid(subject: str) -> bool:
-        pass
+    def is_subject_valid(subject: typing.Union[str, None]) -> bool:
+        if not(isinstance(subject, str)) or (subject == ""):
+            return False
+        return True
 
     @staticmethod
-    def is_message_valid(message: str) -> bool:
-        pass
+    def is_message_valid(message: typing.Union[str, None]) -> bool:
+        if not(isinstance(message, str)) or (message == ""):
+            return False
+        return True
 
 
 class Ticket(ndb.Model):
