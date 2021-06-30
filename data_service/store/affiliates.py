@@ -226,14 +226,9 @@ class EarningsData(ndb.Model):
         #
     """
 
-    def set_date(self, value) -> date:
-        if not isinstance(value, date):
-            raise ValueError("{} is invalid".format(str(self)))
-        return value
-
     affiliate_id: str = ndb.StringProperty(validator=setters.set_id)
     start_date: date = ndb.DateProperty(auto_now_add=True)
-    last_updated: date = ndb.DateProperty(validator=set_date)
+    last_updated: date = ndb.DateProperty(validator=setters.set_date)
     total_earned: AmountMixin = ndb.StructuredProperty(AmountMixin, validator=setters.set_amount)
     is_paid: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
     on_hold: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)
@@ -244,6 +239,8 @@ class EarningsData(ndb.Model):
         if self.affiliate_id != other.affiliate_id:
             return False
         if self.start_date != other.start_date:
+            return False
+        if self.total_earned != other.total_earned:
             return False
         return True
 

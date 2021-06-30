@@ -2,6 +2,8 @@
 import datetime
 import typing
 
+from google.cloud import ndb
+
 from data_service.store.wallet import WalletModel
 from data_service.views.memberships import MembershipsView
 from data_service.store.memberships import Memberships, MembershipPlans
@@ -52,6 +54,15 @@ def cron_down_grade_unpaid_memberships():
     pass
 
 
+async def add_earnings(affiliate: Affiliates, earnings: EarningsData):
+    # validate and refactor the below code
+    wallet_instance: WalletModel = await WalletModel.query(WalletModel.uid == affiliate.uid).get_async()
+    wallet_instance.available_funds = wallet_instance.available_funds + earnings.total_earned
+    earnings.is_paid = True
+    wallet_instance.put_async()
+    earnings.put_async()
+
+
 def cron_finalize_affiliate_payments():
     """
         cron job
@@ -59,16 +70,14 @@ def cron_finalize_affiliate_payments():
         and send to recruiter wallet
     """
     affiliates_list: typing.List[Affiliates] = Affiliates.query().fetch()
+    coro: list = []
     for affiliate in affiliates_list:
         earnings_data: EarningsData = EarningsData.query(EarningsData.affiliate_id == affiliate.affiliate_id).get()
-
         if not earnings_data.is_paid:
-            wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == affiliate.uid).get()
-            wallet_instance.available_funds = wallet_instance.available_funds + earnings_data.total_earned
-            wallet_instance.put()
+            coro.append(add_earnings(affiliate=affiliate, earnings=earnings_data))
 
-            earnings_data.is_paid = True
-            earnings_data.put()
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(asyncio.wait(coro))
 
 
 def cron_send_login_reminders():
