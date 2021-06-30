@@ -158,4 +158,29 @@ def update_membership_plan() -> tuple:
                                                  term_payment=term_payment, registration_amount=registration_amount,
                                                  schedule_day=schedule_day, schedule_term=schedule_term,
                                                  currency=currency, is_active=is_active)
-#  API also refer to admin app
+
+
+@memberships_bp.route('/api/v1/is-member-off/<path:uid>', methods=["GET"])
+def is_member_off(uid: str) -> tuple:
+    """
+        for a specific user returns membership
+    """
+    membership_instance: MembershipsView = MembershipsView()
+    return membership_instance.is_member_off(uid=uid)
+
+
+@memberships_bp.route('/api/v1/memberships-payment-amount/<path:uid>', methods=["GET"])
+def payment_amount(uid: str) -> tuple:
+    """
+        for a specific member return payment amounts
+    """
+    membership_instance: MembershipsView = MembershipsView()
+    return membership_instance.payment_amount(uid=uid)
+
+
+@memberships_bp.route('/api/v1/memberships-set-payment-status/<path:uid>/<path:status>', methods=["GET"])
+def set_payment_status(uid: str, status: str) -> tuple:
+    membership_instance: MembershipsView = MembershipsView()
+    return membership_instance.set_payment_status(uid=uid, status=status)
+
+
