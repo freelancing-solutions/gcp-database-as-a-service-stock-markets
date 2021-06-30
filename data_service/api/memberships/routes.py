@@ -109,4 +109,53 @@ def get_membership_plans() -> tuple:
     member_ship_instance_view: MembershipPlansView = MembershipPlansView()
     return member_ship_instance_view.return_all_plans()
 
+
+@memberships_bp.route('/api/v1/update-membership-plan', methods=["POST"])
+def update_membership_plan() -> tuple:
+    member_ship_instance_view: MembershipPlansView = MembershipPlansView()
+    membership_plan: dict = request.get_json()
+    if ("plan_id" in membership_plan) and (membership_plan["plan_id"] != ""):
+        plan_id: typing.Union[str, None] = membership_plan.get("plan_id")
+    else:
+        return jsonify({'status': False, 'message': 'plan_id cannot be null'}), 500
+    if ("plan_name" in membership_plan) and (membership_plan["plan_name"] != ""):
+        plan_name: typing.Union[str, None] = membership_plan.get("plan_name")
+    else:
+        return jsonify({'status': False, 'message': "plan_name is required"}), 500
+    if ("description" in membership_plan) and (membership_plan["description"] != ""):
+        description: typing.Union[str, None] = membership_plan.get("description")
+    else:
+        return jsonify({'status': False, 'message': 'description is required'}), 500
+    if ("schedule_day" in membership_plan) and (membership_plan["schedule_day"] != ""):
+        schedule_day: typing.Union[int, None] = int(membership_plan.get("schedule_day")) \
+            if membership_plan.get("schedule_day") is not None else None
+    else:
+        return jsonify({'status': False, 'message': 'schedule_day is required'}), 500
+    if ("schedule_term" in membership_plan) and (membership_plan["schedule_term"] != ""):
+        schedule_term: typing.Union[str, None] = membership_plan.get("schedule_term")
+    else:
+        return jsonify({'status': False, 'message': 'schedule_term is required'}), 500
+    if ("term_payment" in membership_plan) and (membership_plan["term_payment"] != ""):
+        term_payment: typing.Union[int, None] = int(membership_plan['term_payment']) \
+            if membership_plan['term_payment'] is not None else None
+    else:
+        return jsonify({'status': False, 'message': 'term_payment is required'}), 500
+    if ("registration_amount" in membership_plan) and (membership_plan["registration_amount"] != ""):
+        registration_amount: typing.Union[int, None] = int(membership_plan["registration_amount"]) \
+            if membership_plan.get("registration_amount") is not None else None
+    else:
+        return jsonify({'status': False, 'message': 'registration_amount is required'}), 500
+    if ("currency" in membership_plan) and (membership_plan["currency"] != ""):
+        currency: typing.Union[str, None] = membership_plan.get("currency")
+    else:
+        return jsonify({'status': False, 'message': 'currency is required'}), 500
+    if ('is_active' in membership_plan) and (membership_plan['is_active'] != ""):
+        is_active: bool = membership_plan.get("is_active")
+    else:
+        return jsonify({'status': False, 'message': 'is_active is required'}), 500
+
+    return member_ship_instance_view.update_plan(plan_id=plan_id, plan_name=plan_name, description=description,
+                                                 term_payment=term_payment, registration_amount=registration_amount,
+                                                 schedule_day=schedule_day, schedule_term=schedule_term,
+                                                 currency=currency, is_active=is_active)
 #  API also refer to admin app

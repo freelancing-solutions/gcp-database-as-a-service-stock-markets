@@ -271,22 +271,22 @@ class MembershipPlansView(Validators):
         """
 
         if ("plan_name" in membership_plan_data) and (membership_plan_data['plan_name'] != ""):
-            plan_name: typing.Union[str,None] = membership_plan_data.get('plan_name')
+            plan_name: typing.Union[str, None] = membership_plan_data.get('plan_name')
         else:
             return jsonify({'status': False, 'message': 'plan name is required'}), 500
 
         if ('description' in membership_plan_data) and (membership_plan_data['description'] != ""):
-            description: typing.Union[str,None] = membership_plan_data.get('description')
+            description: typing.Union[str, None] = membership_plan_data.get('description')
         else:
             return jsonify({'status': False, 'message': 'description is required'}), 500
 
         if ('schedule_day' in membership_plan_data) and (membership_plan_data['schedule_day'] != ""):
-            schedule_day: typing.Union[str,None] = membership_plan_data.get('schedule_day')
+            schedule_day: typing.Union[str, None] = membership_plan_data.get('schedule_day')
         else:
             return jsonify({'status': False, 'message': 'scheduled day is required'}), 500
 
         if ('schedule_term' in membership_plan_data) and (membership_plan_data['schedule_term'] != ""):
-            schedule_term: typing.Union[str,None] = membership_plan_data.get('schedule_term')
+            schedule_term: typing.Union[str, None] = membership_plan_data.get('schedule_term')
         else:
             return jsonify({'status': False, 'message': 'schedule term is required'}), 500
 
