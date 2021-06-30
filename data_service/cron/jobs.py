@@ -7,6 +7,7 @@ import asyncio
 
 
 def return_plan_by_id(plan_id: str, payment_plans: typing.List[MembershipPlans]) -> typing.Union[MembershipPlans, None]:
+
     for plan in payment_plans:
         if plan.plan_id == plan_id:
             return plan
