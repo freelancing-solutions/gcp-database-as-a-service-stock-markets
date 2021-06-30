@@ -1,9 +1,7 @@
 # Cron jobs for stock trading app
 import datetime
 import typing
-
 from google.cloud import ndb
-
 from data_service.store.wallet import WalletModel
 from data_service.views.memberships import MembershipsView
 from data_service.store.memberships import Memberships, MembershipPlans

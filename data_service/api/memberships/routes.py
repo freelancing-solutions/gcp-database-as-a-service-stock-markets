@@ -1,3 +1,5 @@
+import typing
+
 from flask import Blueprint, request, jsonify
 from datetime import datetime, date
 from data_service.api.api_authenticator import handle_auth
@@ -82,12 +84,12 @@ def change_membership_plan(plan_id: str) -> tuple:
     if plan_id != "":
         json_data: dict = request.get_json()
         if ("uid" in json_data) and (json_data['uid'] != ""):
-            uid: str = json_data.get("uid")
+            uid: typing.Union[str, None] = json_data.get("uid")
         else:
             return jsonify({'status': False, 'message': 'User Id is required'}), 500
 
         if ('dest_plan_id' in json_data) and (json_data['dest_plan_id'] != ""):
-            dest_plan_id: str = json_data.get("dest_plan_id")
+            dest_plan_id: typing.Union[str, None] = json_data.get("dest_plan_id")
         else:
             return jsonify({"status": False, "message": "destination plan id is required"}), 500
 

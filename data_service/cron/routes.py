@@ -33,7 +33,7 @@ cron_bp = Blueprint('cron', __name__)
 
 # Memberships cron jobs
 @cron_bp.route('/cron/create-memberships-invoices', methods=["GET"])
-def create_memberships_invoices():
+def create_memberships_invoices() -> tuple:
     """
         used to go through each membership plans and executes payments
     """
@@ -42,7 +42,7 @@ def create_memberships_invoices():
 
 
 @cron_bp.route('/cron/downgrade-memberships', methods=["GET"])
-def downgrade_unpaid():
+def downgrade_unpaid() -> tuple:
     """
         goes through memberships plans and downgrade unpaid plans
     """
@@ -52,7 +52,7 @@ def downgrade_unpaid():
 
 # finalize affiliate payments schedule this job
 @cron_bp.route('/cron/finalize-affiliate-payment', methods=['GET'])
-def finalize_affiliate_payment():
+def finalize_affiliate_payment() -> tuple:
     """
         send affiliate payment to wallet
     """

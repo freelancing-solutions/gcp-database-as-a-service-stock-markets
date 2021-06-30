@@ -225,8 +225,8 @@ class MembershipsView(Validators):
                 message: str = 'could not find plan associate with the plan_id'
                 return jsonify({'status': False, 'message': message}), 500
             amount_data: dict = {
-                'term_payment_amount': str(membership_plan_instance.term_payment_amount),
-                'registration_amount': str(membership_plan_instance.registration_amount)}
+                'term_payment_amount': membership_plan_instance.term_payment_amount.to_dict(),
+                'registration_amount': membership_plan_instance.registration_amount.to_dict()}
             message: str = 'successfully returned payment details'
             return jsonify({'status': True, 'payload': amount_data, 'message': message}), 200
 
@@ -271,22 +271,22 @@ class MembershipPlansView(Validators):
         """
 
         if ("plan_name" in membership_plan_data) and (membership_plan_data['plan_name'] != ""):
-            plan_name = membership_plan_data.get('plan_name')
+            plan_name: typing.Union[str,None] = membership_plan_data.get('plan_name')
         else:
             return jsonify({'status': False, 'message': 'plan name is required'}), 500
 
         if ('description' in membership_plan_data) and (membership_plan_data['description'] != ""):
-            description: str = membership_plan_data.get('description')
+            description: typing.Union[str,None] = membership_plan_data.get('description')
         else:
             return jsonify({'status': False, 'message': 'description is required'}), 500
 
         if ('schedule_day' in membership_plan_data) and (membership_plan_data['schedule_day'] != ""):
-            schedule_day: str = membership_plan_data.get('schedule_day')
+            schedule_day: typing.Union[str,None] = membership_plan_data.get('schedule_day')
         else:
             return jsonify({'status': False, 'message': 'scheduled day is required'}), 500
 
         if ('schedule_term' in membership_plan_data) and (membership_plan_data['schedule_term'] != ""):
-            schedule_term: str = membership_plan_data.get('schedule_term')
+            schedule_term: typing.Union[str,None] = membership_plan_data.get('schedule_term')
         else:
             return jsonify({'status': False, 'message': 'schedule term is required'}), 500
 
@@ -301,7 +301,7 @@ class MembershipPlansView(Validators):
             return jsonify({'status': False, 'message': 'registration amount is required'}), 500
 
         if ('currency' in membership_plan_data) and (membership_plan_data['currency'] != ""):
-            currency: str = str(membership_plan_data.get('currency'))
+            currency: typing.Union[str,None] = str(membership_plan_data.get('currency'))
         else:
             return jsonify({'status': False, 'message': 'currency is required'}), 500
 
@@ -312,7 +312,7 @@ class MembershipPlansView(Validators):
             # Creating Amount Mixins to represent real currency
             curr_term_payment: AmountMixin = AmountMixin(amount=term_payment, currency=currency)
             curr_registration_amount: AmountMixin = AmountMixin(amount=registration_amount, currency=currency)
-
+            # IF one of the values is not defined then this will throw an error
             plan_instance: MembershipPlans = MembershipPlans(plan_id=create_id(), plan_name=plan_name,
                                                              description=description,
                                                              total_members=total_members,
