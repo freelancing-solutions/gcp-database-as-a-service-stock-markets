@@ -307,7 +307,9 @@ class AffiliateTransactionItems(ndb.Model):
 class AffiliateSettingsStats(ndb.Model):
     """
         if earnings are recurring then an affiliate will continue to earn income
-        on their down-line , if not then income will be earned once off when a recruited user becomes a member.
+        on their down-line ,
+        if not then income will be earned once off when a recruited
+        user becomes a member.
     """
     earnings_percent: int = ndb.IntegerProperty(validator=setters.set_percent)
     recurring_earnings: bool = ndb.BooleanProperty(default=False, validator=setters.set_bool)

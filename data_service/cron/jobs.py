@@ -1,8 +1,11 @@
 # Cron jobs for stock trading app
 import datetime
 import typing
+
+from data_service.store.wallet import WalletModel
 from data_service.views.memberships import MembershipsView
 from data_service.store.memberships import Memberships, MembershipPlans
+from data_service.store.affiliates import Affiliates, Recruits, EarningsData
 import asyncio
 
 
@@ -49,12 +52,23 @@ def cron_down_grade_unpaid_memberships():
     pass
 
 
-def cron_send_affiliate_payments():
+def cron_finalize_affiliate_payments():
     """
         cron job
-        function: when executed go over all affiliate records and gather payment data and send to recruiter wallet
+        function: when executed go over all affiliate records and gather payment data
+        and send to recruiter wallet
     """
-    pass
+    affiliates_list: typing.List[Affiliates] = Affiliates.query().fetch()
+    for affiliate in affiliates_list:
+        earnings_data: EarningsData = EarningsData.query(EarningsData.affiliate_id == affiliate.affiliate_id).get()
+
+        if not earnings_data.is_paid:
+            wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == affiliate.uid).get()
+            wallet_instance.available_funds = wallet_instance.available_funds + earnings_data.total_earned
+            wallet_instance.put()
+
+            earnings_data.is_paid = True
+            earnings_data.put()
 
 
 def cron_send_login_reminders():

@@ -55,6 +55,22 @@ class AmountMixin(ndb.Model):
             return False
         return True
 
+    def __add__(self, other) -> int:
+        if self.__class__ != other.__class__:
+            raise TypeError("Invalid type")
+        if self.currency != other.currency:
+            raise TypeError("Incompatible Currency")
+        self.amount += other.amount
+        return self.amount
+
+    def __sub__(self, other) -> int:
+        if self.__class__ != other.__class__:
+            raise TypeError("Invalid type")
+        if self.currency != other.currency:
+            raise TypeError("Incompatible Currency")
+        self.amount += other.amount
+        return self.amount
+
     def __str__(self) -> str:
         return "Amount: {} {}".format(self.currency, self.amount)
 
