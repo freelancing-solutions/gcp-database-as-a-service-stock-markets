@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
 from data_service.config.exceptions import DataServiceError, InputError
-from jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_send_affiliate_payments
+from jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
 cron_bp = Blueprint('cron', __name__)
 
 #
@@ -32,8 +32,8 @@ cron_bp = Blueprint('cron', __name__)
 
 
 # Memberships cron jobs
-@cron_bp.route('/cron/pay-memberships', methods=["GET"])
-def pay_memberships():
+@cron_bp.route('/cron/create-memberships-invoices', methods=["GET"])
+def create_memberships_invoices():
     """
         used to go through each membership plans and executes payments
     """
@@ -50,11 +50,11 @@ def downgrade_unpaid():
     return 'OK', 200
 
 
-# Affiliates cron jobs
-@cron_bp.route('/cron/send-affiliate-payment', methods=['GET'])
-def send_affiliate_payment():
+# finalize affiliate payments schedule this job
+@cron_bp.route('/cron/finalize-affiliate-payment', methods=['GET'])
+def finalize_affiliate_payment():
     """
         send affiliate payment to wallet
     """
-    cron_send_affiliate_payments()
+    cron_finalize_affiliate_payments()
     return 'OK', 200

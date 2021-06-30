@@ -54,13 +54,15 @@ def cron_down_grade_unpaid_memberships():
     pass
 
 
-async def add_earnings(affiliate: Affiliates, earnings: EarningsData):
+async def add_earnings(affiliate: Affiliates, earnings: EarningsData) -> bool:
+    # TODO may use ndb.tasklets to complete this tasks
     # validate and refactor the below code
     wallet_instance: WalletModel = await WalletModel.query(WalletModel.uid == affiliate.uid).get_async()
     wallet_instance.available_funds = wallet_instance.available_funds + earnings.total_earned
     earnings.is_paid = True
     wallet_instance.put_async()
     earnings.put_async()
+    return True
 
 
 def cron_finalize_affiliate_payments():
@@ -73,7 +75,8 @@ def cron_finalize_affiliate_payments():
     coro: list = []
     for affiliate in affiliates_list:
         earnings_data: EarningsData = EarningsData.query(EarningsData.affiliate_id == affiliate.affiliate_id).get()
-        if not earnings_data.is_paid:
+        if not (earnings_data.is_paid or earnings_data.on_hold):
+            # if its paid or its on hold do not add
             coro.append(add_earnings(affiliate=affiliate, earnings=earnings_data))
 
     loop = asyncio.new_event_loop()
