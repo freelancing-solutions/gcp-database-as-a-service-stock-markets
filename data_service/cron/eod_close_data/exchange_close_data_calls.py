@@ -10,10 +10,11 @@
 
 import typing
 from google.cloud import ndb
-from data_service.store.stocks import Stock
+
 from data_service.store.settings import ExchangeDataModel
 from data_service.views.settings import ExchangeDataView
 import asyncio
+import aiohttp
 
 
 def stocks_by_exchange(exchange_id: str) -> typing.List[dict]:
@@ -47,42 +48,88 @@ def add_stock_to_exchange(exchange_id: str, stock_instance: dict) -> bool:
     return False
 
 
-async def get_stock_close_data_from_pse(ticker: dict, exchange: dict) -> dict:
+async def get_stock_close_data_from_pse(ticker: dict, exchange: dict) -> bool:
     """
         get stock data from pse ana save into the database
         # net_volumes, sell_volumes, buy_volumes
         if unable to get the data for the stock try eod
+        TODO- complete this
+        ticker: dict
+        exchange: dict
     """
-    pass
+    pse_stock_endpoint: str = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(pse_stock_endpoint) as response:
+            response_data = await response.json()
+            # TODO get net volume
+            # TODO get sell volume
+            # TODO get buy volume
+            # If cant obtain data use create task to use eod instead
+            # TODO - send net , sell and buy for the stock to save to database
+            pass
+    return True
 
 
-async def get_stock_close_data_from_eod(ticker: dict, exchange: dict) -> dict:
+async def get_stock_close_data_from_eod(ticker: dict, exchange: dict) -> bool:
     """
         get stock data from eod ana save into the database
         # net_volumes, sell_volumes, buy_volumes
         if unable to get the data for the stock try yahoo
+        TODO- complete this
     """
-    pass
+    eod_stock_endpoint: str = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(eod_stock_endpoint) as response:
+            response_data = await response.json()
+            # TODO get net volume
+            # TODO get sell volume
+            # TODO get buy volume
+            # If cant obtain data use create task to use eod instead
+            # TODO - send net , sell and buy for the stock to save to database
+            pass
+    return True
 
 
-async def get_stock_close_data_from_yahoo(ticker: dict, exchange: dict) -> dict:
+async def get_stock_close_data_from_yahoo(ticker: dict, exchange: dict) -> bool:
     """
         get stock data from yahoo finance ana save into the database
         # net_volumes, sell_volumes, buy_volumes
         if unable to get the data for the stock skip
+        TODO- complete this
     """
-    pass
+    yahoo_stock_endpoint: str = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(yahoo_stock_endpoint) as response:
+            response_data = await response.json()
+            # TODO get net volume
+            # TODO get sell volume
+            # TODO get buy volume
+            # If cant obtain data use create task to use eod instead
+            # TODO - send net , sell and buy for the stock to save to database
+            pass
+    return True
 
 
-async def get_crypto_close_data_from_binance(ticker: dict) -> dict:
+async def get_crypto_close_data_from_binance(ticker: dict) -> bool:
     """
         get stock data from binance and save into database
         # net_volumes, sell_volumes, buy_volumes
         if unable to get the data for the stock try
             1. another exchange
             2. another one
+        TODO- complete this
     """
-    pass
+    binance_stock_endpoint: str = ""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(binance_stock_endpoint) as response:
+            response_data = await response.json()
+            # TODO get net volume
+            # TODO get sell volume
+            # TODO get buy volume
+            # If cant obtain data use create task to use eod instead
+            # TODO - send net , sell and buy for the stock to save to database
+            pass
+    return True
 
 
 def cron_call_close_data_apis():
