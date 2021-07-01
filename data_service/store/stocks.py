@@ -58,6 +58,12 @@ class Setters:
             raise TypeError("{} can only be a string".format(str(prop)))
         return broker_name.strip().lower()
 
+    @staticmethod
+    def set_bool(prop, value: bool) -> bool:
+        if not(isinstance(value, bool)):
+            raise TypeError("{} Invalid type".format(str(prop)))
+        return value
+
 
 setters: Setters = Setters()
 
@@ -71,6 +77,7 @@ class Stock(ndb.Model):
     stock_code: str = ndb.StringProperty(required=True, indexed=True, validator=setters.set_string)
     stock_name: str = ndb.StringProperty(required=True, validator=setters.set_stock_name)
     symbol: str = ndb.StringProperty(required=True, indexed=True, validator=setters.set_string)
+    is_crypto: bool = ndb.BooleanProperty(validator=setters.set_bool)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:

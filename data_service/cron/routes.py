@@ -2,8 +2,11 @@ import os
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
 from data_service.config.exceptions import DataServiceError, InputError
-from jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
+from operational_jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
+from exchange_calls import cron_call_eod_api, cron_call_binance_api, cron_call_pse_api, cron_call_yahoo_api
+
 cron_bp = Blueprint('cron', __name__)
+
 
 #
 # @cron_bp.route('/cron/get-tickers-eod', methods=['GET'])
@@ -57,4 +60,31 @@ def finalize_affiliate_payment() -> tuple:
         send affiliate payment to wallet
     """
     cron_finalize_affiliate_payments()
+    return 'OK', 200
+
+
+# fetch stock data from eod api
+@cron_bp.route('/cron/call-eod-api', methods=['POST', 'GET'])
+def call_eod_api() -> tuple:
+    cron_call_eod_api()
+    return 'OK', 200
+
+
+@cron_bp.route('/cron/call-eod-api', methods=['POST', 'GET'])
+def call_pse_api() -> tuple:
+    cron_call_pse_api()
+    return 'OK', 200
+
+
+# fetch stock data from binance api
+@cron_bp.route('/cron/call-eod-api', methods=['POST', 'GET'])
+def call_binance_api() -> tuple:
+    cron_call_binance_api()
+    return 'OK', 200
+
+
+# fetch stock data from yahoo finance api
+@cron_bp.route('cron/call-yahoo-api', methods=['POST', 'GET'])
+def call_yahoo_api() -> tuple:
+    cron_call_yahoo_api()
     return 'OK', 200
