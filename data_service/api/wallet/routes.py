@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.wallet import WalletView
-
 wallet_bp = Blueprint("wallet", __name__)
 
 

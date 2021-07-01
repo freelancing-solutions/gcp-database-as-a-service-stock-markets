@@ -1,5 +1,4 @@
 import typing
-
 from flask import Blueprint, request, jsonify
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.users import UserView
@@ -28,7 +27,7 @@ def get_kwargs(user_data: dict) -> tuple:
 def create_user() -> tuple:
     """
         given user details create new user
-    :return: json response as tuple
+        :return: json response as tuple
     """
     # created new user
     user_data: dict = request.get_json()
@@ -48,8 +47,8 @@ def create_user() -> tuple:
 def user(path: str) -> tuple:
     """
         update or get a specific user by uid
-    :param path:
-    :return: json response as tuple
+        :param path:
+        :return: json response as tuple
     """
 
     users_view_instance: UserView = UserView()
@@ -85,8 +84,8 @@ def user(path: str) -> tuple:
 def get_all(path: str) -> tuple:
     """
         get all , active or in-active users
-    :param path:
-    :return: json response as tuple
+        :param path:
+        :return: json response as tuple
     """
     if path == "all":
         users_view_instance: UserView = UserView()
@@ -120,7 +119,7 @@ def check_password() -> tuple:
 def de_activate_user() -> tuple:
     """
         given uid in json de-activate user
-    :return: json as tuple
+        :return: json as tuple
     """
     user_data: dict = request.get_json()
     uid: str = user_data.get("uid")

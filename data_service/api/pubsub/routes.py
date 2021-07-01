@@ -1,9 +1,8 @@
 import base64
 import json
-from flask import Blueprint, request, jsonify, current_app, redirect, url_for
+from flask import Blueprint, request, jsonify, current_app
 from data_service.views.users import UserView
 from data_service.views.stocks import StockView
-
 pubsub_bp = Blueprint('pubsub', __name__)
 
 

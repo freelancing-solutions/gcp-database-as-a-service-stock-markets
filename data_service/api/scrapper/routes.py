@@ -1,8 +1,6 @@
-from flask import Blueprint, request, jsonify
-
+from flask import Blueprint, request
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.scrapper import ScrapperView
-
 scrapper_bp = Blueprint("scrapper", __name__)
 
 

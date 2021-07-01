@@ -1,4 +1,3 @@
-
 import typing
 
 tickers_type = typing.List[dict]

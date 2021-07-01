@@ -1,8 +1,6 @@
 from flask import Blueprint, request, jsonify
-
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.settings import ExchangeDataView, ScrappingPagesView
-
 settings_bp = Blueprint('settings_bp', __name__)
 
 

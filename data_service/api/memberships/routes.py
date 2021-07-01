@@ -5,7 +5,6 @@ from data_service.api.api_authenticator import handle_auth
 from data_service.config.exceptions import InputError
 from data_service.utils.utils import date_string_to_date
 from data_service.views.memberships import MembershipsView, MembershipPlansView
-
 memberships_bp = Blueprint('memberships', __name__)
 
 
