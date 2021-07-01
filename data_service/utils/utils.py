@@ -46,7 +46,6 @@ def date_string_to_date(date_str: str) -> date:
         if year < 1990:
             raise ValueError("Date Format invalid")
         return date(year=year, month=month, day=day)
-
     elif isinstance(date_str, date):
         return date_str
     else:
@@ -54,7 +53,6 @@ def date_string_to_date(date_str: str) -> date:
 
 
 # cache functions
-
 def end_of_month() -> bool:
     now: date = datetime.now().date()
     if now.day in [30, 31, 1]:

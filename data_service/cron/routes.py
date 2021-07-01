@@ -1,6 +1,14 @@
+"""
+    entry point to cron jobs
+"""
+
 from flask import Blueprint
-from operational_jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
-from data_service.cron.close_data.exchange_close_data_calls import cron_call_close_data_apis, cron_call_crypto_close_data_api
+
+from data_service.api.api_authenticator import handle_auth
+from data_service.cron.eod_close_data.exchange_close_data_calls import cron_call_close_data_apis, \
+    cron_call_crypto_close_data_api
+from data_service.cron.operational_jobs.operational_jobs import cron_create_membership_invoices, \
+    cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
 
 cron_bp = Blueprint('cron', __name__)
 
@@ -32,7 +40,8 @@ cron_bp = Blueprint('cron', __name__)
 
 
 # Memberships cron jobs
-@cron_bp.route('/cron/create-memberships-invoices', methods=["GET"])
+@cron_bp.route('/cron/create-memberships-invoices', methods=["GET", "POST"])
+@handle_auth
 def create_memberships_invoices() -> tuple:
     """
         used to go through each membership plans and executes payments
@@ -41,7 +50,8 @@ def create_memberships_invoices() -> tuple:
     return 'OK', 200
 
 
-@cron_bp.route('/cron/downgrade-memberships', methods=["GET"])
+@cron_bp.route('/cron/downgrade-memberships', methods=["GET", "POST"])
+@handle_auth
 def downgrade_unpaid() -> tuple:
     """
         goes through memberships plans and downgrade unpaid plans
@@ -51,7 +61,8 @@ def downgrade_unpaid() -> tuple:
 
 
 # finalize affiliate payments schedule this job
-@cron_bp.route('/cron/finalize-affiliate-payment', methods=['GET'])
+@cron_bp.route('/cron/finalize-affiliate-payment', methods=["GET", "POST"])
+@handle_auth
 def finalize_affiliate_payment() -> tuple:
     """
         send affiliate payment to wallet
@@ -62,6 +73,7 @@ def finalize_affiliate_payment() -> tuple:
 
 # fetch stock data from eod api
 @cron_bp.route('/cron/call-fiat-exchange-stock-close-data-api', methods=['POST', 'GET'])
+@handle_auth
 def call_close_data_api() -> tuple:
     cron_call_close_data_apis()
     return 'OK', 200
@@ -69,6 +81,7 @@ def call_close_data_api() -> tuple:
 
 # fetch stock data from binance api
 @cron_bp.route('/cron/call-crypto-close-data-api', methods=['POST', 'GET'])
+@handle_auth
 def call_crypto_close_data_api() -> tuple:
     cron_call_crypto_close_data_api()
     return 'OK', 200

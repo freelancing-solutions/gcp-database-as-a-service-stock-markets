@@ -1,11 +1,6 @@
 import typing
 from flask import Blueprint, request, jsonify
-from datetime import datetime, date
-from data_service.api.api_authenticator import handle_auth
-from data_service.config.exceptions import InputError
-from data_service.utils.utils import date_string_to_date
 from data_service.views.helpdesk import TicketView
-
 helpdesk_bp = Blueprint('helpdesk', __name__)
 
 

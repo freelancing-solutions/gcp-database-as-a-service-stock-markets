@@ -7,10 +7,8 @@
     data for the day or time of day,
     if any missing data is detected its updated on the database
 """
-
 import typing
 from google.cloud import ndb
-
 from data_service.store.settings import ExchangeDataModel
 from data_service.views.settings import ExchangeDataView
 import asyncio
@@ -168,7 +166,6 @@ def cron_call_crypto_close_data_api():
                         exchange_tickers: typing.List[dict] = response_data['payload']
                         for ticker in exchange_tickers:
                             coro.append(get_crypto_close_data_from_binance(ticker=ticker))
-
     loop = asyncio.new_event_loop()
     loop.run_until_complete(asyncio.wait(coro))
     return 'OK', 200

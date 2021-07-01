@@ -1,8 +1,6 @@
 from flask import Blueprint, request
-
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.affiliates import AffiliatesView, RecruitsView
-
 affiliates_bp = Blueprint('affiliates', __name__)
 
 

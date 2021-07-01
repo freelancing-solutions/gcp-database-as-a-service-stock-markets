@@ -25,6 +25,7 @@ def create_app(config_class=Config):
     cache_memberships.init_app(app=app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': default_timeout})
     cache_users.init_app(app=app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': default_timeout})
 
+    from data_service.cron.routes import cron_bp
     from data_service.api.users.routes import users_bp
     from data_service.api.stocks.routes import stocks_bp
     from data_service.api.settings.routes import settings_bp
@@ -38,6 +39,7 @@ def create_app(config_class=Config):
     from data_service.tasks.routers import task_bp
     from data_service.frontpage.routes import home_bp
 
+    app.register_blueprint(cron_bp)
     app.register_blueprint(wallet_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(stocks_bp)

@@ -1,8 +1,6 @@
 from flask import Blueprint, request
-
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.memberships import CouponsView
-
 coupons_bp = Blueprint('coupons', __name__)
 
 
@@ -30,6 +28,5 @@ def coupons(path: str) -> tuple:
         return coupons_view_instance.get_expired_coupons()
     else:
         pass
-
     # TODO integrate Coupons to admin app and allow for the app to
     # generate and manage them
