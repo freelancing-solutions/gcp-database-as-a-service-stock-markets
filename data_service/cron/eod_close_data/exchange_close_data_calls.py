@@ -51,6 +51,7 @@ async def get_stock_close_data_from_pse(ticker: dict, exchange: dict) -> dict:
     """
         get stock data from pse ana save into the database
         # net_volumes, sell_volumes, buy_volumes
+        if unable to get the data for the stock try eod
     """
     pass
 
@@ -59,6 +60,7 @@ async def get_stock_close_data_from_eod(ticker: dict, exchange: dict) -> dict:
     """
         get stock data from eod ana save into the database
         # net_volumes, sell_volumes, buy_volumes
+        if unable to get the data for the stock try yahoo
     """
     pass
 
@@ -67,11 +69,19 @@ async def get_stock_close_data_from_yahoo(ticker: dict, exchange: dict) -> dict:
     """
         get stock data from yahoo finance ana save into the database
         # net_volumes, sell_volumes, buy_volumes
+        if unable to get the data for the stock skip
     """
     pass
 
 
 async def get_crypto_close_data_from_binance(ticker: dict) -> dict:
+    """
+        get stock data from binance and save into database
+        # net_volumes, sell_volumes, buy_volumes
+        if unable to get the data for the stock try
+            1. another exchange
+            2. another one
+    """
     pass
 
 

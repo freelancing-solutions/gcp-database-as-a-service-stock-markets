@@ -1,10 +1,6 @@
-import os
-from flask import Blueprint, jsonify
-from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
-from data_service.config.exceptions import DataServiceError, InputError
+from flask import Blueprint
 from operational_jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
-from exchange_close_data_calls import cron_call_eod_api, cron_call_binance_api, cron_call_pse_api, cron_call_yahoo_api, \
-    cron_call_close_data_apis, cron_call_crypto_close_data_api
+from data_service.cron.close_data.exchange_close_data_calls import cron_call_close_data_apis, cron_call_crypto_close_data_api
 
 cron_bp = Blueprint('cron', __name__)
 
