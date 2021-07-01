@@ -1,5 +1,4 @@
 import typing
-
 from flask import Blueprint, request, jsonify
 from datetime import datetime, date
 from data_service.api.api_authenticator import handle_auth

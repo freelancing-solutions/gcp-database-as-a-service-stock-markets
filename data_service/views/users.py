@@ -71,7 +71,7 @@ class UserView:
     @handle_view_errors
     def update_user(self, uid:  typing.Union[str, None], names:  typing.Union[str, None],
                     surname:  typing.Union[str, None], cell:  typing.Union[str, None],
-                    email:  typing.Union[str, None]) -> tuple:
+                    email:  typing.Union[str, None], is_admin: bool, is_support: bool) -> tuple:
         """
             update user details
         """
@@ -84,8 +84,11 @@ class UserView:
             user_instance.set_surname(surname=surname)
             user_instance.set_cell(cell=cell)
             user_instance.set_email(email=email)
+            user_instance.set_admin(is_admin=is_admin)
+            user_instance.set_support(is_support=is_support)
             user_instance.put(retries=self._max_retries, timeout=self._max_timeout)
-            return jsonify({'status': True, 'message': 'successfully updated user details'}), 200
+            return jsonify({'status': True, 'message': 'successfully updated user details',
+                            'payload': user_instance.to_dict()}), 200
         else:
             return jsonify({'status': False, 'message': 'user not found cannot update user details'}), 500
 

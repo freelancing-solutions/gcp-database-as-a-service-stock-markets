@@ -1,3 +1,5 @@
+import typing
+
 from flask import Blueprint, request, jsonify
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.users import UserView
@@ -6,17 +8,17 @@ users_bp = Blueprint("users", __name__)
 
 def get_kwargs(user_data: dict) -> tuple:
     if ("uid" in user_data) and (user_data["uid"] != ""):
-        uid: str = user_data.get("uid")
+        uid: typing.Union[str, None] = user_data.get("uid")
     else:
-        uid: str = ""
+        uid: typing.Union[str, None] = None
     if ("email" in user_data) and (user_data["email"] != ""):
-        email: str = user_data.get("email")
+        email: typing.Union[str, None] = user_data.get("email")
     else:
-        email: str = ""
+        email: typing.Union[str, None] = None
     if ("cell" in user_data) and (user_data["cell"] != ""):
-        cell: str = user_data.get("cell")
+        cell: typing.Union[str, None] = user_data.get("cell")
     else:
-        cell: str = ""
+        cell: typing.Union[str, None] = None
 
     return uid, email, cell
 
@@ -63,8 +65,11 @@ def user(path: str) -> tuple:
             surname: str = user_data.get("surname")
             cell: str = user_data.get("cell")
             email: str = user_data.get("email")
+            is_admin: bool = user_data.get('is_admin')
+            is_support: bool = user_data.get('is_support')
             return users_view_instance.update_user(uid=uid, names=names, surname=surname,
-                                                   cell=cell, email=email)
+                                                   cell=cell, email=email, is_admin=is_admin,
+                                                   is_support=is_support)
         elif path == "delete":
             user_data: dict = request.get_json()
             uid, email, cell = get_kwargs(user_data=user_data)
@@ -75,7 +80,7 @@ def user(path: str) -> tuple:
             return users_view_instance.get_user(uid=uid, email=email, cell=cell)
 
 
-@users_bp.route("/api/v1/users/<path:path>", methods=["GET"])
+@users_bp.route("/api/v1/users/<path:path>", methods=["GET", "POST"])
 @handle_auth
 def get_all(path: str) -> tuple:
     """
@@ -101,7 +106,7 @@ def get_all(path: str) -> tuple:
 def check_password() -> tuple:
     """
         given a password in json check if it matches the hash in file
-    :return:
+        :return:
     """
     user_data: dict = request.get_json()
     uid: str = user_data.get("uid")

@@ -1,11 +1,11 @@
-import functools
 import os
 from flask import request
 from werkzeug.exceptions import Unauthorized
 from data_service.utils.utils import is_development
-from functools import lru_cache
+import functools
 
 
+@functools.lru_cache(maxsize=1024)
 def project_valid(project_name: str) -> bool:
     authorized_projects = os.environ.get('AUTH_PROJECTS').split(",")
     if not(isinstance(project_name, str)):
@@ -15,6 +15,7 @@ def project_valid(project_name: str) -> bool:
     return False
 
 
+@functools.lru_cache(maxsize=1024)
 def request_url_valid(url: str) -> bool:
     authorized_urls = os.environ.get('AUTH_URLS').split(",")
     if not(isinstance(url, str)):
@@ -26,7 +27,7 @@ def request_url_valid(url: str) -> bool:
     return False
 
 
-@lru_cache(maxsize=1025)
+@functools.lru_cache(maxsize=1024)
 def handle_auth(func):
     @functools.wraps(func)
     def auth_wrapper(*args, **kwargs):

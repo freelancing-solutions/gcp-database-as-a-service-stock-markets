@@ -243,7 +243,31 @@ class TicketView(Validators):
                             'message': 'successfully updated ticket'}), 200
         return jsonify({'status': False, 'message': 'Unable to find ticket'}), 500
 
-    # TODO - refactor response sending algorithms for tickets
+    @use_context
+    @handle_view_errors
+    def get_all_tickets(self) -> tuple:
+        tickets_list: typing.List[dict] = [ticket.to_dict() for ticket in Ticket.query().fetch()]
+        return jsonify({'status': True, 'payload': tickets_list, 'message': 'successfully returned tickets'}), 200
+
+    @use_context
+    @handle_view_errors
+    def get_unresolved_tickets(self) -> tuple:
+        tickets_list: typing.List[dict] = [ticket.to_dict() for ticket in Ticket.query(
+            Ticket.is_resolved == False).fetch()]
+        return jsonify({'status': True, 'payload': tickets_list,
+                        'message': 'successfully returned tickets'}), 200
+
+    @use_context
+    @handle_view_errors
+    def get_resolved_tickets(self) -> tuple:
+        tickets_list: typing.List[dict] = [ticket.to_dict() for ticket in Ticket.query(
+            Ticket.is_resolved == True).fetch()]
+        return jsonify({'status': True, 'payload': tickets_list,
+                        'message': 'successfully returned tickets'}), 200
+
+
+
+
 
 
 class TicketThreadView(Validators):
