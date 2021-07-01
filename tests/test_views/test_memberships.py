@@ -1,9 +1,12 @@
+import random
 import typing
 from datetime import datetime, timedelta
 from random import randint
 
 from google.cloud import ndb
 
+from data_service.config.stocks import currency_symbols
+from data_service.store.mixins import AmountMixin
 from data_service.views.memberships import MembershipsView
 from data_service.store.memberships import Memberships, MembershipPlans
 from data_service.utils.utils import create_id
@@ -19,7 +22,11 @@ class MembershipsQueryMock:
     results_range: int = randint(0, 100)
 
     def __init__(self):
-        pass
+        self.membership_instance.plan_id = create_id()
+        self.membership_instance.status = "paid"
+        self.membership_instance.date_created = datetime.now()
+        self.membership_instance.plan_start_date = datetime.now().date()
+        self.membership_instance.payment_method = 'paypal'
 
     def fetch(self) -> typing.List[Memberships]:
         return [self.membership_instance for _ in range(self.results_range)]
@@ -37,7 +44,16 @@ class MembershipPlansQueryMock:
     results_range: int = randint(0, 100)
 
     def __init__(self):
-        pass
+        self.membership_plan_instance.date_created = datetime.now()
+        self.membership_plan_instance.plan_name = "bronze"
+        self.membership_plan_instance.description = "bronze plan"
+        self.membership_plan_instance.total_members = 10
+        self.membership_plan_instance.schedule_day = 1
+        self.membership_plan_instance.schedule_term = "monthly"
+        self.membership_plan_instance.term_payment_amount = AmountMixin(amount=100,
+                                                                        currency=random.choice(currency_symbols()))
+        self.membership_plan_instance.registration_amount = AmountMixin(amount=100,
+                                                                        currency=random.choice(currency_symbols()))
 
     def fetch(self) -> typing.List[MembershipPlans]:
         return [self.membership_plan_instance for _ in range(self.results_range)]
@@ -167,7 +183,8 @@ def test_plan_members_payment_status(mocker):
         uid: str = membership_mock_data['uid']
         plan_id: str = membership_mock_data['plan_id']
         status: str = membership_mock_data['status']
-        response, status = membership_view_instance.return_plan_members_by_payment_status(plan_id=plan_id, status=status)
+        response, status = membership_view_instance.return_plan_members_by_payment_status(plan_id=plan_id,
+                                                                                          status=status)
         assert status == 200, "unable to fetch plan members by status"
 
     mocker.stopall()

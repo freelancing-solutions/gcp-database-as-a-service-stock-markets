@@ -218,17 +218,20 @@ class MembershipsView(Validators):
             for a specific user return payment amount
         """
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
+        print(membership_instance)
         if isinstance(membership_instance, Memberships):
             plan_id: str = membership_instance.plan_id
             membership_plan_instance: MembershipPlans = MembershipPlansView().get_plan(plan_id=plan_id)
             if membership_plan_instance is None:
                 message: str = 'could not find plan associate with the plan_id'
                 return jsonify({'status': False, 'message': message}), 500
-            amount_data: dict = {
-                'term_payment_amount': membership_plan_instance.term_payment_amount.to_dict(),
-                'registration_amount': membership_plan_instance.registration_amount.to_dict()}
-            message: str = 'successfully returned payment details'
-            return jsonify({'status': True, 'payload': amount_data, 'message': message}), 200
+            print(membership_plan_instance)
+            if (membership_plan_instance.term_payment_amount is not None) and (membership_plan_instance.registration_amount is not None):
+                amount_data: dict = {
+                    'term_payment_amount': membership_plan_instance.term_payment_amount.to_dict(),
+                    'registration_amount': membership_plan_instance.registration_amount.to_dict()}
+                message: str = 'successfully returned payment details'
+                return jsonify({'status': True, 'payload': amount_data, 'message': message}), 200
 
         message: str = 'unable to locate membership details'
         return jsonify({'status': False, 'message': message}), 500
