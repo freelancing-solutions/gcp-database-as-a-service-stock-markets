@@ -22,6 +22,7 @@ class ExchangeDataModel(ndb.Model):
     exchange_id: str = ndb.StringProperty()
     exchange_country: str = ndb.StringProperty()
     exchange_name: str = ndb.StringProperty()
+    exchange_type: str = ndb.StringProperty(default='fiat')
     exchange_tickers_list: tickers_type = ndb.PickleProperty()  # an actual list datatype containing all
     # the available symbols
     last_accessed_timestamp: int = ndb.IntegerProperty(default=0)

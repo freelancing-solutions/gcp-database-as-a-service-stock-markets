@@ -68,7 +68,7 @@ class ExchangeDataView:
         else:
             return jsonify({'status': False, 'message': 'unable to find the exchange please inform admin'}), 500
 
-    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
     def get_exchange_tickers(self, exchange_id: str) -> tuple:
@@ -80,7 +80,7 @@ class ExchangeDataView:
         else:
             return jsonify({'status': False, 'message': 'Unable to locate exchange'}), 500
 
-    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
     def get_exchange(self, exchange_id: str) -> tuple:
@@ -90,7 +90,7 @@ class ExchangeDataView:
                             'payload': exchange_instance.to_dict()}), 200
         return jsonify({'status': False, 'message': 'error unable to locate exchange'}), 500
 
-    @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
     def return_all_exchanges(self) -> tuple:
@@ -99,7 +99,7 @@ class ExchangeDataView:
         message: str = 'successfully retrieved Exchanges List'
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
-    @cache_stocks.cached(timeout=return_ttl(name='short'), unless=end_of_month)
+    @cache_stocks.cached(timeout=return_ttl(name='short'))
     @use_context
     @handle_view_errors
     def return_exchange_errors(self, exchange_id: str) -> tuple:

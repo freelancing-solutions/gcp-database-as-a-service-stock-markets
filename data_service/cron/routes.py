@@ -3,7 +3,8 @@ from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
 from data_service.config.exceptions import DataServiceError, InputError
 from operational_jobs import cron_create_membership_invoices, cron_down_grade_unpaid_memberships, cron_finalize_affiliate_payments
-from exchange_calls import cron_call_eod_api, cron_call_binance_api, cron_call_pse_api, cron_call_yahoo_api
+from exchange_close_data_calls import cron_call_eod_api, cron_call_binance_api, cron_call_pse_api, cron_call_yahoo_api, \
+    cron_call_close_data_apis, cron_call_crypto_close_data_api
 
 cron_bp = Blueprint('cron', __name__)
 
@@ -64,27 +65,16 @@ def finalize_affiliate_payment() -> tuple:
 
 
 # fetch stock data from eod api
-@cron_bp.route('/cron/call-eod-api', methods=['POST', 'GET'])
-def call_eod_api() -> tuple:
-    cron_call_eod_api()
-    return 'OK', 200
-
-
-@cron_bp.route('/cron/call-eod-api', methods=['POST', 'GET'])
-def call_pse_api() -> tuple:
-    cron_call_pse_api()
+@cron_bp.route('/cron/call-fiat-exchange-stock-close-data-api', methods=['POST', 'GET'])
+def call_close_data_api() -> tuple:
+    cron_call_close_data_apis()
     return 'OK', 200
 
 
 # fetch stock data from binance api
-@cron_bp.route('/cron/call-eod-api', methods=['POST', 'GET'])
-def call_binance_api() -> tuple:
-    cron_call_binance_api()
+@cron_bp.route('/cron/call-crypto-close-data-api', methods=['POST', 'GET'])
+def call_crypto_close_data_api() -> tuple:
+    cron_call_crypto_close_data_api()
     return 'OK', 200
 
 
-# fetch stock data from yahoo finance api
-@cron_bp.route('cron/call-yahoo-api', methods=['POST', 'GET'])
-def call_yahoo_api() -> tuple:
-    cron_call_yahoo_api()
-    return 'OK', 200
