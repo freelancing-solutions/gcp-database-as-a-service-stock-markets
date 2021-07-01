@@ -27,7 +27,7 @@ class ExchangeDataModel(ndb.Model):
     last_accessed_timestamp: int = ndb.IntegerProperty(default=0)
     last_accessed_results: bool = ndb.BooleanProperty(default=True)  # if results where positive
     # true else false
-    errors_list: errors_type = ndb.StringProperty(repeated=True)  # comma separated list containing last accessed
+    errors_list = ndb.StringProperty(repeated=True)  # comma separated list containing last accessed
 
     def __str__(self) -> str:
         return "<Exchange {} {}".format(self.exchange_name, self.exchange_country)

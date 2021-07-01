@@ -32,6 +32,7 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def add_exchange(self, country: str = None, name: str = None) -> tuple:
+        # TODO - data verification needed here
         exchange_instance: ExchangeDataModel = ExchangeDataModel()
         exchange_instance.set_exchange_country(country=country)
         exchange_instance.set_exchange_name(exchange=name)
@@ -56,10 +57,8 @@ class ExchangeDataView:
     @handle_view_errors
     def add_complete_stock_tickers_list(self, exchange_id: str, tickers_list: list) -> tuple:
         exchange_id: str = exchange_id.strip()
-        exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
-
-        if len(exchange_list) > 0:
-            exchange_instance: ExchangeDataModel = exchange_list[0]
+        exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
+        if isinstance(exchange_instance, ExchangeDataModel):
             if exchange_instance.set_exchange_tickers_list(tickers_list=tickers_list) is True:
                 exchange_instance.put()
                 return jsonify({'status': True, 'message': 'stock tickers added',
@@ -73,11 +72,8 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def get_exchange_tickers(self, exchange_id: str) -> tuple:
-        exchange_id: str = exchange_id.strip()
-        exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
-
-        if len(exchange_list) > 0:
-            exchange_instance: ExchangeDataModel = exchange_list[0]
+        exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
+        if isinstance(exchange_instance, ExchangeDataModel):
             tickers_list: tickers_type = exchange_instance.exchange_tickers_list
             return jsonify({'status': True, 'message': 'successfully obtained exchange tickers',
                             'payload': tickers_list}), 200
@@ -88,11 +84,8 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def get_exchange(self, exchange_id: str) -> tuple:
-        exchange_id: str = exchange_id.strip()
-        exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
-
-        if len(exchange_list) > 0:
-            exchange_instance: ExchangeDataModel = exchange_list[0]
+        exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
+        if isinstance(exchange_instance, ExchangeDataModel):
             return jsonify({'status': True, 'message': 'successfully fetched an exchange',
                             'payload': exchange_instance.to_dict()}), 200
         return jsonify({'status': False, 'message': 'error unable to locate exchange'}), 500
@@ -110,10 +103,9 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def return_exchange_errors(self, exchange_id: str) -> tuple:
-        exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
-        if len(exchange_list) > 0:
-            exchange_instance: ExchangeDataModel = exchange_list[0]
-            payload: tickers_type = exchange_instance.exchange_tickers_list
+        exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
+        if isinstance(exchange_instance, ExchangeDataModel):
+            payload: typing.List[str] = exchange_instance.errors_list.split(",")
             return jsonify({'status': True,
                             'message': 'successfully fetched exchange errors',
                             'payload': payload}), 200
@@ -124,9 +116,8 @@ class ExchangeDataView:
     @handle_view_errors
     def delete_exchange(self, exchange_id: str) -> tuple:
         exchange_id: str = exchange_id.strip()
-        exchange_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
-        if len(exchange_list) > 0:
-            exchange_instance: ExchangeDataModel = exchange_list[0]
+        exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
+        if isinstance(exchange_instance, ExchangeDataModel):
             exchange_instance.key.delete()
             pages_list: scrape_list_type = ScrappingPagesModel.query(
                 ScrappingPagesModel.exchange_id == exchange_id).fetch()
