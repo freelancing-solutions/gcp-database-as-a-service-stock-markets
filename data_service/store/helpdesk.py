@@ -159,7 +159,6 @@ class TicketThread(ndb.Model):
             return False
         if self.time_created != other.time_created:
             return False
-
         return True
 
     def __str__(self) -> str:

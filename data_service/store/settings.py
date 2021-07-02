@@ -1,5 +1,4 @@
 import typing
-
 from google.cloud import ndb
 from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 from data_service.config.types import tickers_type, errors_type, timestamps_type
@@ -31,7 +30,7 @@ class ExchangeDataModel(ndb.Model):
     errors_list = ndb.StringProperty(repeated=True)  # comma separated list containing last accessed
 
     def __str__(self) -> str:
-        return "<Exchange {} {}".format(self.exchange_name, self.exchange_country)
+        return "<Exchange Name : {} Country: {} Type: {}".format(self.exchange_name, self.exchange_country, self.exchange_type)
 
     def __repr__(self):
         return self.__str__()
@@ -44,6 +43,8 @@ class ExchangeDataModel(ndb.Model):
         if self.exchange_name != other.exchange_name:
             return False
         if self.exchange_country != other.exchange_country:
+            return False
+        if self.exchange_type != other.exchange_type:
             return False
         return True
 

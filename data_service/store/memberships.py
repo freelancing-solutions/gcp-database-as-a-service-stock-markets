@@ -258,7 +258,11 @@ class MembershipPlans(ndb.Model):
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
-        if self.plan_id != other.__class__:
+        if self.plan_id != other.plan_id:
+            return False
+        if self.plan_name != other.plan_name:
+            return False
+        if self.total_members != other.total_members:
             return False
         return True
 

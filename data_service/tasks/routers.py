@@ -1,9 +1,6 @@
 import json
-
 from flask import Blueprint, request, jsonify
-
 from data_service.views.stocks import StockView
-
 task_bp = Blueprint('tasks', __name__)
 
 
@@ -34,7 +31,6 @@ def stock_task_handler(path: str) -> tuple:
             sid: str = json_data.get("sid")
         else:
             return jsonify({"status": False, "message": "sid is required"}), 500
-
         if "stock_id" in json_data and json_data["stock_id"] != "":
             stock_id: str = json_data.get("stock_id")
         else:
