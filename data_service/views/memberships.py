@@ -178,6 +178,21 @@ class MembershipsView(Validators):
             message: str = "Unable to find plan members whose payment status is {}".format(status)
             return jsonify({'status': False, 'message': message}), 500
 
+    @cache_memberships.cached(timeout=return_ttl(name='long'), unless=end_of_month)
+    @use_context
+    @handle_view_errors
+    def return_members_by_payment_status(self, status: typing.Union[str, None]) -> tuple:
+        membership_list: typing.List[Memberships] = Memberships.query(Memberships.status == status).fetch()
+        if isinstance(membership_list, list) and len(membership_list) > 0:
+            response_data: typing.List[dict] = [member.to_dict() for member in membership_list]
+            message: str = 'successfully fetched members'
+            return jsonify({'status': True, 'payload': response_data, 'message': message}), 200
+        else:
+            message: str = "Unable to find plan members whose payment status is {}".format(status)
+            return jsonify({'status': False, 'message': message}), 500
+
+
+
     @cache_memberships.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
