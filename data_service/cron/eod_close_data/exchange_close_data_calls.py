@@ -169,3 +169,8 @@ def cron_call_crypto_close_data_api():
     loop = asyncio.new_event_loop()
     loop.run_until_complete(asyncio.wait(coro))
     return 'OK', 200
+
+
+def cron_perform_net_calculations():
+    pass
+
