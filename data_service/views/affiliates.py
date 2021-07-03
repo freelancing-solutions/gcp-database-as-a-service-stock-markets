@@ -17,7 +17,7 @@ from data_service.views.use_context import use_context
 class Validator(ValidAffiliate, ValidRecruit, ValidEarnings):
 
     def can_register_affiliate(self, uid: str) -> bool:
-        already_registered: bool = self.user_already_registered(uid=uid)
+        already_registered: typing.Union[bool, None] = self.user_already_registered(uid=uid)
         if not isinstance(already_registered, bool):
             raise ValueError("invalid user id")
         print("User Already Registered: {}".format(already_registered))
@@ -157,7 +157,9 @@ class AffiliatesView(Validator):
         """
         affiliates_list: typing.List[Affiliates] = Affiliates.query().fetch()
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
-        return jsonify({'status': True, 'message': 'Successfully returned all affiliates',
+        message: str = "Successfully returned all affiliates"
+        return jsonify({'status': True,
+                        'message': message,
                         'payload': payload}), 200
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
@@ -183,7 +185,9 @@ class AffiliatesView(Validator):
         affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.is_active == False,
                                                                     Affiliates.is_deleted == False).fetch()
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
-        return jsonify({'status': True, 'message': 'successfully returned all affiliates',
+        message: str = "successfully returned all affiliates"
+        return jsonify({'status': True,
+                        'message': message,
                         'payload': payload}), 200
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
@@ -195,7 +199,9 @@ class AffiliatesView(Validator):
         """
         affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.is_deleted == True).fetch()
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
-        return jsonify({'status': True, 'message': 'Successfully returned deleted affiliates',
+        message: str = "Successfully returned deleted affiliates"
+        return jsonify({'status': True,
+                        'message': message,
                         'payload': payload}), 200
 
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
@@ -207,7 +213,9 @@ class AffiliatesView(Validator):
         """
         affiliates_list: typing.List[Affiliates] = Affiliates.query(Affiliates.is_deleted == False).fetch()
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
-        return jsonify({'status': True, 'message': 'Successfully returned affiliates which are not deleted',
+        message: str = "Successfully returned affiliates which are not deleted"
+        return jsonify({'status': True,
+                        'message': message,
                         'payload': payload}), 200
 
 
