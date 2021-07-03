@@ -265,13 +265,13 @@ class TicketView(Validators):
         return jsonify({'status': True, 'payload': tickets_list,
                         'message': 'successfully returned tickets'}), 200
 
-
     @use_context
     @handle_view_errors
     def fetch_ticket(self, ticket_id: str) -> tuple:
         ticket_instance: Ticket = Ticket.query(Ticket.ticket_id == ticket_id).get()
         return jsonify({'status': True, 'payload': ticket_instance.to_dict(),
                         'message': 'successfully returned ticket'}), 200
+
 
 class TicketThreadView(Validators):
     pass

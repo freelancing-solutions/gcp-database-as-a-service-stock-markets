@@ -7,7 +7,6 @@ from data_service.store.settings import (UserSettingsModel, AdminSettingsModel, 
 from data_service.utils.utils import return_ttl, end_of_month
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
-
 exc_list_type = typing.List[ExchangeDataModel]
 scrape_list_type = typing.List[ScrappingPagesModel]
 api_list_type = typing.List[StockAPIEndPointModel]
@@ -44,9 +43,8 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def update_exchange(self, exchange_id: str = None, country: str = None, name: str = None) -> tuple:
-        exchanges_list: exc_list_type = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).fetch()
-        if len(exchanges_list) > 0:
-            exchange_instance: ExchangeDataModel = exchanges_list[0]
+        exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
+        if isinstance(exchange_instance, ExchangeDataModel):
             exchange_instance.set_exchange_country(country=country)
             exchange_instance.set_exchange_name(exchange=name)
             exchange_instance.put()
@@ -56,7 +54,6 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def add_complete_stock_tickers_list(self, exchange_id: str, tickers_list: list) -> tuple:
-        exchange_id: str = exchange_id.strip()
         exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
         if isinstance(exchange_instance, ExchangeDataModel):
             if exchange_instance.set_exchange_tickers_list(tickers_list=tickers_list) is True:
@@ -115,7 +112,6 @@ class ExchangeDataView:
     @use_context
     @handle_view_errors
     def delete_exchange(self, exchange_id: str) -> tuple:
-        exchange_id: str = exchange_id.strip()
         exchange_instance: ExchangeDataModel = ExchangeDataModel.query(ExchangeDataModel.exchange_id == exchange_id).get()
         if isinstance(exchange_instance, ExchangeDataModel):
             exchange_instance.key.delete()
@@ -153,36 +149,36 @@ class ScrappingPagesView:
     @handle_view_errors
     def add_scrapper_settings(self, scrapper_settings: dict) -> tuple:
         if ("exchange_id" in scrapper_settings) and (scrapper_settings['exchange_id'] != ""):
-            exchange_id: str = scrapper_settings.get('exchange_id')
+            exchange_id: typing.Union[str, None] = scrapper_settings.get('exchange_id')
         else:
             return jsonify({"status": False, "message": "exchange id is required"}), 500
 
         if ("target_url" in scrapper_settings) and (scrapper_settings["target_url"] != ""):
-            target_url: str = scrapper_settings.get("target_url")
+            target_url: typing.Union[str, None] = scrapper_settings.get("target_url")
         else:
             return jsonify({"status": False, "message": "target url is required"}), 500
 
         if ("access_timestamps" in scrapper_settings) and (scrapper_settings["access_timestamps"] != ""):
-            access_timestamps: typing.List[int] = scrapper_settings.get('access_timestamps') or None
+            access_timestamps: typing.List[int] = scrapper_settings.get('access_timestamps')
         else:
             return jsonify({"status": False, "message": "access timestamps is required"}), 500
 
         if ("require_login" in scrapper_settings) and (scrapper_settings["require_login"] != ""):
-            require_login: bool = scrapper_settings.get("require_login")
+            require_login: typing.Union[bool, None] = scrapper_settings.get("require_login")
             scrapper_settings_instance: ScrappingPagesModel = ScrappingPagesModel()
             if require_login:
                 if ("login_page_url" in scrapper_settings) and (scrapper_settings["login_page_url"] != ""):
-                    login_page_url: str = scrapper_settings.get("login_page_url")
+                    login_page_url: typing.Union[str, None] = scrapper_settings.get("login_page_url")
                 else:
                     return jsonify({"status": False, "message": "login page url is required"}), 500
 
                 if ("username" in scrapper_settings) and (scrapper_settings["username"] != ""):
-                    username: str = scrapper_settings.get("username")
+                    username: typing.Union[str, None] = scrapper_settings.get("username")
                 else:
                     return jsonify({"status": False, "message": "login_name is required"}), 500
 
                 if ("password" in scrapper_settings) and (scrapper_settings["password"] != ""):
-                    password: str = scrapper_settings.get('password')
+                    password: typing.Union[str, None]= scrapper_settings.get('password')
                 else:
                     return jsonify({"status": False, "message": "password is required"}), 500
                 try:

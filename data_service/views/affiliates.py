@@ -294,9 +294,8 @@ class RecruitsView(Validator):
         affiliate_id: typing.Union[str, None] = recruit_data.get('affiliate_id')
         if (affiliate_id is None) or (affiliate_id == ""):
             return jsonify({'status': False, 'message': 'affiliate_id is required'}), 500
-        recruits_list: typing.List[Recruits] = Recruits.query(Recruits.affiliate_id == affiliate_id).fetch()
-        if isinstance(recruits_list, list) and (len(recruits_list) > 0):
-            recruit_instance: Recruits = recruits_list[0]
+        recruit_instance: Recruits = Recruits.query(Recruits.affiliate_id == affiliate_id).get()
+        if isinstance(recruit_instance, Recruits):
             message: str = "Successfully retrieved recruit"
             return jsonify({'status': True, 'payload': recruit_instance.to_dict(), 'message': message}), 200
         else:
@@ -311,7 +310,6 @@ class RecruitsView(Validator):
             return jsonify({'status': False, 'message': 'is_active status is required'}), 500
         recruits_list: typing.List[Recruits] = Recruits.query(Recruits.is_active == is_active).fetch()
         payload = [recruit.to_dict() for recruit in recruits_list]
-
         message: str = "{} recruits successfully fetched recruits by active status".format(str(len(recruits_list)))
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 
@@ -323,7 +321,6 @@ class RecruitsView(Validator):
             return jsonify({'status': False, 'message': 'is_deleted status is required'}), 500
         recruits_list: typing.List[Recruits] = Recruits.query(Recruits.is_deleted == is_deleted).fetch()
         payload = [recruit.to_dict() for recruit in recruits_list]
-
         message: str = "{} recruits successfully fetched recruits by deleted status".format(str(len(recruits_list)))
         return jsonify({'status': True, 'message': message, 'payload': payload}), 200
 

@@ -94,8 +94,8 @@ class WalletView(Validator):
         paypal_address: typing.Union[str, None] = wallet_data.get("paypal_address")
 
         if self.can_update_wallet(uid=uid) is True:
-
             wall_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
+            # No need to test for wallet availability as can update returned True
             wall_instance.uid = uid
             amount_instance: AmountMixin = AmountMixin(amount=available_funds, currency=currency)
             wall_instance.available_funds = amount_instance
@@ -130,13 +130,15 @@ class WalletView(Validator):
     def return_all_wallets(self) -> tuple:
         wallet_list: typing.List[WalletModel] = WalletModel.query().fetch()
         payload: typing.List[dict] = [wallet.to_dict() for wallet in wallet_list]
-        return jsonify({'status': True, 'payload': payload,
+        return jsonify({'status': True,
+                        'payload': payload,
                         'message': 'wallets returned'}), 200
 
     @use_context
     @handle_view_errors
     def return_wallets_by_balance(self, lower_bound: int, higher_bound: int) -> tuple:
-        if not(isinstance(lower_bound, int) and isinstance(higher_bound, int)):
+        # if either lower_bound and higher_bound are not int then exit
+        if not(isinstance(lower_bound, int) or isinstance(higher_bound, int)):
             return jsonify({'status': False, 'message': "specify lower bound and higher bound"}), 500
         wallet_list: typing.List[WalletModel] = WalletModel.query(WalletModel.available_funds > lower_bound,
                                                                   WalletModel.available_funds < higher_bound).fetch()

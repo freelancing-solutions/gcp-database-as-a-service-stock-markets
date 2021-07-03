@@ -34,17 +34,16 @@ def settings(path):
 @settings_bp.route('/api/v1/exchange/<path:path>', methods=['POST', 'GET'])
 @handle_auth
 def exchange_data(path: str) -> tuple:
-    exchange_data_instance = ExchangeDataView()
+    exchange_data_instance: ExchangeDataView = ExchangeDataView()
     if request.method == "GET":
         pass
     if request.method == "POST":
         if path == "add":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('country' in json_data) and (json_data['country'] != ""):
                 country: typing.Union[str, None] = json_data.get('country')
             else:
                 return jsonify({"status": False, "message": "Country is required"}), 500
-
             if ("name" in json_data) and (json_data['name'] != ""):
                 name: typing.Union[str, None] = json_data.get('name')
             else:
@@ -52,7 +51,7 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.add_exchange(country=country, name=name)
 
         elif path == "update":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
                 exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
@@ -69,7 +68,7 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.update_exchange(exchange_id=exchange_id, country=country, name=name)
 
         elif path == "add-tickers":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
                 exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
@@ -81,7 +80,7 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.add_complete_stock_tickers_list(exchange_id=exchange_id, tickers_list=tickers)
 
         elif path == "get-tickers":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
                 exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
@@ -89,7 +88,7 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.get_exchange_tickers(exchange_id=exchange_id)
 
         elif path == "get-exchange":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
                 exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
@@ -100,7 +99,7 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.return_all_exchanges()
 
         elif path == "exchange-errors":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
                 exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
@@ -108,7 +107,7 @@ def exchange_data(path: str) -> tuple:
             return exchange_data_instance.return_exchange_errors(exchange_id=exchange_id)
 
         elif path == "delete-exchange":
-            json_data = request.get_json()
+            json_data: dict = request.get_json()
             if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
                 exchange_id: typing.Union[str, None] = json_data.get('exchange_id') or None
             else:

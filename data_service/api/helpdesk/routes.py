@@ -30,7 +30,7 @@ def resolved_tickets() -> tuple:
 @helpdesk_bp.route('api/v1/help-desk/ticket', methods=["POST", "GET"])
 def get_support_ticket() -> tuple:
     request_data: dict = request.get_json()
-    if "ticket_id" in request_data and request_data["ticket_id"] != "":
+    if ("ticket_id" in request_data) and (request_data["ticket_id"] != ""):
         ticket_id: typing.Union[str, None] = request_data.get('ticket_id')
     else:
         return jsonify({'status': False, 'message': 'ticket_id is required'}), 500
