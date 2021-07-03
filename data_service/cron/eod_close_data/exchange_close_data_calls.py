@@ -27,13 +27,12 @@ def stocks_by_exchange(exchange_id: str) -> typing.List[dict]:
 
 def ticker_found(tickers_list: typing.List[dict], stock_instance: dict) -> bool:
     for ticker in tickers_list:
-        if ticker['symbol'] == stock_instance['symbol'] and ticker['stock_name'] == stock_instance['stock_name']:
+        if (ticker['symbol'] == stock_instance['symbol']) and (ticker['stock_name'] == stock_instance['stock_name']):
             return True
     return False
 
 
-@ndb.tasklet
-def add_stock_to_exchange(exchange_id: str, stock_instance: dict) -> bool:
+async def add_stock_to_exchange(exchange_id: str, stock_instance: dict) -> bool:
     exchange_instance: ExchangeDataModel = ExchangeDataModel.query(
         ExchangeDataModel.exchange_id == exchange_id).get_async().result()
     if isinstance(exchange_instance, ExchangeDataModel):

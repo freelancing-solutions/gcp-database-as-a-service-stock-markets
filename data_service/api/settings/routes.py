@@ -1,3 +1,5 @@
+import typing
+
 from flask import Blueprint, request, jsonify
 from data_service.api.api_authenticator import handle_auth
 from data_service.views.settings import ExchangeDataView, ScrappingPagesView
@@ -38,41 +40,41 @@ def exchange_data(path: str) -> tuple:
     if request.method == "POST":
         if path == "add":
             json_data = request.get_json()
-            if 'country' in json_data and json_data['country'] != "":
-                country: str = json_data.get('country') or None
+            if ('country' in json_data) and (json_data['country'] != ""):
+                country: typing.Union[str, None] = json_data.get('country')
             else:
                 return jsonify({"status": False, "message": "Country is required"}), 500
 
-            if "name" in json_data and json_data['name'] != "":
-                name: str = json_data.get('name') or None
+            if ("name" in json_data) and (json_data['name'] != ""):
+                name: typing.Union[str, None] = json_data.get('name')
             else:
                 return jsonify({"status": False, "message": "Name is required"}), 500
             return exchange_data_instance.add_exchange(country=country, name=name)
 
         elif path == "update":
             json_data = request.get_json()
-            if 'exchange_id' in json_data and json_data['exchange_id'] != "":
-                exchange_id: str = json_data.get('exchange_id') or None
+            if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
+                exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
-            if 'country' in json_data and json_data['country'] != "":
-                country: str = json_data.get('country') or None
+            if ('country' in json_data) and (json_data['country'] != ""):
+                country: typing.Union[str, None] = json_data.get('country')
             else:
                 return jsonify({"status": False, "message": "Country is required"}), 500
 
-            if 'name' in json_data and json_data['name'] != "":
-                name: str = json_data.get('name') or None
+            if ('name' in json_data) and (json_data['name'] != ""):
+                name: typing.Union[str, None] = json_data.get('name')
             else:
                 return jsonify({"status": False, "message": "Name is required"}), 500
             return exchange_data_instance.update_exchange(exchange_id=exchange_id, country=country, name=name)
 
         elif path == "add-tickers":
             json_data = request.get_json()
-            if 'exchange_id' in json_data and json_data['exchange_id'] != "":
-                exchange_id: str = json_data.get('exchange_id') or None
+            if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
+                exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
-            if 'tickers' in json_data and json_data['tickers'] != "":
+            if ('tickers' in json_data) and (json_data['tickers'] != ""):
                 tickers: list = json_data.get('tickers') or []
             else:
                 return jsonify({"status": False, "message": "Tickers is required"}), 500
@@ -80,16 +82,16 @@ def exchange_data(path: str) -> tuple:
 
         elif path == "get-tickers":
             json_data = request.get_json()
-            if 'exchange_id' in json_data and json_data['exchange_id'] != "":
-                exchange_id: str = json_data.get('exchange_id') or None
+            if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
+                exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
             return exchange_data_instance.get_exchange_tickers(exchange_id=exchange_id)
 
         elif path == "get-exchange":
             json_data = request.get_json()
-            if 'exchange_id' in json_data and json_data['exchange_id'] != "":
-                exchange_id: str = json_data.get('exchange_id') or None
+            if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
+                exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
             return exchange_data_instance.get_exchange(exchange_id=exchange_id)
@@ -99,16 +101,16 @@ def exchange_data(path: str) -> tuple:
 
         elif path == "exchange-errors":
             json_data = request.get_json()
-            if 'exchange_id' in json_data and json_data['exchange_id'] != "":
-                exchange_id: str = json_data.get('exchange_id') or None
+            if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
+                exchange_id: typing.Union[str, None] = json_data.get('exchange_id')
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
             return exchange_data_instance.return_exchange_errors(exchange_id=exchange_id)
 
         elif path == "delete-exchange":
             json_data = request.get_json()
-            if 'exchange_id' in json_data and json_data['exchange_id'] != "":
-                exchange_id: str = json_data.get('exchange_id') or None
+            if ('exchange_id' in json_data) and (json_data['exchange_id'] != ""):
+                exchange_id: typing.Union[str, None] = json_data.get('exchange_id') or None
             else:
                 return jsonify({"status": False, "message": "Exchange ID is required"}), 500
             return exchange_data_instance.delete_exchange(exchange_id=exchange_id)
