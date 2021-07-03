@@ -566,9 +566,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def update_broker_data(self, broker_id: str, broker_code: str, broker_name: str) -> tuple:
-        broker_instance_list: typing.List[Broker] = Broker.query(Broker.broker_id == broker_id).fetch()
-        if isinstance(broker_instance_list, list) and len(broker_instance_list) > 0:
-            broker_instance: Broker = broker_instance_list[0]
+        broker_instance: Broker = Broker.query(Broker.broker_id == broker_id).get()
+        if isinstance(broker_instance, Broker):
             broker_instance.broker_id = broker_id
             broker_instance.broker_code = broker_code
             broker_instance.broker_name = broker_name
@@ -583,22 +582,22 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
     @use_context
     @handle_view_errors
     def update_stock_model(self, stock_model: dict) -> tuple:
-        if 'transaction_id' in stock_model and stock_model['transaction_id'] != "":
+        if ('transaction_id' in stock_model) and (stock_model['transaction_id'] != ""):
             transaction_id: typing.Union[str, None] = stock_model.get('transaction_id')
         else:
             return jsonify({'status': False, 'message': 'transaction_id is required'}), 500
 
-        if 'exchange_id' in stock_model and stock_model['exchange_id'] != "":
+        if ('exchange_id' in stock_model) and (stock_model['exchange_id'] != ""):
             exchange_id: typing.Union[str, None] = stock_model.get('exchange_id')
         else:
             return jsonify({'status': False, 'message': 'exchange_id is required'}), 500
 
-        if 'stock' in stock_model and stock_model['stock'] != "":
+        if ('stock' in stock_model) and (stock_model['stock'] != ""):
             stock: typing.Union[Stock, None] = stock_model.get('stock')
         else:
             return jsonify({'status': False, 'message': 'stock is required'}), 500
 
-        if 'broker' in stock_model and stock_model['broker'] != "":
+        if ('broker' in stock_model) and (stock_model['broker'] != ""):
             broker: typing.Union[Broker, None] = stock_model.get('broker')
         else:
             return jsonify({'status': False, 'message': 'Broker is required'}), 500
@@ -631,16 +630,15 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         else:
             return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
 
+    # noinspection DuplicatedCode
     @data_wrappers.get_buy_volume_data
     @use_context
     @handle_view_errors
     def update_buy_volume(self, stock_id: str, date_created: date_class, buy_volume: int, buy_value: int,
                           buy_ave_price: int, buy_market_val_percent: int,
                           buy_trade_count: int, transaction_id: str) -> tuple:
-        buy_transactions_list: typing.List[BuyVolumeModel] = BuyVolumeModel.query(
-            BuyVolumeModel.transaction_id == transaction_id).fetch()
-        if isinstance(buy_transactions_list, list) > 0:
-            buy_instance: BuyVolumeModel = buy_transactions_list[0]
+        buy_instance: BuyVolumeModel = BuyVolumeModel.query(BuyVolumeModel.transaction_id == transaction_id).get()
+        if isinstance(buy_instance, BuyVolumeModel):
             buy_instance.stock_id = stock_id
             buy_instance.date_created = date_created
             buy_instance.buy_volume = buy_volume
