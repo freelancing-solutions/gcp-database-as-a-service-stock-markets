@@ -24,3 +24,4 @@ def use_context(func):
         with client.context():
             return func(*args, **kwargs)
     return wrapper
+
