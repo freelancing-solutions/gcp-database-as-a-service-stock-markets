@@ -4,11 +4,7 @@ from datetime import date as date_class
 from datetime import datetime, timezone
 from google.api_core.exceptions import RetryError, Aborted
 from flask import current_app, jsonify
-from google.cloud import ndb
-from google.cloud.ndb import Future
 from google.cloud.ndb.exceptions import BadRequestError, BadQueryError
-from google.cloud.ndb.tasklets import _TaskletFuture
-
 from data_service.main import cache_stocks
 from data_service.config.exceptions import DataServiceError
 from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel, SellVolumeModel, NetVolumeModel
@@ -16,7 +12,6 @@ from data_service.utils.utils import date_string_to_date, create_id, return_ttl,
 from data_service.config import Config
 from data_service.views.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
-
 stock_list_type = typing.List[Stock]
 
 
@@ -41,7 +36,6 @@ class StockDataWrappers:
                 stock_code: typing.Union[str, None] = stock_data.get('stock_code')
             else:
                 return jsonify({'status': False, 'message': 'Stock Code is required'}), 500
-
             if 'stock_name' in stock_data and stock_data['stock_name'] != "":
                 stock_name: typing.Union[str, None] = stock_data.get('stock_name')
             else:
@@ -50,7 +44,6 @@ class StockDataWrappers:
                 symbol: typing.Union[str, None] = stock_data.get('symbol')
             else:
                 return jsonify({'status': False, 'message': 'Stock Symbol is required'}), 500
-
             return func(stock_id=stock_id, stock_code=stock_code, stock_name=stock_name, symbol=symbol, *args)
 
         return wrapper
@@ -72,7 +65,6 @@ class StockDataWrappers:
                 broker_name: typing.Union[str, None] = broker_data.get("broker_name")
             else:
                 return jsonify({'status': False, 'message': 'Broker Name is required'}), 500
-
             return func(broker_id=broker_id, broker_code=broker_code, broker_name=broker_name, *args)
 
         return wrapper

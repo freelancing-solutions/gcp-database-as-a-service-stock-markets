@@ -1,5 +1,4 @@
 import typing
-
 from google.cloud import ndb
 from datetime import datetime
 
@@ -20,7 +19,7 @@ class Setters:
     @staticmethod
     def set_email(prop, value: str) -> str:
         """
-            TODO validate email
+            TODO validate emailx
         """
         return value
 

@@ -3,7 +3,6 @@ from google.cloud import ndb
 from datetime import date, datetime
 from google.api_core.exceptions import RetryError, Aborted
 from data_service.store.mixins import AmountMixin
-from google.cloud.ndb.exceptions import BadArgumentError, BadQueryError, BadRequestError, BadValueError
 
 
 class AffiliatesValidators:
@@ -121,7 +120,6 @@ class ClassSetters:
             raise TypeError("{} can only be an integer".format(str(prop)))
         if value < 0:
             raise ValueError('{} can only be positive integer'.format(str(prop)))
-
         return value
 
     @staticmethod
@@ -140,10 +138,8 @@ class ClassSetters:
     def set_percent(prop, value: int) -> int:
         if not(isinstance(value, int)):
             raise TypeError("{}, can only be an integer".format(str(prop)))
-
         if 0 < value > 100:
             raise ValueError("{}, should be a percent".format(str(prop)))
-
         return value
 
     @staticmethod
@@ -271,7 +267,7 @@ class AffiliateEarningsTransactions(ndb.Model):
         return True
 
     def __str__(self) -> str:
-        return "total_earned: {} ".format(str(self.total_earned))
+        return "<Total Earned: {} ".format(str(self.total_earned))
 
     def __repr__(self) -> str:
         return self.__str__()
