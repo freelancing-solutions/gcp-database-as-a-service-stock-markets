@@ -174,7 +174,7 @@ class AffiliatesView(Validator):
         payload = [affiliate.to_dict() for affiliate in affiliates_list]
         return jsonify({'status': True, 'message': 'successfully returned all affiliates',
                         'payload': payload}), 200
-
+    
     @cache_affiliates.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors
