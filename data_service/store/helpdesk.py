@@ -1,7 +1,7 @@
 import typing
 from google.cloud import ndb
 from datetime import datetime
-
+import re
 
 class Setters:
 
@@ -21,7 +21,10 @@ class Setters:
         """
             TODO validate emailx
         """
-        return value
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.match(regex, value):
+            return value
+        raise ValueError("Invalid email address")
 
     @staticmethod
     def set_cell(prop, value: str) -> str:
