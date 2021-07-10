@@ -22,6 +22,7 @@ requests-toolbelt
 shortuuid
 Werkzeug
 gunicorn
+python-binance
 python-decouple
 pandas
 numpy

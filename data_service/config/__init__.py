@@ -15,6 +15,8 @@ class Config:
     DATASTORE_TIMEOUT: int = 3600  # seconds
     DATASTORE_RETRIES: int = 10  # total retries when saving to datastore
     CURRENCY: str = "PHP"
+    BINANCE_API_KEY: str = os.environ.get("BINANCE_API_KEY") or config("BINANCE_API_KEY")
+    BINANCE_SECRET: str = os.environ.get("BINANCE_SECRET_KEY") or config("BINANCE_SECRET_KEY")
 
 
 
