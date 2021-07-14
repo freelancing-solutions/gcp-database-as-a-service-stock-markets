@@ -327,12 +327,15 @@ class NetVolumeModel(ndb.Model):
 
 
 class StockPrideData(ndb.Model):
+    """
+        used to capture daily lows and highs for each stock
+    """
     stock_id: str = ndb.StringProperty(validator=setters.set_id)
     date: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=stock_setters.set_date)
-    open: float == ndb.FloatProperty(default=0, validator=setters.set_float)
-    high: float == ndb.FloatProperty(default=0, validator=setters.set_float)
-    low: float == ndb.FloatProperty(default=0, validator=setters.set_float)
-    close: float == ndb.FloatProperty(default=0, validator=setters.set_float)
-    adjusted_close: float == ndb.FloatProperty(default=0, validator=setters.set_float)
-    volume: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+    open: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+    high: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+    low: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+    close: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+    adjusted_close: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+    volume: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
 
