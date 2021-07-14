@@ -51,15 +51,13 @@ def cron_down_grade_unpaid_memberships():
     pass
 
 
-async def add_earnings(affiliate: Affiliates, earnings: EarningsData) -> bool:
+async def add_earnings(affiliate: Affiliates, earnings: EarningsData) -> any:
     # TODO may use ndb.tasklets to complete this tasks
     # validate and refactor the below code
-    wallet_instance: WalletModel = await WalletModel.query(WalletModel.uid == affiliate.uid).get_async()
+    wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == affiliate.uid).get_async().results()
     wallet_instance.available_funds = wallet_instance.available_funds + earnings.total_earned
     earnings.is_paid = True
-    wallet_instance.put_async()
-    earnings.put_async()
-    return True
+    return wallet_instance.put_async(), earnings.put_async()
 
 
 def cron_finalize_affiliate_payments():
@@ -78,4 +76,5 @@ def cron_finalize_affiliate_payments():
 
     loop = asyncio.new_event_loop()
     loop.run_until_complete(asyncio.wait(coro))
+
 
