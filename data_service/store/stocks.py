@@ -326,7 +326,7 @@ class NetVolumeModel(ndb.Model):
         return "<Net_Volume: {}{}{}".format(self.date_created, self.transaction_id, self.stock_id)
 
 
-class StockPrideData(ndb.Model):
+class StockPriceData(ndb.Model):
     """
         used to capture daily lows and highs for each stock
     """
@@ -338,4 +338,21 @@ class StockPrideData(ndb.Model):
     close: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
     adjusted_close: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
     volume: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class:
+            return False
+        if self.stock_id != other.stock_id:
+            return False
+        if self.date != other.date:
+            return False
+        return True
+
+    def __str__(self) -> str:
+        return "<StockPriceData stock_id: {} , date: {} , open: {}, high: {}, low: {}".format(self.stock_id, self.date,
+                                                                                              self.open, self.high,
+                                                                                              self.low)
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
