@@ -164,6 +164,17 @@ class StockModelSetters:
         return value
 
     @staticmethod
+    def set_float(prop, value: float) -> float:
+        if (value is None) or (value == ""):
+            raise ValueError("{} can not be Null".format(str(prop)))
+
+        if not(isinstance(value, float)):
+            raise TypeError("{} can only be a float".format(str(prop)))
+        if value < 0:
+            raise ValueError("{} can only be a positive float".format(str(prop)))
+        return value
+
+    @staticmethod
     def set_currency(prop, value: str) -> str:
         if value not in currency_symbols():
             raise TypeError("{} not a valid currency".format(str(prop)))
@@ -313,3 +324,15 @@ class NetVolumeModel(ndb.Model):
 
     def __repr__(self) -> str:
         return "<Net_Volume: {}{}{}".format(self.date_created, self.transaction_id, self.stock_id)
+
+
+class StockPrideData(ndb.Model):
+    stock_id: str = ndb.StringProperty(validator=setters.set_id)
+    date: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=stock_setters.set_date)
+    open: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+    high: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+    low: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+    close: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+    adjusted_close: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+    volume: float == ndb.FloatProperty(default=0, validator=setters.set_float)
+
