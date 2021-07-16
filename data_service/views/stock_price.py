@@ -172,7 +172,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
             return jsonify({'status': False, 'message': 'stock id is required'}), 500
         one_month = date_days_ago(days=30)
         stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
-                                                                             StockPriceData.date_created > one_month)
+                                                                             StockPriceData.date_created > one_month).fetch()
         payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
         message: str = 'successfully fetched monthly stock price data'
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
@@ -186,7 +186,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
 
         week = date_days_ago(days=7)
         stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
-                                                                             StockPriceData.date_created > week)
+                                                                             StockPriceData.date_created > week).fetch()
         payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
         message: str = 'successfully fetched weekly stock price data'
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
@@ -204,7 +204,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
 
         n_days = date_days_ago(days=days)
         stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
-                                                                             StockPriceData.date_created > n_days)
+                                                                             StockPriceData.date_created > n_days).fetch()
         payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
         message: str = 'successfully fetched weekly stock price data'
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200

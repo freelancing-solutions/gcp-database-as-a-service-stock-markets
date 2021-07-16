@@ -332,13 +332,13 @@ class StockPriceData(ndb.Model):
     """
     stock_id: str = ndb.StringProperty(validator=setters.set_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
-                                           validator=stock_setters.set_date)
-    price_open: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
-    price_high: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
-    price_low: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
-    price_close: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
-    adjusted_close: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
-    volume: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+                                                   validator=stock_setters.set_date)
+    price_open: int = ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    price_high: int = ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    price_low: int = ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    price_close: int = ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    adjusted_close: int = ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    volume: int = ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class:
