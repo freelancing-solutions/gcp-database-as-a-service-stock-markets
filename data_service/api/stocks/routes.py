@@ -1,8 +1,10 @@
-from datetime import date as date_class
+import typing
+from datetime import date as date_class, date
 from flask import Blueprint, request, jsonify
 from data_service.api.api_authenticator import handle_auth
 from data_service.config.exceptions import InputError
 from data_service.utils.utils import date_string_to_date, task_counter
+from data_service.views.stock_price import StockPriceDataView
 from data_service.views.stocks import StockView
 from data_service.tasks.tasks import create_task
 from functools import lru_cache
@@ -170,3 +172,40 @@ def day_volumes(path: str) -> tuple:
         return stock_view_instance.get_day_net_volumes(date_created=date_created)
     else:
         pass
+
+
+@stocks_bp.route('/api/v1/eod/<path:path>', methods=['POST'])
+@handle_auth
+def eod_price_data(path: str) -> tuple:
+    eod_instance: StockPriceDataView = StockPriceDataView()
+    request_data: dict = request.get_json()
+    if path == "create-eod":
+        return eod_instance.add_stock_price_data(stock_price_data=request_data)
+    elif path == "get-by-date":
+        if "date_created" in request_data and request_data['date_created'] != "":
+            date_created: typing.Union[date, None] = request_data.get('date_created')
+        else:
+            return jsonify({'status': False, 'message': 'date_created is required'}), 500
+        return eod_instance.get_stock_price_data_list_by_date(date_created=date_created)
+    elif path == "get-monthly-by-stock-id":
+        if "stock_id" in request_data and request_data["stock_id"] != "":
+            stock_id: typing.Union[str, None] = request_data.get("stock_id")
+        else:
+            return jsonify({'status': False, 'message': 'stock_id is required'}), 500
+        return eod_instance.get_monthly_stock_price_data_list_by_stock_id(stock_id=stock_id)
+    elif path == "get-weekly-by-stock-id":
+        if "stock_id" in request_data and request_data["stock_id"] != "":
+            stock_id: typing.Union[str, None] = request_data.get("stock_id")
+        else:
+            return jsonify({'status': False, 'message': 'stock_id is required'}), 500
+        return eod_instance.get_weekly_stock_price_data_list_by_stock_id(stock_id=stock_id)
+    elif path == "get-n-days-by-stock-id":
+        if "stock_id" in request_data and request_data["stock_id"] != "":
+            stock_id: typing.Union[str, None] = request_data.get("stock_id")
+        else:
+            return jsonify({'status': False, 'message': 'stock_id is required'}), 500
+        if 'days' in request_data and request_data['days'] != "":
+            days: typing.Union[int, None] = request_data.get("days")
+        else:
+            return jsonify({'status': False, 'message': 'days is required'}), 500
+        return eod_instance.get_n_days_stock_price_data_list_by_stock_id(stock_id=stock_id, days=days)
