@@ -421,7 +421,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             return jsonify({'status': False, 'message': message}), 500
         return jsonify({'status': True,
                         'message': 'successfully saved stock data',
-                        "payload": {"stock_instance": stock_instance.to_dict()}}), 200
+                        "payload": stock_instance.to_dict()}), 200
 
     @data_wrappers.get_broker_data
     @use_context
@@ -918,3 +918,5 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
 
         message: str = "daily net volume data not found"
         return jsonify({"status": True, "payload": payload, "message": message}), 500
+
+

@@ -331,13 +331,14 @@ class StockPriceData(ndb.Model):
         used to capture daily lows and highs for each stock
     """
     stock_id: str = ndb.StringProperty(validator=setters.set_id)
-    date: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET), validator=stock_setters.set_date)
-    open: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
-    high: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
-    low: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
-    close: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
-    adjusted_close: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
-    volume: float == ndb.FloatProperty(default=0, validator=stock_setters.set_int)
+    date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
+                                           validator=stock_setters.set_date)
+    price_open: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    price_high: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    price_low: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    price_close: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    adjusted_close: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
+    volume: int == ndb.IntegerProperty(default=0, validator=stock_setters.set_int)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class:
@@ -355,4 +356,3 @@ class StockPriceData(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
-

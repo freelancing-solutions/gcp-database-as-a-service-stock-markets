@@ -19,7 +19,7 @@ def create_id(size: int = 64, chars: str = char_set) -> str: return ''.join(rand
 def timestamp() -> int: return int(float(time.time()) * 1000)
 
 
-def get_days(days: int) -> int: return int(24 * days * 60 * 60 * 1000)
+def get_days(days: int) -> int: return int(days * 24 * 60 * 60 * 1000)
 
 
 def timestamp_difference(stamp1: int, stamp2: int) -> int: return int(stamp1 - stamp2)
@@ -90,6 +90,10 @@ def datetime_now() -> datetime:
     return datetime.now()
 
 
+def date_days_ago(days: int) -> date:
+    return date.fromtimestamp(float(timestamp() - get_days(days=days)/1000))
+
+
 def task_counter(timer_limit: int = 10000) -> any:
     """
         if request is to create task then
@@ -111,4 +115,8 @@ def get_payment_methods() -> typing.List[str]:
 
 
 if __name__ == '__main__':
-    pass
+    today = datetime.now()
+    last_30_days_timestamp = timestamp() - get_days(days=30)
+    print(date.fromtimestamp(float(last_30_days_timestamp/1000)))
+    print(last_30_days_timestamp)
+
