@@ -13,6 +13,7 @@ from unittest.mock import sentinel
 from google.cloud import ndb
 from data_service.sdks.eod.eod_historical_data._utils import RemoteDataError
 from data_service.store.settings import ExchangeDataModel
+from data_service.utils.utils import create_id, date_string_to_date
 from data_service.views.settings import ExchangeDataView
 from data_service.views.stock_price import StockPriceDataView
 from data_service.sdks.eod.eod_historical_data.data import get_eod_data_async
@@ -86,7 +87,19 @@ def convert_eod_stock_price_data(data) -> dict:
                 "volume": 0
             }
     """
-    pass
+    def convert_to_int(num: float) -> int:
+        return int(num * 100)
+
+    return {
+        "stock_id": create_id(),
+        "date_created": date_string_to_date(date_str=data[0]),
+        "price_open": convert_to_int(num=data[1]),
+        "price_high": convert_to_int(num=data[2]),
+        "price_low": convert_to_int(num=data[3]),
+        "price_close": convert_to_int(num=data[4]),
+        "adjusted_close": convert_to_int(num=data[5]),
+        "volume": convert_to_int(num=data[6])
+    }
 
 
 async def get_stock_close_data_from_eod(ticker: dict, exchange: dict, today: bool = True) -> bool:
