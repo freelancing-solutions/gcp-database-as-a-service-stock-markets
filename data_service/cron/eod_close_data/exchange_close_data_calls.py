@@ -165,8 +165,9 @@ def cron_call_crypto_close_data_api():
                         exchange_tickers: typing.List[dict] = response_data['payload']
                         for ticker in exchange_tickers:
                             coro.append(get_crypto_close_data_from_binance(ticker=ticker))
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(asyncio.wait(coro))
+    if len(coro) > 0:
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(asyncio.wait(coro))
     return 'OK', 200
 
 

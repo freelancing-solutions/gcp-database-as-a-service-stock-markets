@@ -27,9 +27,9 @@ def cron_send_login_reminders():
         users_list = response_data['payload']
         for user in users_list:
             coro.append(send_email(to=user['email'], subject=subject, body=body))
-
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(asyncio.wait(coro))
+    if len(coro) > 0:
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(asyncio.wait(coro))
     return 'OK', 200
 
 
@@ -57,9 +57,9 @@ def cron_send_payment_reminders():
             if response_data['status']:
                 user_instance: dict = response_data['payload']
                 coro.append(send_email(to=user_instance['email'], subject=subject, body=body))
-
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(asyncio.wait(coro))
+        if len(coro) > 0:
+            loop = asyncio.new_event_loop()
+            loop.run_until_complete(asyncio.wait(coro))
         return 'OK', 200
 
 

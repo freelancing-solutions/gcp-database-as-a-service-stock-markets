@@ -39,8 +39,9 @@ def cron_create_membership_invoices():
             if membership_plan is not None:
                 # Process Payment
                 coro.append(create_invoice(membership_plan=membership_plan, membership=membership))
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(asyncio.wait(coro))
+    if len(coro) > 0:
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(asyncio.wait(coro))
 
 
 def cron_down_grade_unpaid_memberships():
@@ -74,7 +75,8 @@ def cron_finalize_affiliate_payments():
             # if its paid or its on hold do not add
             coro.append(add_earnings(affiliate=affiliate, earnings=earnings_data))
 
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(asyncio.wait(coro))
+    if len(coro) > 0:
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(asyncio.wait(coro))
 
 
