@@ -48,6 +48,12 @@ class ExchangeDataModel(ndb.Model):
             return False
         return True
 
+    def __len__(self) -> int:
+        return len(self.exchange_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.exchange_id)
+
     # errors if available
     def set_exchange_id(self) -> bool:
         self.exchange_id = create_id()
@@ -115,6 +121,12 @@ class ScrappingPagesModel(ndb.Model):
         if self.target_url != other.target_url:
             return False
         return True
+
+    def __len__(self) -> int:
+        return len(self.exchange_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.exchange_id)
 
     def set_exchange_id(self, exchange_id: typing.Union[str, None]) -> bool:
 
@@ -208,6 +220,12 @@ class StockAPIEndPointModel(ndb.Model):
         if self.stocks_api_endpoint != other.stocks_api_endpoint:
             return False
         return True
+
+    def __len__(self) -> int:
+        return len(self.exchange_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.exchange_id)
 
     def set_api_id(self) -> bool:
         self.api_id = create_id()

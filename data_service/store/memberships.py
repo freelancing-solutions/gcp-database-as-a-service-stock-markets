@@ -467,6 +467,7 @@ class MembershipDailyStats(ndb.Model):
         return True
 
     def __len__(self) -> int:
-        if self.daily_id:
-            return 1
-        return 0
+        return len(self.daily_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.daily_id)

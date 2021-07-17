@@ -97,9 +97,10 @@ class Stock(ndb.Model):
         return "<Stock: {}{}{}{}".format(self.stock_id, self.stock_code, self.symbol, self.stock_name)
 
     def __len__(self) -> int:
-        if self.stock_id:
-            return 1
-        return 0
+        return len(self.stock_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.stock_id)
 
 
 class Broker(ndb.Model):
@@ -126,9 +127,11 @@ class Broker(ndb.Model):
         return "<Broker: {} {} {}".format(self.broker_id, self.broker_code, self.broker_name)
 
     def __len__(self) -> int:
-        if self.broker_id:
-            return 1
-        return 0
+        return len(self.broker_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.broker_id)
+
 
 class StockModelSetters:
     def __init__(self):
@@ -228,9 +231,10 @@ class StockModel(ndb.Model):
         return "<Stock_Model: {}{}{}".format(self.transaction_id, self.stock.stock_id, self.broker.broker_id)
 
     def __len__(self) -> int:
-        if self.exchange_id:
-            return 1
-        return 0
+        return len(self.exchange_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.transaction_id)
 
 
 class BuyVolumeModel(ndb.Model):
@@ -270,9 +274,11 @@ class BuyVolumeModel(ndb.Model):
         return "<Buy_Volume: {}{}{}".format(self.transaction_id, self.stock_id, self.date_created)
 
     def __len__(self) -> int:
-        if self.transaction_id:
-            return 1
-        return 0
+        return len(self.transaction_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.transaction_id)
+
 
 class SellVolumeModel(ndb.Model):
     """
@@ -311,9 +317,10 @@ class SellVolumeModel(ndb.Model):
         return "Sell_Volume: {} {} {}".format(self.transaction_id, self.stock_id, self.date_created)
 
     def __len__(self) -> int:
-        if self.transaction_id:
-            return 1
-        return 0
+        return len(self.transaction_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.transaction_id)
 
 
 class NetVolumeModel(ndb.Model):
@@ -349,9 +356,10 @@ class NetVolumeModel(ndb.Model):
         return "<Net_Volume: {}{}{}".format(self.date_created, self.transaction_id, self.stock_id)
 
     def __len__(self) -> int:
-        if self.stock_id:
-            return 1
-        return 0
+        return len(self.stock_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.stock_id)
 
 
 class StockPriceData(ndb.Model):
@@ -386,6 +394,8 @@ class StockPriceData(ndb.Model):
         return self.__str__()
 
     def __len__(self) -> int:
-        if self.stock_id:
-            return 1
-        return 0
+        return len(self.stock_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.stock_id)
+

@@ -82,6 +82,9 @@ class AmountMixin(ndb.Model):
             return 1
         return 0
 
+    def __bool__(self) -> bool:
+        return True if self.amount is not None else False
+
 
 class UserMixin(ndb.Model):
     email: str = ndb.StringProperty(validator=setters.set_email)
@@ -103,9 +106,10 @@ class UserMixin(ndb.Model):
         return self.__str__()
 
     def __len__(self) -> int:
-        if self.email:
-            return 1
-        return 0
+        return len(self.email)
+
+    def __bool__(self) -> bool:
+        return bool(self.email)
 
 
 # TODO add validators for address
@@ -137,7 +141,7 @@ class AddressMixin(ndb.Model):
         return self.__str__()
 
     def __len__(self) -> int:
-        if self.line_1:
-            return 1
-        return 0
+        return len(self.line_1)
 
+    def __bool__(self) -> bool:
+        return bool(self.line_1)

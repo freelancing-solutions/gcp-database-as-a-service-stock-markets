@@ -57,3 +57,10 @@ class ScrapperTempStore(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __len__(self) -> int:
+        return len(self.data_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.data_id)
+

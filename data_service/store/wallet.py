@@ -96,6 +96,9 @@ class WalletModel(ndb.Model):
     def __len__(self) -> int:
         return len(self.uid)
 
+    def __bool__(self) -> bool:
+        return bool(self.uid)
+
 
 class WalletTransactionsModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=setters.set_id)
@@ -120,6 +123,9 @@ class WalletTransactionsModel(ndb.Model):
 
     def __len__(self) -> int:
         return len(self.uid) and len(self.transaction_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.uid) or bool(self.transaction_id)
 
 
 class WalletTransactionItemModel(ndb.Model):
@@ -149,4 +155,5 @@ class WalletTransactionItemModel(ndb.Model):
         return len(self.transaction_id)
 
     def __bool__(self) -> bool:
-        return True if self.transaction_id else False
+        # return True if self.transaction_id else False
+        return bool(self.transaction_id)
