@@ -94,9 +94,7 @@ class WalletModel(ndb.Model):
         return True
 
     def __len__(self) -> int:
-        if self.uid:
-            return 1
-        return 0
+        return len(self.uid)
 
 
 class WalletTransactionsModel(ndb.Model):
@@ -121,9 +119,7 @@ class WalletTransactionsModel(ndb.Model):
         return True
 
     def __len__(self) -> int:
-        if self.uid and self.transaction_id:
-            return 1
-        return 0
+        return len(self.uid) and len(self.transaction_id)
 
 
 class WalletTransactionItemModel(ndb.Model):
@@ -150,7 +146,7 @@ class WalletTransactionItemModel(ndb.Model):
         return True
 
     def __len__(self) -> int:
-        if self.transaction_id:
-            return 1
-        return 0
+        return len(self.transaction_id)
 
+    def __bool__(self) -> bool:
+        return True if self.transaction_id else False

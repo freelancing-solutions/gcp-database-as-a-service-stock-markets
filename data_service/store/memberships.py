@@ -236,9 +236,10 @@ class Memberships(ndb.Model):
         return "Memberships: {}{}{}".format(self.uid, self.plan_id, self.status)
 
     def __len__(self) -> int:
-        if self.uid:
-            return 1
-        return 0
+        return len(self.uid)
+
+    def __bool__(self) -> bool:
+        return bool(self.uid)
 
 
 # noinspection DuplicatedCode
@@ -283,6 +284,9 @@ class MembershipPlans(ndb.Model):
         if self.plan_id:
             return 1
         return 0
+
+    def __bool__(self) -> bool:
+        return bool(self.plan_id)
 
 
 # noinspection DuplicatedCode
@@ -338,6 +342,9 @@ class MembershipInvoices(ndb.Model):
         if self.uid:
             return 1
         return 0
+
+    def __bool__(self) -> bool:
+        return bool(self.uid)
 
 
 # noinspection DuplicatedCode
@@ -395,6 +402,9 @@ class Coupons(ndb.Model):
             return 1
         return 0
 
+    def __bool__(self) -> bool:
+        return bool(self.code)
+
 
 # noinspection DuplicatedCode
 class AccessRights(ndb.Model):
@@ -411,9 +421,10 @@ class AccessRights(ndb.Model):
     # TODO - finish this
 
     def __len__(self) -> int:
-        if self.plan_id:
-            return 1
-        return 0
+        return len(self.plan_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.plan_id)
 
 
 class MembershipDailyStats(ndb.Model):

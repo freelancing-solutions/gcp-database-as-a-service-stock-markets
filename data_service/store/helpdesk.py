@@ -79,7 +79,13 @@ class HelpDesk(ndb.Model):
         return True
 
     def __len__(self) -> int:
-        return self.total_tickets
+        if self.total_tickets is not None:
+            return 1
+        return 0
+
+    def __bool__(self) -> bool:
+        # Cannot use bool as total_tickets of 0 will return False
+        return True if self.total_tickets is not None else False
 
 
 class TicketValid:
@@ -138,9 +144,11 @@ class Ticket(ndb.Model):
         return self.__str__()
 
     def __len__(self) -> int:
-        if self.ticket_id:
-            return 1
-        return 0
+        return len(self.ticket_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.ticket_id)
+        # return True if self.ticket_id or self.uid else False
 
 
 class TicketThreadValid:
@@ -181,6 +189,8 @@ class TicketThread(ndb.Model):
         return self.__str__()
 
     def __len__(self) -> int:
-        if self.ticket_id:
-            return 1
-        return 0
+        return len(self.ticket_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.ticket_id)
+        # return True if self.ticket_id else False

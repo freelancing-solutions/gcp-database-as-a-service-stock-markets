@@ -189,6 +189,10 @@ class Affiliates(ndb.Model):
     def __len__(self) -> int:
         return len(self.affiliate_id)
 
+    def __bool__(self) -> bool:
+        return bool(self.affiliate_id)
+        # return True if self.affiliate_id else False
+
 
 class Recruits(ndb.Model):
     """
@@ -220,6 +224,11 @@ class Recruits(ndb.Model):
 
     def __len__(self) -> int:
         return len(self.affiliate_id)
+
+    def __bool__(self) -> bool:
+        return bool(self.affiliate_id)
+        # return True if self.affiliate_id else False
+
 
 class EarningsData(ndb.Model):
     """
@@ -255,6 +264,11 @@ class EarningsData(ndb.Model):
     def __len__(self) -> int:
         return len(self.affiliate_id)
 
+    def __bool__(self) -> bool:
+        # return True if self.affiliate_id else False
+        return bool(self.affiliate_id)
+
+
 class AffiliateEarningsTransactions(ndb.Model):
     """
         keeps track of amounts paid from earningsData
@@ -282,6 +296,11 @@ class AffiliateEarningsTransactions(ndb.Model):
     def __len__(self) -> int:
         return len(self.affiliate_id)
 
+    def __bool__(self) -> bool:
+        # return True if self.affiliate_id else False
+        return bool(self.affiliate_id)
+
+
 class AffiliateTransactionItems(ndb.Model):
     """
         keeps track of singular transaction items
@@ -307,6 +326,10 @@ class AffiliateTransactionItems(ndb.Model):
 
     def __len__(self) -> int:
         return len(self.transaction_id)
+
+    def __bool__(self) -> bool:
+        # return True if self.transaction_id else False
+        return bool(self.transaction_id)
 
 
 class AffiliateSettingsStats(ndb.Model):
@@ -339,3 +362,13 @@ class AffiliateSettingsStats(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __len__(self) -> int:
+        # return self.earnings_percent
+        if self.earnings_percent:
+            return 1
+        return 0
+
+    def __bool__(self) -> bool:
+        # return True if self.earnings_percent is not None else False
+        return bool(self.earnings_percent)
