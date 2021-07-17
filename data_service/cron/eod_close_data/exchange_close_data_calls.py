@@ -72,7 +72,7 @@ async def get_stock_close_data_from_eod(ticker: dict, exchange: dict) -> bool:
         get stock data from eod ana save into the database
         # net_volumes, sell_volumes, buy_volumes
         if unable to get the data for the stock try yahoo
-        TODO- complete this
+        TODO- Use python-eod sdk
     """
     eod_stock_endpoint: str = ""
     async with aiohttp.ClientSession() as session:
