@@ -162,7 +162,6 @@ class StockPriceDataView(CatchStockPriceDataErrors):
         """
         pass
 
-
     @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
@@ -177,7 +176,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
     @use_context
     @handle_view_errors
     def get_monthly_stock_price_data_list_by_stock_id(self, stock_id: typing.Union[str, None]) -> tuple:
-        if not(isinstance(stock_id, str)):
+        if not (isinstance(stock_id, str)):
             return jsonify({'status': False, 'message': 'stock id is required'}), 500
         one_month = date_days_ago(days=30)
         stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
@@ -190,7 +189,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
     @use_context
     @handle_view_errors
     def get_weekly_stock_price_data_list_by_stock_id(self, stock_id: typing.Union[str, None]) -> tuple:
-        if not(isinstance(stock_id, str)):
+        if not (isinstance(stock_id, str)):
             return jsonify({'status': False, 'message': 'stock id is required'}), 500
 
         week = date_days_ago(days=7)
@@ -206,9 +205,9 @@ class StockPriceDataView(CatchStockPriceDataErrors):
     def get_n_days_stock_price_data_list_by_stock_id(self, stock_id: typing.Union[str, None],
                                                      days: typing.Union[int, None]) -> tuple:
 
-        if not(isinstance(days, int)) or (days < 0):
+        if not (isinstance(days, int)) or (days < 0):
             return jsonify({'status': False, 'message': 'days is required and should be greater than 0'}), 500
-        if not(isinstance(stock_id, str)):
+        if not (isinstance(stock_id, str)):
             return jsonify({'status': False, 'message': 'stock id is required'}), 500
 
         n_days = date_days_ago(days=days)

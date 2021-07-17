@@ -7,7 +7,7 @@ import pandas as pd
 from pandas.api.types import is_number
 from urllib.parse import urlencode
 from requests.exceptions import RetryError, ConnectTimeout
-from config.config import Config
+from data_service.sdks.eod.config.config import Config
 
 config_instance: Config = Config()
 # NOTE do not remove

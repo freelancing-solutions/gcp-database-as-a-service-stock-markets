@@ -8,7 +8,7 @@ from ._utils import (_init_session, _format_date,
                      _sanitize_dates, _url, RemoteDataError, _handle_request_errors, EnvironNotSet,
                      _handle_environ_error, sentinel, api_key_not_authorized)
 
-from config.config import Config
+from data_service.sdks.eod.config.config import Config
 
 config_data: Config = Config()
 
