@@ -7,10 +7,15 @@
     data for the day or time of day,
     if any missing data is detected its updated on the database
 """
+import datetime
 import typing
+from unittest.mock import sentinel
 from google.cloud import ndb
+from data_service.sdks.eod.eod_historical_data._utils import RemoteDataError
 from data_service.store.settings import ExchangeDataModel
 from data_service.views.settings import ExchangeDataView
+from data_service.views.stock_price import StockPriceDataView
+from data_service.sdks.eod.eod_historical_data.data import get_eod_data_async
 import asyncio
 import aiohttp
 
@@ -67,23 +72,53 @@ async def get_stock_close_data_from_pse(ticker: dict, exchange: dict) -> bool:
     return True
 
 
-async def get_stock_close_data_from_eod(ticker: dict, exchange: dict) -> bool:
+def convert_eod_stock_price_data(data) -> dict:
+    """
+        format:
+            {
+                "stock_id": "",
+                "date_created": "",
+                "price_open": 0,
+                "price_high": 0,
+                "price_low": 0,
+                "price_close": 0,
+                "adjusted_close": 0,
+                "volume": 0
+            }
+    """
+    pass
+
+
+async def get_stock_close_data_from_eod(ticker: dict, exchange: dict, today: bool = True) -> bool:
     """
         get stock data from eod ana save into the database
         # net_volumes, sell_volumes, buy_volumes
         if unable to get the data for the stock try yahoo
         TODO- Use python-eod sdk
     """
-    eod_stock_endpoint: str = ""
-    async with aiohttp.ClientSession() as session:
-        async with session.get(eod_stock_endpoint) as response:
-            response_data = await response.json()
-            # TODO get net volume
-            # TODO get sell volume
-            # TODO get buy volume
-            # If cant obtain data use create task to use eod instead
-            # TODO - send net , sell and buy for the stock to save to database
-            pass
+    try:
+        stock_price_data: StockPriceDataView = StockPriceDataView()
+        if today:
+            response = await get_eod_data_async(symbol=ticker['symbol'],
+                                                exchange=exchange['symbol'],
+                                                start=str(datetime.datetime.now().date()),
+                                                end=str(datetime.datetime.now().date()))
+        else:
+            response = await get_eod_data_async(symbol=ticker['symbol'],
+                                                exchange=exchange['symbol'])
+
+        if (response != sentinel) and (response is not None):
+            # this means response contains data as dataframe
+            coro: list = []
+            for data in response:
+                stock_data: dict = convert_eod_stock_price_data(data=data)
+                coro.append(stock_price_data.add_stock_price_data_async(stock_price_data=stock_data))
+
+            if len(coro) > 0:
+                loop = asyncio.new_event_loop()
+                loop.run_until_complete(asyncio.wait(coro))
+    except RemoteDataError:
+        pass
     return True
 
 
@@ -143,9 +178,10 @@ def cron_call_close_data_apis():
                 if response_data['status']:
                     exchange_tickers: typing.List[dict] = response_data['payload']
                     for ticker in exchange_tickers:
-                        coro.append(get_stock_close_data_from_pse(ticker=ticker, exchange=exchange))
-    loop = asyncio.new_event_loop()
-    loop.run_until_complete(asyncio.wait(coro))
+                        coro.append(get_stock_close_data_from_eod(ticker=ticker, exchange=exchange, today=True))
+    if len(coro) > 0:
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(asyncio.wait(coro))
     return 'OK', 200
 
 

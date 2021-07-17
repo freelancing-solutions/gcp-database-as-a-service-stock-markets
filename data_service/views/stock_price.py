@@ -154,6 +154,15 @@ class StockPriceDataView(CatchStockPriceDataErrors):
                         'message': 'successfully saved stock data',
                         "payload": stock_price_data_instance.to_dict()}), 200
 
+    @use_context
+    @handle_view_errors
+    async def add_stock_price_data_async(self) -> tuple:
+        """
+            add stock price data asynchronously
+        """
+        pass
+
+
     @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors

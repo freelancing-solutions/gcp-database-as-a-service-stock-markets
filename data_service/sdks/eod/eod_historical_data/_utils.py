@@ -47,7 +47,9 @@ def _sanitize_dates(start: typing.Union[None, int], end: typing.Union[None, int]
 
     if is_number(end):
         # regard int as year
-        end: datetime.datetime = datetime.datetime(end, 1, 1)
+        month = datetime.datetime.now().month
+        day = datetime.datetime.now().day
+        end: datetime.datetime = datetime.datetime(end, month, day)
     end = pd.to_datetime(end)
 
     if start and end:

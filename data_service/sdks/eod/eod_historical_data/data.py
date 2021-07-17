@@ -1,3 +1,4 @@
+import datetime
 import typing
 import aiohttp as aiohttp
 import requests
@@ -56,10 +57,12 @@ def get_eod_data(symbol: str, exchange: str, start: typing.Union[str, int] = Non
 
 @_handle_environ_error
 @_handle_request_errors
-async def get_eod_data_async(symbol: str, exchange: str, start: typing.Union[str, int] = None,
+async def get_eod_data_async(symbol: str, exchange: str, start: typing.Union[str, int] = 2010,
                              end: typing.Union[str, int] = None,
                              api_key: str = EOD_HISTORICAL_DATA_API_KEY_DEFAULT) -> typing.Union[pd.DataFrame, None]:
     symbol_exchange: str = "{}.{}".format(symbol, exchange)
+    if end is None:
+        end = datetime.datetime.now().year
     start, end = _sanitize_dates(start, end)
     endpoint: str = "/eod/{}".format(symbol_exchange)
     url: str = EOD_HISTORICAL_DATA_API_URL + endpoint
@@ -76,7 +79,7 @@ async def get_eod_data_async(symbol: str, exchange: str, start: typing.Union[str
                                                                    skipfooter=1, parse_dates=[0], index_col=0)
                 return df
             elif response.status == api_key_not_authorized:
-                print("API Key Restricted, Try upgrading your API Key: {}".format(__name__))
+                # print("API Key Restricted, Try upgrading your API Key: {}".format(__name__))
                 return sentinel
             else:
                 params["api_token"] = "YOUR_HIDDEN_API"
