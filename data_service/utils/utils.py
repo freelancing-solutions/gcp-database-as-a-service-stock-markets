@@ -4,7 +4,7 @@ import random
 import string
 import time
 import typing
-from datetime import datetime, date
+from datetime import date
 from datetime import time as time_class
 
 char_set = string.ascii_lowercase + string.digits
@@ -57,7 +57,7 @@ def date_string_to_date(date_str: str) -> date:
 
 # cache functions
 def end_of_month() -> bool:
-    now: date = datetime.now().date()
+    now: date = datetime.datetime.now().date()
     if now.day in [30, 31, 1]:
         return True
     return False
@@ -79,19 +79,20 @@ def return_ttl(name: str) -> int:
 
 # TODO Refactor the entire codebase to use this function to obtain todays date
 def today() -> date:
-    return datetime.now().date()
+    return datetime.datetime.now().date()
 
 
 def time_now() -> time_class:
-    return datetime.now().time()
+    return datetime.datetime.now().time()
 
 
 def datetime_now() -> datetime:
-    return datetime.now()
+    return datetime.datetime.now()
 
 
 def date_days_ago(days: int) -> date:
-    return date.fromtimestamp(float(timestamp() - get_days(days=days)/1000))
+    days_ago = datetime.datetime.now() - datetime.timedelta(days=days)
+    return days_ago.date()
 
 
 def task_counter(timer_limit: int = 10000) -> any:
@@ -115,8 +116,11 @@ def get_payment_methods() -> typing.List[str]:
 
 
 if __name__ == '__main__':
-    today = datetime.now()
-    last_30_days_timestamp = timestamp() - get_days(days=30)
-    print(date.fromtimestamp(float(last_30_days_timestamp/1000)))
-    print(last_30_days_timestamp)
+    # today = datetime.datetime.now()
+    # last_30_days_timestamp = timestamp() - get_days(days=30)
+    # print(date.fromtimestamp(float(last_30_days_timestamp/1000)))
+    # print(last_30_days_timestamp)
+    # expire_after = datetime.datetime.now() - datetime.timedelta(days=30)
+    # print(expire_after.date())
+    pass
 
