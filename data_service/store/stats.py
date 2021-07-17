@@ -35,6 +35,11 @@ class ClientTraffic(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __len__(self) -> int:
+        if self.interval_id:
+            return 1
+        return 0
+
 
 class DataServiceTraffic(ndb.Model):
     """
@@ -60,3 +65,8 @@ class DataServiceTraffic(ndb.Model):
 
     def __repr__(self):
         return self.__str__()
+
+    def __len__(self) -> int:
+        if self.interval_id:
+            return 1
+        return 0

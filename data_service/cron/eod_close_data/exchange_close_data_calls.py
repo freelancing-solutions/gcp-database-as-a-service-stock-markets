@@ -120,7 +120,7 @@ async def get_stock_close_data_from_eod(ticker: dict, exchange: dict, today: boo
             response = await get_eod_data_async(symbol=ticker['symbol'],
                                                 exchange=exchange['symbol'])
 
-        if (response != sentinel) and (response is not None):
+        if (response is not sentinel) and (response is not None):
             # this means response contains data as dataframe
             coro: list = []
             for data in response:

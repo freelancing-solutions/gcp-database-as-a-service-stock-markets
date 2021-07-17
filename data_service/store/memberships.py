@@ -235,6 +235,11 @@ class Memberships(ndb.Model):
     def __repr__(self) -> str:
         return "Memberships: {}{}{}".format(self.uid, self.plan_id, self.status)
 
+    def __len__(self) -> int:
+        if self.uid:
+            return 1
+        return 0
+
 
 # noinspection DuplicatedCode
 class MembershipPlans(ndb.Model):
@@ -273,6 +278,11 @@ class MembershipPlans(ndb.Model):
 
     def __repr__(self) -> str:
         return "<Memberships: {}{}".format(self.plan_id, self.plan_name)
+
+    def __len__(self) -> int:
+        if self.plan_id:
+            return 1
+        return 0
 
 
 # noinspection DuplicatedCode
@@ -323,6 +333,11 @@ class MembershipInvoices(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __len__(self) -> int:
+        if self.uid:
+            return 1
+        return 0
 
 
 # noinspection DuplicatedCode
@@ -375,6 +390,11 @@ class Coupons(ndb.Model):
             return False
         return True
 
+    def __len__(self) -> int:
+        if self.code:
+            return 1
+        return 0
+
 
 # noinspection DuplicatedCode
 class AccessRights(ndb.Model):
@@ -389,6 +409,11 @@ class AccessRights(ndb.Model):
     access_rights_list: typing.List[str] = ndb.StringProperty(repeated=True)  # a list containing the rights of users
 
     # TODO - finish this
+
+    def __len__(self) -> int:
+        if self.plan_id:
+            return 1
+        return 0
 
 
 class MembershipDailyStats(ndb.Model):
@@ -429,3 +454,8 @@ class MembershipDailyStats(ndb.Model):
         if self.total_earned_so_far != other.total_earned_so_far:
             return False
         return True
+
+    def __len__(self) -> int:
+        if self.daily_id:
+            return 1
+        return 0

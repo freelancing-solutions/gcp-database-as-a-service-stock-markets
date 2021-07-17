@@ -186,6 +186,9 @@ class Affiliates(ndb.Model):
     def __repr__(self) -> str:
         return "<Affiliates: {}{}".format(self.affiliate_id, self.uid)
 
+    def __len__(self) -> int:
+        return len(self.affiliate_id)
+
 
 class Recruits(ndb.Model):
     """
@@ -215,6 +218,8 @@ class Recruits(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __len__(self) -> int:
+        return len(self.affiliate_id)
 
 class EarningsData(ndb.Model):
     """
@@ -247,6 +252,8 @@ class EarningsData(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __len__(self) -> int:
+        return len(self.affiliate_id)
 
 class AffiliateEarningsTransactions(ndb.Model):
     """
@@ -272,6 +279,8 @@ class AffiliateEarningsTransactions(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __len__(self) -> int:
+        return len(self.affiliate_id)
 
 class AffiliateTransactionItems(ndb.Model):
     """
@@ -295,6 +304,9 @@ class AffiliateTransactionItems(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __len__(self) -> int:
+        return len(self.transaction_id)
 
 
 class AffiliateSettingsStats(ndb.Model):

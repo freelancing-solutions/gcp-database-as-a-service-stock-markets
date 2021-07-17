@@ -3,6 +3,7 @@ from google.cloud import ndb
 from datetime import datetime
 import re
 
+
 class Setters:
 
     @staticmethod
@@ -77,24 +78,27 @@ class HelpDesk(ndb.Model):
             return False
         return True
 
+    def __len__(self) -> int:
+        return self.total_tickets
+
 
 class TicketValid:
 
     @staticmethod
     def is_topic_valid(topic: typing.Union[str, None]) -> bool:
-        if not(isinstance(topic, str)) or (topic == ""):
+        if not (isinstance(topic, str)) or (topic == ""):
             return False
         return True
 
     @staticmethod
     def is_subject_valid(subject: typing.Union[str, None]) -> bool:
-        if not(isinstance(subject, str)) or (subject == ""):
+        if not (isinstance(subject, str)) or (subject == ""):
             return False
         return True
 
     @staticmethod
     def is_message_valid(message: typing.Union[str, None]) -> bool:
-        if not(isinstance(message, str)) or (message == ""):
+        if not (isinstance(message, str)) or (message == ""):
             return False
         return True
 
@@ -133,6 +137,11 @@ class Ticket(ndb.Model):
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __len__(self) -> int:
+        if self.ticket_id:
+            return 1
+        return 0
+
 
 class TicketThreadValid:
     pass
@@ -170,3 +179,8 @@ class TicketThread(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __len__(self) -> int:
+        if self.ticket_id:
+            return 1
+        return 0

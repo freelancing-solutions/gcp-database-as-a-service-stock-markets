@@ -93,6 +93,11 @@ class WalletModel(ndb.Model):
             return False
         return True
 
+    def __len__(self) -> int:
+        if self.uid:
+            return 1
+        return 0
+
 
 class WalletTransactionsModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=setters.set_id)
@@ -114,6 +119,11 @@ class WalletTransactionsModel(ndb.Model):
         if self.transaction_date != other.transaction_date:
             return False
         return True
+
+    def __len__(self) -> int:
+        if self.uid and self.transaction_id:
+            return 1
+        return 0
 
 
 class WalletTransactionItemModel(ndb.Model):
@@ -138,3 +148,9 @@ class WalletTransactionItemModel(ndb.Model):
         if self.amount != other.amount:
             return False
         return True
+
+    def __len__(self) -> int:
+        if self.transaction_id:
+            return 1
+        return 0
+

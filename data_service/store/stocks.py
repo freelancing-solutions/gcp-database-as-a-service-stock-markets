@@ -96,6 +96,11 @@ class Stock(ndb.Model):
     def __repr__(self) -> str:
         return "<Stock: {}{}{}{}".format(self.stock_id, self.stock_code, self.symbol, self.stock_name)
 
+    def __len__(self) -> int:
+        if self.stock_id:
+            return 1
+        return 0
+
 
 class Broker(ndb.Model):
     """
@@ -120,6 +125,10 @@ class Broker(ndb.Model):
     def __repr__(self) -> str:
         return "<Broker: {} {} {}".format(self.broker_id, self.broker_code, self.broker_name)
 
+    def __len__(self) -> int:
+        if self.broker_id:
+            return 1
+        return 0
 
 class StockModelSetters:
     def __init__(self):
@@ -218,6 +227,11 @@ class StockModel(ndb.Model):
     def __repr__(self) -> str:
         return "<Stock_Model: {}{}{}".format(self.transaction_id, self.stock.stock_id, self.broker.broker_id)
 
+    def __len__(self) -> int:
+        if self.exchange_id:
+            return 1
+        return 0
+
 
 class BuyVolumeModel(ndb.Model):
     """
@@ -255,6 +269,10 @@ class BuyVolumeModel(ndb.Model):
     def __repr__(self) -> str:
         return "<Buy_Volume: {}{}{}".format(self.transaction_id, self.stock_id, self.date_created)
 
+    def __len__(self) -> int:
+        if self.transaction_id:
+            return 1
+        return 0
 
 class SellVolumeModel(ndb.Model):
     """
@@ -292,6 +310,11 @@ class SellVolumeModel(ndb.Model):
     def __repr__(self) -> str:
         return "Sell_Volume: {} {} {}".format(self.transaction_id, self.stock_id, self.date_created)
 
+    def __len__(self) -> int:
+        if self.transaction_id:
+            return 1
+        return 0
+
 
 class NetVolumeModel(ndb.Model):
     """
@@ -325,6 +348,11 @@ class NetVolumeModel(ndb.Model):
     def __repr__(self) -> str:
         return "<Net_Volume: {}{}{}".format(self.date_created, self.transaction_id, self.stock_id)
 
+    def __len__(self) -> int:
+        if self.stock_id:
+            return 1
+        return 0
+
 
 class StockPriceData(ndb.Model):
     """
@@ -356,3 +384,8 @@ class StockPriceData(ndb.Model):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def __len__(self) -> int:
+        if self.stock_id:
+            return 1
+        return 0
