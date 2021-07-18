@@ -15,6 +15,12 @@ class WalletValidator:
         wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get()
         return True if isinstance(wallet_instance, WalletModel) else False
 
+    @staticmethod
+    @handle_store_errors
+    async def wallet_exist_async(uid: str) -> typing.Union[bool, None]:
+        wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == uid).get_async().get_result()
+        return True if isinstance(wallet_instance, WalletModel) else False
+
     # TODO complete validations for all Wallet Models
     # TODO be sure to integrate all models to the view
 

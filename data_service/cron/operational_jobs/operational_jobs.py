@@ -55,7 +55,7 @@ def cron_down_grade_unpaid_memberships():
 async def add_earnings(affiliate: Affiliates, earnings: EarningsData) -> any:
     # TODO may use ndb.tasklets to complete this tasks
     # validate and refactor the below code
-    wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == affiliate.uid).get_async().results()
+    wallet_instance: WalletModel = WalletModel.query(WalletModel.uid == affiliate.uid).get_async().get_result()
     wallet_instance.available_funds = wallet_instance.available_funds + earnings.total_earned
     earnings.is_paid = True
     return wallet_instance.put_async(), earnings.put_async()
