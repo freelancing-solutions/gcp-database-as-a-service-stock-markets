@@ -91,7 +91,7 @@ class CatchStockPriceDataErrors:
         try:
             if not isinstance(stock_id, str):
                 return None
-            stock_instance: Stock = Stock.query(Stock.stock_id == stock_id).get_async().results()
+            stock_instance: Stock = Stock.query(Stock.stock_id == stock_id).get_async().get_result()
             if isinstance(stock_instance, Stock):
                 return True
             return False
@@ -105,7 +105,6 @@ class CatchStockPriceDataErrors:
             return None
         except Aborted:
             return None
-
 
     @staticmethod
     def price_data_exist(stock_id: typing.Union[str, None], date_created: typing.Union[date, None]) -> \
@@ -132,6 +131,31 @@ class CatchStockPriceDataErrors:
         except Aborted:
             return None
 
+    @staticmethod
+    async def price_data_exist_async(stock_id: typing.Union[str, None], date_created: typing.Union[date, None]) -> \
+            typing.Union[bool, None]:
+        try:
+            if not (isinstance(stock_id, str)):
+                return None
+            if not (isinstance(date_created, date)):
+                return None
+            stock_price_data: StockPriceData = StockPriceData.query(StockPriceData.stock_id == stock_id,
+                                                                    StockPriceData.date_created == date_created).get_async().get_result()
+            if isinstance(stock_price_data, StockPriceData):
+                return True
+            return False
+
+        except BadRequestError:
+            return None
+        except BadQueryError:
+            return None
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+        except Aborted:
+            return None
+
     def can_add_price_data(self, stock_id: typing.Union[str, None],
                            date_created: typing.Union[date, None]) -> bool:
         is_stock_exist = self.stock_exist(stock_id=stock_id)
@@ -142,7 +166,12 @@ class CatchStockPriceDataErrors:
 
     async def can_add_price_data_async(self, stock_id: typing.Union[str, None],
                                        date_created: typing.Union[date, None]) -> bool:
-        is_stock_exist = self.stock_exist(stock_id=stock_id)
+        is_stock_exist = await self.stock_exist_async(stock_id=stock_id)
+        is_price_data_exist = await self.price_data_exist_async(stock_id=stock_id, date_created=date_created)
+        if isinstance(is_stock_exist, bool) and isinstance(is_price_data_exist, bool):
+            return is_stock_exist and not is_price_data_exist
+        raise DataServiceError(description="Unable to read database")
+
 
 class StockPriceDataView(CatchStockPriceDataErrors):
     def __init__(self):
@@ -180,11 +209,34 @@ class StockPriceDataView(CatchStockPriceDataErrors):
 
     @use_context
     @handle_view_errors
-    async def add_stock_price_data_async(self) -> tuple:
+    async def add_stock_price_data_async(self,
+                                         stock_id: typing.Union[str, None],
+                                         date_created: typing.Union[date, None],
+                                         price_open: typing.Union[int, None],
+                                         price_high: typing.Union[int, None],
+                                         price_low: typing.Union[int, None],
+                                         price_close: typing.Union[int, None],
+                                         adjusted_close: typing.Union[int, None],
+                                         volume: typing.Union[int, None]
+                                         ) -> tuple:
         """
             add stock price data asynchronously
         """
-        pass
+        if await self.can_add_price_data_async(stock_id=stock_id, date_created=date_created) is True:
+            stock_price_data_instance: StockPriceData = StockPriceData(stock_id=stock_id, date_created=date_created,
+                                                                       price_open=price_open, price_high=price_high,
+                                                                       price_low=price_low, price_close=price_close,
+                                                                       adjusted_close=adjusted_close, volume=volume)
+            key = stock_price_data_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
+            if key is None:
+                message: str = "Unable to write to database"
+                raise DataServiceError(description=message)
+        else:
+            message: str = "Stock price data may already be added"
+            return jsonify({'status': False, 'message': message}), 500
+        return jsonify({'status': True,
+                        'message': 'successfully saved stock data',
+                        "payload": stock_price_data_instance.to_dict()}), 200
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
@@ -199,12 +251,35 @@ class StockPriceDataView(CatchStockPriceDataErrors):
     @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
+    async def get_stock_price_data_list_by_date_async(self, date_created: typing.Union[date, None]) -> tuple:
+
+        stock_price_data_list: typing.List[StockPriceData] = StockPriceData.query(
+            StockPriceData.date_created == date_created).fetch_async().get_result()
+        payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_data_list]
+        return jsonify({'status': True, 'payload': payload, 'message': 'successfully fetched stock price data'}), 200
+
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
+    @use_context
+    @handle_view_errors
     def get_monthly_stock_price_data_list_by_stock_id(self, stock_id: typing.Union[str, None]) -> tuple:
         if not (isinstance(stock_id, str)):
             return jsonify({'status': False, 'message': 'stock id is required'}), 500
         one_month = date_days_ago(days=30)
         stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
                                                                              StockPriceData.date_created > one_month).fetch()
+        payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
+        message: str = 'successfully fetched monthly stock price data'
+        return jsonify({'status': True, 'payload': payload, 'message': message}), 200
+
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
+    @use_context
+    @handle_view_errors
+    async def get_monthly_stock_price_data_list_by_stock_id_async(self, stock_id: typing.Union[str, None]) -> tuple:
+        if not (isinstance(stock_id, str)):
+            return jsonify({'status': False, 'message': 'stock id is required'}), 500
+        one_month = date_days_ago(days=30)
+        stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
+                                                                             StockPriceData.date_created > one_month).fetch_async().get_result()
         payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
         message: str = 'successfully fetched monthly stock price data'
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
@@ -226,6 +301,20 @@ class StockPriceDataView(CatchStockPriceDataErrors):
     @cache_stocks.cached(timeout=return_ttl(name='medium'))
     @use_context
     @handle_view_errors
+    async def get_weekly_stock_price_data_list_by_stock_id_async(self, stock_id: typing.Union[str, None]) -> tuple:
+        if not (isinstance(stock_id, str)):
+            return jsonify({'status': False, 'message': 'stock id is required'}), 500
+
+        week = date_days_ago(days=7)
+        stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
+                                                                             StockPriceData.date_created > week).fetch_async().get_result()
+        payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
+        message: str = 'successfully fetched weekly stock price data'
+        return jsonify({'status': True, 'payload': payload, 'message': message}), 200
+
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
+    @use_context
+    @handle_view_errors
     def get_n_days_stock_price_data_list_by_stock_id(self, stock_id: typing.Union[str, None],
                                                      days: typing.Union[int, None]) -> tuple:
 
@@ -237,6 +326,24 @@ class StockPriceDataView(CatchStockPriceDataErrors):
         n_days = date_days_ago(days=days)
         stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
                                                                              StockPriceData.date_created > n_days).fetch()
+        payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
+        message: str = 'successfully fetched weekly stock price data'
+        return jsonify({'status': True, 'payload': payload, 'message': message}), 200
+
+    @cache_stocks.cached(timeout=return_ttl(name='medium'))
+    @use_context
+    @handle_view_errors
+    async def get_n_days_stock_price_data_list_by_stock_id_async(self, stock_id: typing.Union[str, None],
+                                                     days: typing.Union[int, None]) -> tuple:
+
+        if not (isinstance(days, int)) or (days < 0):
+            return jsonify({'status': False, 'message': 'days is required and should be greater than 0'}), 500
+        if not (isinstance(stock_id, str)):
+            return jsonify({'status': False, 'message': 'stock id is required'}), 500
+
+        n_days = date_days_ago(days=days)
+        stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
+                                                                             StockPriceData.date_created > n_days).fetch_async().get_result()
         payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
         message: str = 'successfully fetched weekly stock price data'
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200
