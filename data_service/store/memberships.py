@@ -18,6 +18,15 @@ class MembershipValidators:
             return True
         return False
 
+    @staticmethod
+    async def start_date_valid_async(start_date: date) -> bool:
+        """
+            check if date is from today and falls within normal parameters
+        """
+        now = datetime.now().date()
+        if isinstance(start_date, date) and start_date > now:
+            return True
+        return False
 
 class PlanValidators:
 
@@ -34,6 +43,30 @@ class PlanValidators:
             return False
         try:
             plan_instance: MembershipPlans = MembershipPlans.query(MembershipPlans.plan_id == plan_id).get()
+            if isinstance(plan_instance, MembershipPlans):
+                return True
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+        except Aborted:
+            return None
+        return False
+
+    @staticmethod
+    async def plan_exist_async(plan_id: str) -> typing.Union[None, bool]:
+        """
+            return True or False
+            return None if Error
+        """
+        if not isinstance(plan_id, str):
+            return False
+        plan_id = plan_id.strip()
+        if plan_id == "":
+            return False
+        try:
+            plan_instance: MembershipPlans = MembershipPlans.query(
+                MembershipPlans.plan_id == plan_id).get_async().get_result()
             if isinstance(plan_instance, MembershipPlans):
                 return True
         except ConnectionRefusedError:
@@ -65,6 +98,28 @@ class PlanValidators:
             return None
         return False
 
+    @staticmethod
+    async def plan_name_exist_async(plan_name: str) -> typing.Union[None, bool]:
+        """
+            returns True or False if plan exist or dont exist
+            returns None if an error occurred
+        """
+        if not isinstance(plan_name, str):
+            return False
+        plan_name = plan_name.strip().lower()
+        if plan_name == "":
+            return False
+        try:
+            plan_instance: MembershipPlans = MembershipPlans.query(
+                MembershipPlans.plan_name == plan_name).get_async().get_result()
+            if isinstance(plan_instance, MembershipPlans):
+                return True
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+        return False
+
 
 class CouponsValidator:
     def __init__(self):
@@ -87,6 +142,22 @@ class CouponsValidator:
             return None
 
     @staticmethod
+    async def coupon_exist_async(code: str) -> typing.Union[None, bool]:
+        if not(isinstance(code, str)):
+            return False
+        if code == "":
+            return False
+        try:
+            coupons_instance: Coupons = Coupons.query(Coupons.code == code).get_async().get_result()
+            if isinstance(coupons_instance, Coupons):
+                return True
+            return False
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+
+    @staticmethod
     def expiration_valid(expiration_time: int) -> bool:
         if not(isinstance(expiration_time, int)):
             return False
@@ -95,7 +166,23 @@ class CouponsValidator:
         return True
 
     @staticmethod
+    async def expiration_valid_async(expiration_time: int) -> bool:
+        if not(isinstance(expiration_time, int)):
+            return False
+        if expiration_time < get_days(days=1):
+            return False
+        return True
+
+    @staticmethod
     def discount_valid(discount_valid: int) -> bool:
+        if not(isinstance(discount_valid, int)):
+            return False
+        if 0 < discount_valid > 100:
+            return False
+        return True
+
+    @staticmethod
+    async def discount_valid_async(discount_valid: int) -> bool:
         if not(isinstance(discount_valid, int)):
             return False
         if 0 < discount_valid > 100:

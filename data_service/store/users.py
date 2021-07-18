@@ -23,6 +23,20 @@ class UserValidators:
             return True
         return False
 
+    @staticmethod
+    async def is_user_valid_async(uid: str) -> typing.Union[None, bool]:
+        if not(isinstance(uid, str)) or (uid == ""):
+            return False
+        try:
+            user_instance: UserModel = UserModel.query(UserModel.uid == uid).get_async().get_result()
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+        if isinstance(user_instance, UserModel):
+            return True
+        return False
+
 
 class UserModel(ndb.Model):
     uid: str = ndb.StringProperty(required=True, indexed=True)
