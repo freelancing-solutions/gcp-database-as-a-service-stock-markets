@@ -85,7 +85,8 @@ class HelpDesk(ndb.Model):
 
     def __bool__(self) -> bool:
         # Cannot use bool as total_tickets of 0 will return False
-        return True if self.total_tickets is not None else False
+        # return True if self.total_tickets is not None else False
+        return bool(self.total_tickets)
 
 
 class TicketValid:
@@ -152,6 +153,9 @@ class Ticket(ndb.Model):
 
 
 class TicketThreadValid:
+    """
+        Error checking for ticket thread
+    """
     pass
 
 
@@ -194,3 +198,5 @@ class TicketThread(ndb.Model):
     def __bool__(self) -> bool:
         return bool(self.ticket_id)
         # return True if self.ticket_id else False
+    
+    

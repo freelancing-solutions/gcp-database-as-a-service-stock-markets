@@ -87,6 +87,27 @@ class CatchStockPriceDataErrors:
             return None
 
     @staticmethod
+    async def stock_exist_async(stock_id: typing.Union[str, None]) -> typing.Union[bool, None]:
+        try:
+            if not isinstance(stock_id, str):
+                return None
+            stock_instance: Stock = Stock.query(Stock.stock_id == stock_id).get_async().results()
+            if isinstance(stock_instance, Stock):
+                return True
+            return False
+        except BadRequestError:
+            return None
+        except BadQueryError:
+            return None
+        except ConnectionRefusedError:
+            return None
+        except RetryError:
+            return None
+        except Aborted:
+            return None
+
+
+    @staticmethod
     def price_data_exist(stock_id: typing.Union[str, None], date_created: typing.Union[date, None]) -> \
             typing.Union[bool, None]:
         try:
@@ -119,6 +140,9 @@ class CatchStockPriceDataErrors:
             return is_stock_exist and not is_price_data_exist
         raise DataServiceError(description="Unable to read database")
 
+    async def can_add_price_data_async(self, stock_id: typing.Union[str, None],
+                                       date_created: typing.Union[date, None]) -> bool:
+        is_stock_exist = self.stock_exist(stock_id=stock_id)
 
 class StockPriceDataView(CatchStockPriceDataErrors):
     def __init__(self):

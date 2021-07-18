@@ -205,9 +205,15 @@ class StockModelSetters:
 
 stock_setters: StockModelSetters = StockModelSetters()
 
+###########################################
+#   Daily Trade Volumes
+###########################################
+
 
 class StockModel(ndb.Model):
-
+    """
+        StockModel for daily trade volumes
+    """
     exchange_id: str = ndb.StringProperty(required=True, indexed=True, validator=setters.set_id)
     transaction_id: str = ndb.StringProperty(validator=setters.set_id)
     stock = ndb.StructuredProperty(Stock, validator=stock_setters.set_stock)
@@ -362,9 +368,13 @@ class NetVolumeModel(ndb.Model):
         return bool(self.stock_id)
 
 
+#####################################################################
+# Daily EOD Stock Price Data Lows / Highs
+
+
 class StockPriceData(ndb.Model):
     """
-        used to capture daily lows and highs for each stock
+        used to capture daily price lows and highs for each stock
     """
     stock_id: str = ndb.StringProperty(validator=setters.set_id)
     date_created: datetime.date = ndb.DateProperty(auto_now_add=True, tzinfo=datetime.timezone(Config.UTC_OFFSET),
