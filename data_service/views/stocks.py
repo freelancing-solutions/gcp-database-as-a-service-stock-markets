@@ -11,7 +11,7 @@ from data_service.store.stocks import Stock, Broker, StockModel, BuyVolumeModel,
 from data_service.utils.utils import date_string_to_date, create_id, return_ttl, end_of_month
 from data_service.config import Config
 from data_service.config.exception_handlers import handle_view_errors
-from data_service.views.use_context import use_context
+from data_service.config.use_context import use_context
 
 stock_list_type = typing.List[Stock]
 

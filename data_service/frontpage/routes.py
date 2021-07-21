@@ -5,7 +5,7 @@ home_bp = Blueprint('home', __name__, template_folder='templates', static_folder
 
 
 @home_bp.route('/', methods=["GET"])
-@cache_stocks.cached(timeout=default_timeout)
+# @cache_stocks.cached(timeout=default_timeout)
 def home():
     return render_template('index.html')
 

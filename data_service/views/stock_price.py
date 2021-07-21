@@ -9,7 +9,7 @@ from data_service.store.stocks import StockPriceData, Stock
 from datetime import date
 from data_service.utils.utils import create_id, return_ttl, date_days_ago
 from data_service.config.exception_handlers import handle_view_errors
-from data_service.views.use_context import use_context
+from data_service.config.use_context import use_context
 
 
 def get_stock_price_data(func):
@@ -61,6 +61,7 @@ def get_stock_price_data(func):
     return wrapper
 
 
+# noinspection DuplicatedCode
 class CatchStockPriceDataErrors:
     def __init__(self):
         super(CatchStockPriceDataErrors, self).__init__()

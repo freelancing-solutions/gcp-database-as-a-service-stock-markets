@@ -5,7 +5,7 @@ from data_service.config.exceptions import DataServiceError
 from data_service.store.scrapper import ScrapperTempStore
 from data_service.utils.utils import create_id
 from data_service.config.exception_handlers import handle_view_errors
-from data_service.views.use_context import use_context
+from data_service.config.use_context import use_context
 
 
 # TODO Create Test Cases for Scrapper and Documentations

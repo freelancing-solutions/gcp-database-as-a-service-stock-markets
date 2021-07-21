@@ -6,7 +6,7 @@ from data_service.main import cache_users
 from data_service.store.users import UserModel
 from data_service.utils.utils import create_id, return_ttl
 from data_service.config.exception_handlers import handle_view_errors
-from data_service.views.use_context import use_context
+from data_service.config.use_context import use_context
 
 users_type = typing.List[UserModel]
 
