@@ -198,5 +198,3 @@ class TicketThread(ndb.Model):
     def __bool__(self) -> bool:
         return bool(self.ticket_id)
         # return True if self.ticket_id else False
-    
-    

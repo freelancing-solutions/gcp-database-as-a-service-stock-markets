@@ -68,7 +68,7 @@ class AmountMixin(ndb.Model):
             raise TypeError("Invalid type")
         if self.currency != other.currency:
             raise TypeError("Incompatible Currency")
-        self.amount += other.amount
+        self.amount -= other.amount
         return self.amount
 
     def __str__(self) -> str:

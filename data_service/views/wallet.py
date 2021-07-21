@@ -124,7 +124,6 @@ class WalletView(Validator):
                             'payload': wallet_instance.to_dict()}), 200
         return jsonify({'status': False, 'message': 'Unable to create wallet'}), 500
 
-
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context
     @handle_view_errors

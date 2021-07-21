@@ -1,7 +1,7 @@
 import typing
 from flask import current_app, jsonify
 from data_service.main import cache_affiliates
-from data_service.store.affiliates import AffiliatesValidators as ValidAffiliate
+from data_service.store.affiliates import AffiliatesValidators as ValidAffiliate, EarningsData
 from data_service.store.affiliates import RecruitsValidators as ValidRecruit
 from data_service.store.affiliates import EarningsValidators as ValidEarnings
 from data_service.store.affiliates import Affiliates, Recruits
