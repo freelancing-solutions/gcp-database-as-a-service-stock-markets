@@ -2,7 +2,7 @@ import typing
 from flask import jsonify, current_app
 from data_service.store.scrapper import ScrapperTempStore
 from data_service.utils.utils import create_id
-from data_service.views.exception_handlers import handle_view_errors
+from data_service.config.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 

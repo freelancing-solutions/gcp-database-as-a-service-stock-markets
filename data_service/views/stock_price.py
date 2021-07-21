@@ -1,4 +1,3 @@
-import datetime
 import typing
 import functools
 from google.api_core.exceptions import RetryError, Aborted
@@ -8,8 +7,8 @@ from data_service.main import cache_stocks
 from data_service.config.exceptions import DataServiceError
 from data_service.store.stocks import StockPriceData, Stock
 from datetime import date
-from data_service.utils.utils import create_id, return_ttl, end_of_month, timestamp, get_days, date_days_ago
-from data_service.views.exception_handlers import handle_view_errors
+from data_service.utils.utils import create_id, return_ttl, date_days_ago
+from data_service.config.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 

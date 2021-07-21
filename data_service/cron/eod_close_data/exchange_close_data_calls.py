@@ -11,7 +11,7 @@ import datetime
 import typing
 from unittest.mock import sentinel
 from google.cloud import ndb
-from data_service.sdks.eod.eod_historical_data._utils import RemoteDataError
+from data_service.config.exceptions import RemoteDataError
 from data_service.store.settings import ExchangeDataModel
 from data_service.utils.utils import create_id, date_string_to_date
 from data_service.views.settings import ExchangeDataView

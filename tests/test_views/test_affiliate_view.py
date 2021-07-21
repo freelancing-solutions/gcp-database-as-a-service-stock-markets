@@ -117,6 +117,7 @@ def test_mark_active(mocker):
         response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active=True)
         assert status == 200, "Unable to mark affiliate as active"
         # noinspection PyTypeChecker
+
         response, status = affiliates_view_instance.mark_active(affiliate_data=affiliate_data_mock, is_active="True")
         assert status == 500, "passing invalid values is not triggering errors"
         affiliate_data_mock['affiliate_id'] = None

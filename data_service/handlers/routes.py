@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound, MethodNotAllowed, Unauthorized, HTTPException
-from data_service.config.exceptions import DataServiceError, InputError
+from data_service.config.exceptions import DataServiceError, InputError, RemoteDataError, UnAuthenticatedError, \
+    RequestError
 
 default_handlers_bp = Blueprint('handlers', __name__)
 
@@ -46,6 +47,11 @@ def handle_un_authorized_requests(e: Unauthorized) -> tuple:
     return jsonify({'status': False, 'message': 'Request Not Authorized'}), 401
 
 
+@default_handlers_bp.app_errorhandler(UnAuthenticatedError)
+def handle_un_authorized_requests(e: UnAuthenticatedError) -> tuple:
+    return jsonify({'status': False, 'message': UnAuthenticatedError.description}), UnAuthenticatedError.code
+
+
 # noinspection PyUnusedLocal
 @default_handlers_bp.app_errorhandler(HTTPException)
 def handle_http_exception(e: HTTPException) -> tuple:
@@ -60,4 +66,14 @@ def handle_data_service_error(e: DataServiceError):
 
 @default_handlers_bp.app_errorhandler(InputError)
 def handle_input_error(e: InputError) -> tuple:
+    return jsonify({'status': False, 'message': e.description}), e.code
+
+
+@default_handlers_bp.app_errorhandler(RemoteDataError)
+def handle_remote_error(e: RemoteDataError) -> tuple:
+    return jsonify({'status': False, 'message': e.description}), e.code
+
+
+@default_handlers_bp.app_errorhandler(RequestError)
+def handle_remote_error(e: RequestError) -> tuple:
     return jsonify({'status': False, 'message': e.description}), e.code

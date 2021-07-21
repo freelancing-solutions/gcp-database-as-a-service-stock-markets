@@ -2,7 +2,7 @@ import typing
 from datetime import datetime
 from google.cloud import ndb
 from data_service.store.mixins import AmountMixin
-from data_service.views.exception_handlers import handle_store_errors
+from data_service.config.exception_handlers import handle_store_errors
 
 
 class WalletValidator:

@@ -1,4 +1,3 @@
-import functools
 import typing
 from flask import jsonify, current_app
 from data_service.config.exceptions import DataServiceError
@@ -6,7 +5,7 @@ from data_service.main import cache_stocks
 from data_service.store.mixins import AmountMixin
 from data_service.store.wallet import WalletModel, WalletValidator
 from data_service.utils.utils import return_ttl, end_of_month
-from data_service.views.exception_handlers import handle_view_errors
+from data_service.config.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 

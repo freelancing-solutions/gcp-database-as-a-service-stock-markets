@@ -12,7 +12,7 @@ from data_service.store.memberships import MembershipValidators as MemberValid
 from data_service.store.memberships import CouponsValidator as CouponValid
 from data_service.utils.utils import create_id, end_of_month, return_ttl, timestamp
 from data_service.main import cache_memberships
-from data_service.views.exception_handlers import handle_view_errors
+from data_service.config.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 
 

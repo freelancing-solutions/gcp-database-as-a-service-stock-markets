@@ -2,10 +2,10 @@ import typing
 from flask import jsonify, current_app
 from data_service.config.types import dict_list_type, tickers_type
 from data_service.main import cache_stocks
-from data_service.store.settings import (UserSettingsModel, AdminSettingsModel, ExchangeDataModel,
+from data_service.store.settings import (ExchangeDataModel,
                                          ScrappingPagesModel, StockAPIEndPointModel)
 from data_service.utils.utils import return_ttl, end_of_month
-from data_service.views.exception_handlers import handle_view_errors
+from data_service.config.exception_handlers import handle_view_errors
 from data_service.views.use_context import use_context
 exc_list_type = typing.List[ExchangeDataModel]
 scrape_list_type = typing.List[ScrappingPagesModel]

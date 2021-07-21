@@ -7,8 +7,9 @@ import pandas as pd
 from pandas.api.types import is_number
 from urllib.parse import urlencode
 from requests.exceptions import RetryError, ConnectTimeout
-from data_service.sdks.eod.config.config import Config
+from data_service.config.exceptions import RequestError, UnAuthenticatedError, InputError
 
+from data_service.sdks.eod.config.config import Config
 config_instance: Config = Config()
 # NOTE do not remove
 from unittest.mock import sentinel
@@ -54,7 +55,7 @@ def _sanitize_dates(start: typing.Union[None, int], end: typing.Union[None, int]
 
     if start and end:
         if start > end:
-            raise Exception("end must be after start")
+            raise InputError("end must be after start")
 
     return start, end
 
@@ -66,24 +67,11 @@ def _handle_request_errors(func: typing.Callable[..., typing.Union[pd.DataFrame,
         try:
             return func(*args, **kwargs)
         except ConnectionError:
-            if config_instance.DEBUG is True:
-                print(traceback.format_exc())
-            else:
-                print("Connection Error")
-            return None
+            raise RequestError('Error Connecting to endpoint')
         except RetryError:
-            if config_instance.DEBUG is True:
-                print(traceback.format_exc())
-            else:
-                print("Connection Error")
-            return None
+            raise RequestError("Error Connecting to endpoint")
         except ConnectTimeout:
-            if config_instance.DEBUG is True:
-                print(traceback.format_exc())
-            else:
-                print("Connection Error")
-            return None
-
+            raise RequestError("Error Connecting to endpoint")
     return wrapper
 
 
@@ -97,25 +85,8 @@ def _handle_environ_error(func: typing.Callable[..., typing.Union[pd.DataFrame, 
             assert api_key != ""
             return func(*args, **kwargs)
         except AssertionError:
-            raise EnvironNotSet("Environment not set see readme.md on how to setup your environment variables")
-
+            raise UnAuthenticatedError("Request not authorised")
     return wrapper
-
-
-# Errors
-
-class RemoteDataError(IOError):
-    """
-    Remote data exception
-    """
-    pass
-
-
-class EnvironNotSet(Exception):
-    """
-        raised when environment variables are not set
-    """
-    pass
 
 
 api_key_not_authorized: int = 403

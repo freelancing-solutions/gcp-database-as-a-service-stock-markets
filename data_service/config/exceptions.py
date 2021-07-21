@@ -21,7 +21,7 @@ class DataServiceError(HTTPException):
         return self.__str__()
 
 
-class InputError(HTTPException):
+class InputError(Exception):
     code: int = 513
     description: str = "Unable to process input"
 
@@ -51,3 +51,64 @@ class UnAuthenticatedError(HTTPException):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+
+class RequestError(HTTPException):
+    code: int = 404
+    description: str = "Request unsuccessful"
+
+    def __init__(self, description: typing.Union[str, None] = None):
+        if description is not None:
+            self.description = description
+        super(RequestError, self).__init__()
+
+    def __str__(self) -> str:
+        return "<RequestError {} Code: {}".format(self.description, str(self.code))
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
+# Errors
+
+class RemoteDataError(IOError):
+    """
+        Remote data exception
+    """
+    code: int = 406
+    description: str = 'Error connecting to remote server'
+
+    def __init__(self, status: typing.Union[int, None] = 406,
+                 description: typing.Union[str, None] = None, url: str = None):
+        if description is not None:
+            self.description = "{} {}".format(description, url)
+            self.status = status
+        super(RemoteDataError, self).__init__()
+
+    def __str__(self) -> str:
+        return "<RemoteDataError {} Code: {}".format(self.description, str(self.code))
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+
+class EnvironNotSet(Exception):
+    """
+        raised when environment variables are not set
+    """
+    code: int = 506
+    description: str = "environment variables not set please inform admin"
+
+    def __init__(self, status: typing.Union[int, None] = 406,
+                 description: typing.Union[str, None] = None, url: str = None):
+        if description is not None:
+            self.description = "{} {}".format(description, url)
+            self.status = status
+        super(EnvironNotSet, self).__init__()
+
+    def __str__(self) -> str:
+        return "<EnvironNotSet {} Code: {}".format(self.description, str(self.code))
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
