@@ -48,7 +48,7 @@ class AffiliatesView(Validator):
             key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "There was an error creating Affiliate"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True,
                             'message': 'successfully registered an affiliate',
                             'payload': affiliate_instance.to_dict()}), 200
@@ -70,7 +70,7 @@ class AffiliatesView(Validator):
             key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Something went wrong while updating affiliate"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True,
                             'message': 'successfully incremented total recruits',
                             'payload': affiliate_instance.to_dict()}), 200
@@ -93,7 +93,7 @@ class AffiliatesView(Validator):
             key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'something went wrong while deleting affiliate'
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True,
                             'message': 'successfully deleted the affiliate',
                             'payload': affiliate_instance.to_dict()}), 200
@@ -117,7 +117,7 @@ class AffiliatesView(Validator):
             key = affiliate_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Unknown Error occurred while trying to mark affiliate as in-active"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully marked affiliate as inactive',
                             'payload': affiliate_instance.to_dict()}), 200
         else:
@@ -244,7 +244,7 @@ class RecruitsView(Validator):
         key = recruit_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "An Error occurred while adding new recruit"
-            return jsonify({'status': False, 'message': message}), 500
+            raise DataServiceError(status=500, description=message)
         return jsonify({'status': True, 'message': 'Successfully created new recruit',
                         'payload': recruit_instance.to_dict()}), 200
 
@@ -264,7 +264,7 @@ class RecruitsView(Validator):
             key = recruits_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Error occurred while deleting recruit"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'Successfully deleted recruit',
                             'payload': recruits_instance.to_dict()}), 200
         else:
@@ -288,7 +288,7 @@ class RecruitsView(Validator):
             key = recruits_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "An Error occurred while changing recruit active status"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'Successfully deleted recruit',
                             'payload': recruits_instance.to_dict()}), 200
         else:

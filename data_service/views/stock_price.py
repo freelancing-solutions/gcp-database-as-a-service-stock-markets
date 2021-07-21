@@ -161,7 +161,8 @@ class CatchStockPriceDataErrors:
         is_price_data_exist = self.price_data_exist(stock_id=stock_id, date_created=date_created)
         if isinstance(is_stock_exist, bool) and isinstance(is_price_data_exist, bool):
             return is_stock_exist and not is_price_data_exist
-        raise DataServiceError(description="Unable to read database")
+        message: str = "Unable to read database"
+        raise DataServiceError(status=500, description=message)
 
     async def can_add_price_data_async(self, stock_id: typing.Union[str, None],
                                        date_created: typing.Union[date, None]) -> bool:
@@ -169,7 +170,8 @@ class CatchStockPriceDataErrors:
         is_price_data_exist = await self.price_data_exist_async(stock_id=stock_id, date_created=date_created)
         if isinstance(is_stock_exist, bool) and isinstance(is_price_data_exist, bool):
             return is_stock_exist and not is_price_data_exist
-        raise DataServiceError(description="Unable to read database")
+        message: str = "Unable to read database"
+        raise DataServiceError(status=500, description=message)
 
 
 class StockPriceDataView(CatchStockPriceDataErrors):
@@ -198,7 +200,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
             key = stock_price_data_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to write to database"
-                raise DataServiceError(description=message)
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = "Stock price data may already be added"
             return jsonify({'status': False, 'message': message}), 500
@@ -229,7 +231,7 @@ class StockPriceDataView(CatchStockPriceDataErrors):
             key = stock_price_data_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Unable to write to database"
-                raise DataServiceError(description=message)
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = "Stock price data may already be added"
             return jsonify({'status': False, 'message': message}), 500
@@ -305,8 +307,8 @@ class StockPriceDataView(CatchStockPriceDataErrors):
             return jsonify({'status': False, 'message': 'stock id is required'}), 500
 
         week = date_days_ago(days=7)
-        stock_price_list: typing.List[StockPriceData] = StockPriceData.query(StockPriceData.stock_id == stock_id,
-                                                                             StockPriceData.date_created > week).fetch_async().get_result()
+        stock_price_list: typing.List[StockPriceData] = StockPriceData.query(
+            StockPriceData.stock_id == stock_id, StockPriceData.date_created > week).fetch_async().get_result()
         payload: typing.List[dict] = [price_data.to_dict() for price_data in stock_price_list]
         message: str = 'successfully fetched weekly stock price data'
         return jsonify({'status': True, 'payload': payload, 'message': message}), 200

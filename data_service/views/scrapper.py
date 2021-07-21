@@ -1,5 +1,7 @@
 import typing
 from flask import jsonify, current_app
+
+from data_service.config.exceptions import DataServiceError
 from data_service.store.scrapper import ScrapperTempStore
 from data_service.utils.utils import create_id
 from data_service.config.exception_handlers import handle_view_errors
@@ -22,7 +24,8 @@ class ScrapperView:
             scrapper_instance.data = scrapper_data.get('data')
             key = scrapper_instance.put()
             if key is None:
-                return jsonify({'status': False, 'message': 'Unable to update database'}), 500
+                message: str = "Unable to save database"
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': False, 'message': "successfully created scrapped data"}), 200
         else:
             return jsonify({'status': False, 'message': "invalid data format"}), 500

@@ -389,7 +389,7 @@ class CatchStockErrors(StockViewContext):
             return not (stock_id_exist or stock_code_exist or symbol_exist)
 
         message: str = "Unable to verify input data, Due to database error please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_add_stock_async(self, stock_code: typing.Union[str, None] = None,
                                   symbol: typing.Union[str, None] = None,
@@ -401,7 +401,8 @@ class CatchStockErrors(StockViewContext):
             return not (stock_id_exist or stock_code_exist or symbol_exist)
 
         message: str = "Unable to verify input data, Due to database error please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
+
 
 
 # noinspection DuplicatedCode
@@ -498,7 +499,7 @@ class CatchBrokerErrors(StockViewContext):
         if isinstance(broker_id_exist, bool) and isinstance(broker_code_exist, bool):
             return not (broker_id_exist or broker_code_exist)
         message: str = "Unable to verify broker data due to database errors please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_add_broker_async(self, broker_id: typing.Union[str, None],
                                    broker_code: typing.Union[str, None]) -> bool:
@@ -507,7 +508,7 @@ class CatchBrokerErrors(StockViewContext):
         if isinstance(broker_id_exist, bool) and isinstance(broker_code_exist, bool):
             return not (broker_id_exist or broker_code_exist)
         message: str = "Unable to verify broker data due to database errors please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
 
 # noinspection DuplicatedCode
@@ -557,7 +558,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             key = stock_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             message: str = "Stock Duplicate detected, you cannot add duplicate stock in here"
             return jsonify({'status': False, 'message': message}), 500
@@ -575,7 +577,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             key = stock_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             message: str = "Stock Duplicate detected, you cannot add duplicate stock in here"
             return jsonify({'status': False, 'message': message}), 500
@@ -593,7 +596,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             key = broker_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             message: str = "cannot create broker data, duplicates would be created"
             return jsonify({'status': False, 'message': message}), 500
@@ -610,7 +614,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             key = broker_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             message: str = "cannot create broker data, duplicates would be created"
             return jsonify({'status': False, 'message': message}), 500
@@ -633,7 +638,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = stock_model_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
+
         return jsonify({'status': True, 'message': 'Stock Model Successfully created',
                         'payload': stock_model_instance.to_dict()}), 200
 
@@ -653,7 +659,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = stock_model_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
+
         return jsonify({'status': True, 'message': 'Stock Model Successfully created',
                         'payload': stock_model_instance.to_dict()}), 200
 
@@ -672,7 +679,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = buy_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
 
         message: str = "Buy volume successfully created"
         return jsonify({'status': True, 'message': message, 'payload': buy_volume_instance.to_dict()}), 200
@@ -691,7 +698,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = buy_volume_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
 
         message: str = "Buy volume successfully created"
         return jsonify({'status': True, 'message': message, 'payload': buy_volume_instance.to_dict()}), 200
@@ -712,7 +719,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = sell_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
+
         return jsonify({'status': True, 'message': 'Sell Volume Successfully created',
                         'payload': sell_volume_instance.to_dict()}), 200
 
@@ -732,7 +740,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = sell_volume_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
+
         return jsonify({'status': True, 'message': 'Sell Volume Successfully created',
                         'payload': sell_volume_instance.to_dict()}), 200
 
@@ -763,7 +772,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = net_volume_instance.put(retries=self._max_retries, timeout=self._max_timeout)
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
+
         message: str = 'Net Volume Successfully created'
         return jsonify({'status': True, 'message': message,
                         'payload': net_volume_instance.to_dict()}), 200
@@ -795,7 +805,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
         key = net_volume_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
         if key is None:
             message: str = "For some strange reason we could not save your data to database"
-            raise DataServiceError(message)
+            raise DataServiceError(status=500, description=message)
+
         message: str = 'Net Volume Successfully created'
         return jsonify({'status': True, 'message': message,
                         'payload': net_volume_instance.to_dict()}), 200
@@ -817,7 +828,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'successfully updated stock'}), 200
             else:
                 message: str = "Unable to update stock data due to database erros"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             message: str = "Could not find stock please try again later"
             return jsonify({'status': False, 'message': message}), 500
@@ -839,7 +851,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'successfully updated stock'}), 200
             else:
                 message: str = "Unable to update stock data due to database erros"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             message: str = "Could not find stock please try again later"
             return jsonify({'status': False, 'message': message}), 500
@@ -859,7 +872,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'broker instance updated successfully'}), 200
             else:
                 message: str = 'while updating broker something snapped'
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
 
     @data_wrappers.get_broker_data
     @use_context
@@ -876,7 +889,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'broker instance updated successfully'}), 200
             else:
                 message: str = 'while updating broker something snapped'
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
 
     @use_context
     @handle_view_errors
@@ -925,7 +938,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'stock model is update'}), 200
             else:
                 message: str = 'Something snapped while updating stock model'
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
 
@@ -978,7 +992,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'stock model is update'}), 200
             else:
                 message: str = 'Something snapped while updating stock model'
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             return jsonify({'status': False, 'message': 'Stock Model not found'}), 500
 
@@ -1001,7 +1016,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             key = buy_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             return jsonify({'status': False, 'message': 'buy volume not found'}), 500
 
@@ -1027,7 +1043,8 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
             key = buy_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "For some strange reason we could not save your data to database"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
+
         else:
             return jsonify({'status': False, 'message': 'buy volume not found'}), 500
 
@@ -1059,7 +1076,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'sell volume successfully updated'}), 200
             else:
                 message: str = "something snapped updating sell volume"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
 
     @data_wrappers.get_sell_volume_data
     @use_context
@@ -1086,7 +1103,7 @@ class StockView(CatchStockErrors, CatchBrokerErrors):
                                 'message': 'sell volume successfully updated'}), 200
             else:
                 message: str = "something snapped updating sell volume"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
 
     @cache_stocks.cached(timeout=return_ttl(name='medium'), unless=end_of_month)
     @use_context

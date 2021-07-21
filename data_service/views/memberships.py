@@ -33,7 +33,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
             return user_valid and not plan_exist and date_valid
 
         message: str = "Unable to verify input data, due to database error, please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_add_member_async(self, uid: typing.Union[str, None], plan_id: typing.Union[str, None],
                                    start_date: date) -> bool:
@@ -45,21 +45,21 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
             return user_valid and not plan_exist and date_valid
 
         message: str = "Unable to verify input data, due to database error, please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     def can_add_plan(self, plan_name: typing.Union[str, None]) -> bool:
         name_exist: typing.Union[None, bool] = self.plan_name_exist(plan_name)
         if isinstance(name_exist, bool):
             return not name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_add_plan_async(self, plan_name: typing.Union[str, None]) -> bool:
         name_exist: typing.Union[None, bool] = await self.plan_name_exist_async(plan_name)
         if isinstance(name_exist, bool):
             return not name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     def can_update_plan(self, plan_id: typing.Union[str, None], plan_name: typing.Union[str, None]) -> bool:
         plan_exist: typing.Union[None, bool] = self.plan_exist(plan_id=plan_id)
@@ -67,7 +67,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         if isinstance(plan_exist, bool) and isinstance(plan_name_exist, bool):
             return plan_exist and plan_name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_update_plan_async(self, plan_id: typing.Union[str, None], plan_name: typing.Union[str, None]) -> bool:
         plan_exist: typing.Union[None, bool] = await self.plan_exist_async(plan_id=plan_id)
@@ -75,7 +75,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         if isinstance(plan_exist, bool) and isinstance(plan_name_exist, bool):
             return plan_exist and plan_name_exist
         message: str = "Unable to verify input data, due to database error, please try again later"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     def can_add_coupon(self, code: typing.Union[str, None], expiration_time: typing.Union[int, None],
                        discount: typing.Union[int, None]) -> bool:
@@ -86,7 +86,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return (not coupon_exist) and expiration_valid and discount_valid
         message: str = "Unable to verify input data"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_add_coupon_async(self, code: typing.Union[str, None], expiration_time: typing.Union[int, None],
                                    discount: typing.Union[int, None]) -> bool:
@@ -97,7 +97,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return (not coupon_exist) and expiration_valid and discount_valid
         message: str = "Unable to verify input data"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     def can_update_coupon(self, code: typing.Union[str, None], expiration_time: typing.Union[int, None],
                           discount: typing.Union[int, None]) -> bool:
@@ -108,7 +108,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return coupon_exist and expiration_valid and discount_valid
         message: str = "Unable to verify input data"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
     async def can_update_coupon_async(self, code: typing.Union[str, None], expiration_time: typing.Union[int, None],
                                       discount: typing.Union[int, None]) -> bool:
@@ -119,7 +119,7 @@ class Validators(UserValid, PlanValid, MemberValid, CouponValid):
         if isinstance(coupon_exist, bool) and isinstance(expiration_valid, bool) and isinstance(discount_valid, bool):
             return coupon_exist and expiration_valid and discount_valid
         message: str = "Unable to verify input data"
-        raise DataServiceError(message)
+        raise DataServiceError(status=500, description=message)
 
 
 # noinspection DuplicatedCode
@@ -146,7 +146,7 @@ class MembershipsView(Validators):
             key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully updated membership',
                             'payload': membership_instance.to_dict()}), 200
 
@@ -172,7 +172,7 @@ class MembershipsView(Validators):
             key = membership_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully updated membership',
                             'payload': membership_instance.to_dict()}), 200
 
@@ -206,7 +206,7 @@ class MembershipsView(Validators):
             key = membership_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
             message: str = "Successfully update membership status"
             return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message}), 200
         message: str = "Memberships record not found"
@@ -222,7 +222,7 @@ class MembershipsView(Validators):
             key = membership_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Unable to save membership instance to database, please try again"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
             message: str = "Successfully update membership status"
             return jsonify({'status': True, 'payload': membership_instance.to_dict(), 'message': message}), 200
         message: str = "Memberships record not found"
@@ -245,7 +245,7 @@ class MembershipsView(Validators):
                                               timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to Change Membership, please try again later"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = "Unable to change membership, cannot find original membership record"
             return jsonify({'status': False, 'message': message}), 500
@@ -269,7 +269,7 @@ class MembershipsView(Validators):
                                                     timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Unable to Change Membership, please try again later"
-                raise DataServiceError(message)
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = "Unable to change membership, cannot find original membership record"
             return jsonify({'status': False, 'message': message}), 500
@@ -451,14 +451,14 @@ class MembershipsView(Validators):
             for a specific user return payment amount
         """
         membership_instance: Memberships = Memberships.query(Memberships.uid == uid).get()
-        print(membership_instance)
+
         if isinstance(membership_instance, Memberships):
             plan_id: str = membership_instance.plan_id
             membership_plan_instance: MembershipPlans = MembershipPlansView().get_plan(plan_id=plan_id)
             if membership_plan_instance is None:
                 message: str = 'could not find plan associate with the plan_id'
                 return jsonify({'status': False, 'message': message}), 500
-            print(membership_plan_instance)
+
             if (membership_plan_instance.term_payment_amount is not None) and (
                     membership_plan_instance.registration_amount is not None):
                 amount_data: dict = {
@@ -531,7 +531,7 @@ class MembershipsView(Validators):
             key = membership_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = 'for some reason we are unable to set payment status'
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = "Membership not found"
             return jsonify({'status': False, 'message': message}), 500
@@ -611,7 +611,7 @@ class MembershipPlansView(Validators):
             key = plan_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = 'Unable to create plan'
             return jsonify({'status': False, 'message': message}), 500
@@ -683,7 +683,7 @@ class MembershipPlansView(Validators):
             key = plan_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = 'Unable to create plan'
             return jsonify({'status': False, 'message': message}), 500
@@ -711,7 +711,7 @@ class MembershipPlansView(Validators):
                 key = membership_plans_instance.put(retries=self._max_retries, timeout=self._max_timeout)
                 if key is None:
                     message: str = 'for some reason we are unable to create a new plan'
-                    return jsonify({'status': False, 'message': message}), 500
+                    raise DataServiceError(status=500, description=message)
                 return jsonify({'status': True, 'message': 'successfully created new membership plan',
                                 'payload': membership_plans_instance.to_dict()}), 200
             else:
@@ -745,7 +745,7 @@ class MembershipPlansView(Validators):
                     retries=self._max_retries, timeout=self._max_timeout).get_result()
                 if key is None:
                     message: str = 'for some reason we are unable to create a new plan'
-                    return jsonify({'status': False, 'message': message}), 500
+                    raise DataServiceError(status=500, description=message)
                 return jsonify({'status': True, 'message': 'successfully created new membership plan',
                                 'payload': membership_plans_instance.to_dict()}), 200
             else:
@@ -782,7 +782,7 @@ class MembershipPlansView(Validators):
             key = membership_plans_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = 'for some reason we are unable to create a new plan'
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully update membership plan status',
                             'payload': membership_plans_instance.to_dict()}), 200
         else:
@@ -957,7 +957,7 @@ class CouponsView(Validators):
             key = coupons_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "an error occured while creating coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = 'Unable to add coupon, please check expiration time or coupon code'
             return jsonify({'status': False, 'message': message}), 500
@@ -974,7 +974,7 @@ class CouponsView(Validators):
             key = coupons_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "an error occured while creating coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
         else:
             message: str = 'Unable to add coupon, please check expiration time or coupon code'
             return jsonify({'status': False, 'message': message}), 500
@@ -992,7 +992,7 @@ class CouponsView(Validators):
             key = coupon_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Error updating coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
 
             return jsonify({'status': True, 'message': 'successfully updated coupon'}), 200
         else:
@@ -1010,7 +1010,7 @@ class CouponsView(Validators):
             key = coupon_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Error updating coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
 
             return jsonify({'status': True, 'message': 'successfully updated coupon'}), 200
         else:
@@ -1032,7 +1032,7 @@ class CouponsView(Validators):
             key = coupon_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
                 message: str = "Unable to cancel coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully cancelled coupon code'}), 200
 
         return jsonify({'status': False, 'message': 'unable to cancel coupon code'}), 500
@@ -1051,7 +1051,7 @@ class CouponsView(Validators):
             key = coupon_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Unable to cancel coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully cancelled coupon code'}), 200
 
         return jsonify({'status': False, 'message': 'unable to cancel coupon code'}), 500
@@ -1070,7 +1070,7 @@ class CouponsView(Validators):
             key = coupon_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
                 message: str = "Unable to cancel coupon"
-                return jsonify({'status': False, 'message': message}), 500
+                raise DataServiceError(status=500, description=message)
             return jsonify({'status': True, 'message': 'successfully cancelled coupon code'}), 200
 
         return jsonify({'status': False, 'message': 'unable to cancel coupon code'}), 500
