@@ -21,22 +21,22 @@ def handle_view_errors(func):
             return({'status': False, 'message': message}), 500
         except TypeError as e:
             message: str = str(e)
-            raise InputError(description='Bad input values, please check your input')
+            raise InputError(status=500, description='Bad input values, please check your input')
         except BadRequestError as e:
             message: str = str(e)
-            raise RequestError(description='Bad request while connecting to database')
+            raise RequestError(status=500, description='Bad request while connecting to database')
         except BadQueryError as e:
             message: str = str(e)
-            raise DataServiceError(description="Error creating database query please check your input")
+            raise DataServiceError(status=500, description="Error creating database query please check your input")
         except ConnectionRefusedError as e:
             message: str = str(e)
-            raise RequestError(description="database server is refusing connection please try again later")
+            raise RequestError(status=500, description="database server is refusing connection please try again later")
         except RetryError as e:
             message: str = str(e)
-            raise RequestError(description="database server is refusing connection please try again later")
+            raise RequestError(status=500, description="database server is refusing connection please try again later")
         except Aborted as e:
             message: str = str(e.message or e)
-            raise RequestError(description="database server is refusing connection please try again later")
+            raise RequestError(status=500, description="database server is refusing connection please try again later")
 
     return wrapper
 
@@ -54,6 +54,10 @@ def handle_store_errors(func):
         except RetryError:
             return None
         except Aborted:
+            return None
+        except BadQueryError:
+            return None
+        except BadRequestError:
             return None
 
     return wrapper
