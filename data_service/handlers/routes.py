@@ -49,7 +49,7 @@ def handle_un_authorized_requests(e: Unauthorized) -> tuple:
 
 @default_handlers_bp.app_errorhandler(UnAuthenticatedError)
 def handle_un_authorized_requests(e: UnAuthenticatedError) -> tuple:
-    return jsonify({'status': False, 'message': UnAuthenticatedError.description}), UnAuthenticatedError.code
+    return jsonify({'status': False, 'message': e.description}), e.code
 
 
 # noinspection PyUnusedLocal

@@ -308,3 +308,5 @@ class WalletView(Validator):
         message: str = "Unable to find wallet"
         return jsonify({'status': False, 'message': message}), 500
 
+
+    # TODO add wallet_withdrawals

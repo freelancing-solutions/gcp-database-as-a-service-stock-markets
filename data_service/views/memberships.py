@@ -1140,8 +1140,9 @@ class CouponsView(Validators):
             return jsonify({'status': False, 'message': 'coupon is required'}), 500
         coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
         if isinstance(coupon_instance, Coupons):
-            message: str = "Coupon has be found"
+            message: str = "Coupon has been found"
             return jsonify({'status': True, 'message': message, 'payload': coupon_instance.to_dict()}), 200
+
         message: str = "Invalid Coupon Code"
         return jsonify({'status': True, 'message': message}), 500
 
@@ -1155,7 +1156,7 @@ class CouponsView(Validators):
             return jsonify({'status': False, 'message': 'coupon is required'}), 500
         coupon_instance: Coupons = Coupons.query(Coupons.code == code).get_async().get_result()
         if isinstance(coupon_instance, Coupons):
-            message: str = "Coupon has be found"
+            message: str = "Coupon has been found"
             return jsonify({'status': True, 'message': message, 'payload': coupon_instance.to_dict()}), 200
         message: str = "Invalid Coupon Code"
         return jsonify({'status': True, 'message': message}), 500
