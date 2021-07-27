@@ -110,7 +110,7 @@ class WalletTransactionsModel(ndb.Model):
     uid: str = ndb.StringProperty(validator=setters.set_id)
     transaction_id: str = ndb.StringProperty(validator=setters.set_id)
     transaction_type: str = ndb.StringProperty(validator=setters.set_transaction_types)
-    transaction_date: str = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_datetime)
+    transaction_date: datetime = ndb.DateTimeProperty(auto_now_add=True, validator=setters.set_datetime)
 
     def __str__(self) -> str:
         return "<Transactions {} {}".format(self.transaction_type, self.transaction_date)

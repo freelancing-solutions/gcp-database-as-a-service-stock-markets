@@ -44,7 +44,7 @@ def handle_auth(func):
         secret_token = request.headers.get('x-auth-token')
         if secret_token is None:
             message: str = 'You are not authorized to use this resources'
-            raise Unauthorized(message)
+            raise Unauthorized(description=message)
             # request not authorized reject
         if secret_token == os.environ.get('SECRET'):
             return func(*args, **kwargs)

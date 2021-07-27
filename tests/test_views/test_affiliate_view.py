@@ -45,6 +45,7 @@ def test_register_affiliate(mocker):
     mocker.patch('google.cloud.ndb.Model.query', return_value=AffiliateQueryMock())
     mocker.patch('data_service.store.affiliates.AffiliatesValidators.user_already_registered', return_value=False)
 
+
     with test_app().app_context():
         affiliates_view_instance = AffiliatesView()
         response, status = affiliates_view_instance.register_affiliate(affiliate_data=affiliate_data_mock)
