@@ -7,3 +7,4 @@ app.yaml
 .pytest_cache/
 *.pyc
 open-api.json
+.vscode/settings.json

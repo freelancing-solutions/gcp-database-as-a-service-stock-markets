@@ -191,6 +191,9 @@ class CouponsValidator:
 
 
 class ClassSetters:
+    """
+        Used to validate fields on datastore database
+    """
     def __init__(self):
         pass
 
