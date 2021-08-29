@@ -2,9 +2,7 @@ import random
 import typing
 from datetime import datetime, timedelta
 from random import randint
-
 from google.cloud import ndb
-
 from data_service.config.stocks import currency_symbols
 from data_service.store.mixins import AmountMixin
 from data_service.views.memberships import MembershipsView

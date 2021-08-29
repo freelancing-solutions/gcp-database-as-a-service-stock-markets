@@ -973,7 +973,7 @@ class CouponsView(Validators):
             coupons_instance: Coupons = Coupons(code=code, discount=discount, expiration_time=expiration_time)
             key = coupons_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
-                message: str = "an error occured while creating coupon"
+                message: str = "an error occurred while creating coupon"
                 raise DataServiceError(status=500, description=message)
         else:
             message: str = 'Unable to add coupon, please check expiration time or coupon code'
@@ -1027,7 +1027,7 @@ class CouponsView(Validators):
             return jsonify({'status': False, 'message': message}), 500
 
         coupon_instance: Coupons = Coupons.query(Coupons.code == code).get()
-        if isinstance(coupon_instance, Coupons):
+        if isinstance(coupon_instance, Coupons) and coupon_instance.code == code:
             coupon_instance.is_valid = False
             key = coupon_instance.put(retries=self._max_retries, timeout=self._max_timeout)
             if key is None:
@@ -1046,7 +1046,7 @@ class CouponsView(Validators):
             message: str = "Coupon Code is required"
             return jsonify({'status': False, 'message': message}), 500
         coupon_instance: Coupons = Coupons.query(Coupons.code == code).get_async().get_result()
-        if isinstance(coupon_instance, Coupons):
+        if isinstance(coupon_instance, Coupons)and coupon_instance.code == code:
             coupon_instance.is_valid = False
             key = coupon_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
@@ -1065,7 +1065,7 @@ class CouponsView(Validators):
             message: str = "Coupon Code is required"
             return jsonify({'status': False, 'message': message}), 500
         coupon_instance: Coupons = Coupons.query(Coupons.code == code).get_async().get_result()
-        if isinstance(coupon_instance, Coupons):
+        if isinstance(coupon_instance, Coupons) and coupon_instance.code == code:
             coupon_instance.is_valid = False
             key = coupon_instance.put_async(retries=self._max_retries, timeout=self._max_timeout).get_result()
             if key is None:
